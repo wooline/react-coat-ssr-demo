@@ -1,0 +1,10 @@
+{
+  "extends": "airbnb-base",
+  "rules": {
+    "import/no-dynamic-require": "off",
+    "no-console": "off",
+    "no-underscore-dangle": "off",
+    "no-useless-concat": "off",
+    "max-len": ["error", {"code": 300}]
+  }
+}
