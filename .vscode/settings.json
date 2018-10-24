@@ -4,5 +4,6 @@
   "editor.formatOnSave": true,
   "prettier.tslintIntegration": true,
   "prettier.stylelintIntegration": true,
-  "prettier.eslintIntegration": true
+  "prettier.eslintIntegration": true,
+  "typescript.updateImportsOnFileMove.enabled": "never"
 }

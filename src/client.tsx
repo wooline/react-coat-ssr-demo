@@ -1,5 +1,4 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import App from "./App";
+import App from "modules/app/views";
+import {buildApp} from "react-coat-pkg";
 
-ReactDOM.render(<App />, document.getElementById("root") as HTMLElement);
+buildApp(App, "root");

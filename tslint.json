@@ -1,6 +1,9 @@
 {
   "extends": ["tslint:recommended", "tslint-react"],
   "rules": {
+    "max-line-length": [true, 300],
+    "object-literal-sort-keys": false,
+    "interface-name": [true, "never-prefix"],
     "no-console": false,
     "jsx-no-lambda": false
   },

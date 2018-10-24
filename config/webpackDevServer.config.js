@@ -1,3 +1,4 @@
+const request = require('request');
 const paths = require('./paths');
 
 const config = {
@@ -5,7 +6,7 @@ const config = {
   watchContentBase: true,
   publicPath: '/',
   compress: true,
-  historyApiFallback: true,
+  historyApiFallback: false,
   hot: true,
   overlay: {
     warnings: true,
@@ -16,5 +17,20 @@ const config = {
   },
   // clientLogLevel: 'none',
   quiet: false,
+  before: (app) => {
+    app.use((req, res, next) => {
+      if (req.url.startsWith('/server/') || req.url.startsWith('/client/')) {
+        next();
+      } else {
+        request(`${req.protocol}://${req.headers.host}/server/js/main.js`, (error, response, body) => {
+          if (body) {
+            res.send(body);
+          } else {
+            res.send(error.toString());
+          }
+        });
+      }
+    });
+  },
 };
 module.exports = config;

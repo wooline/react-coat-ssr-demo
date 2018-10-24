@@ -4,8 +4,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const PostcssFlexbugsFixes = require('postcss-flexbugs-fixes');
 const PostcssPresetEnv = require('postcss-preset-env');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const paths = require('./paths');
+
+const tsCompilerOptions = require(path.join(paths.rootPath, './tsconfig.json')).compilerOptions;
+tsCompilerOptions.target = 'es2017';
 
 const getStyleLoaders = (cssOptions, preProcessor) => {
   const loaders = [
@@ -49,8 +51,8 @@ const clientConfig = {
   entry: [path.join(paths.srcPath, './client')],
   output: {
     path: paths.distClientPath,
-    filename: 'static/js/[name].[chunkhash:8].js',
-    chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
+    filename: 'js/[name].[chunkhash:8].js',
+    chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
     publicPath: paths.sitePath,
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info => path.relative(paths.srcPath, info.absoluteResourcePath).replace(/\\/g, '/'),
@@ -74,7 +76,11 @@ const clientConfig = {
       chunks: 'async',
     },
     // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
-    runtimeChunk: true,
+    runtimeChunk: 'single',
+  },
+  performance: {
+    maxEntrypointSize: 1000000,
+    maxAssetSize: 1000000,
   },
   module: {
     strictExportPresence: true,
@@ -102,15 +108,14 @@ const clientConfig = {
         include: paths.srcPath,
         loader: require.resolve('url-loader'),
         query: {
-          name: 'static/media/[name].[hash:8].[ext]',
+          name: 'media/[name].[hash:8].[ext]',
         },
       },
     ],
   },
   plugins: [
-    new CleanWebpackPlugin(paths.distPath, { root: paths.rootPath }),
     new HtmlWebpackPlugin({
-      template: path.join(paths.publicPath, './index.html'),
+      template: path.join(paths.publicPath, './server/tpl.html'),
     }),
     new ManifestPlugin({
       fileName: 'asset-manifest.json',
@@ -128,9 +133,10 @@ const serverConfig = {
   devtool: false,
   entry: [path.join(paths.srcPath, './server')],
   output: {
+    libraryTarget: 'commonjs2',
     path: paths.distServerPath,
-    filename: 'static/js/[name].[chunkhash:8].js',
-    chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
+    filename: '[name].js',
+    chunkFilename: '[name].chunk.js',
     publicPath: paths.sitePath,
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info => path.relative(paths.srcPath, info.absoluteResourcePath).replace(/\\/g, '/'),
@@ -152,9 +158,20 @@ const serverConfig = {
     minimize: false,
     splitChunks: {
       chunks: 'async',
+      cacheGroups: {
+        vendor: {
+          chunks: 'async',
+          name: 'vendor',
+          enforce: true,
+        },
+      },
     },
     // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
-    runtimeChunk: true,
+    runtimeChunk: false,
+  },
+  performance: {
+    maxEntrypointSize: 1000000,
+    maxAssetSize: 1000000,
   },
   module: {
     strictExportPresence: true,
@@ -164,36 +181,12 @@ const serverConfig = {
         include: paths.srcPath,
         loader: require.resolve('ts-loader'),
         options: {
+          compilerOptions: tsCompilerOptions,
           transpileOnly: true,
-        },
-      },
-      {
-        test: /\.css$/,
-        use: getStyleLoaders({
-          importLoaders: 1,
-        }),
-      },
-      {
-        test: /\.less$/,
-        use: getStyleLoaders({ importLoaders: 2 }, 'less-loader'),
-      },
-      {
-        test: /\.(png|jpe?g|gif)$/,
-        include: paths.srcPath,
-        loader: require.resolve('url-loader'),
-        query: {
-          name: 'static/media/[name].[hash:8].[ext]',
         },
       },
     ],
   },
-  plugins: [
-    new ManifestPlugin({
-      fileName: 'asset-manifest.json',
-      publicPath: paths.sitePath,
-    }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new webpack.ProgressPlugin(),
-  ],
+  plugins: [new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/), new webpack.ProgressPlugin()],
 };
 module.exports = [clientConfig, serverConfig];

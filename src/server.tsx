@@ -1,5 +1,6 @@
-import * as React from "react";
-import * as ReactServer from "react-dom/server";
-import App from "./App";
+import App from "modules/app/views";
+import {renderApp} from "react-coat-pkg";
 
-export default ReactServer.renderToString(<App />);
+export default function render() {
+  return renderApp(App);
+}

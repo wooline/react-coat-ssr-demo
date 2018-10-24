@@ -42,15 +42,14 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
 
 const clientConfig = {
   mode: 'development',
-  context: paths.srcPath,
-  entry: ['./client'],
+  entry: [path.join(paths.srcPath, './client')],
   output: {
     pathinfo: true, // 输入代码添加额外的路径注释，提高代码可读性
-    filename: 'static/js/[name].js',
-    chunkFilename: 'static/js/[name].chunk.js',
-    publicPath: '/client',
+    filename: 'client/js/[name].js',
+    chunkFilename: 'client/js/[name].chunk.js',
+    publicPath: '/',
     // Point sourcemap entries to original disk location (format as URL on Windows)
-    devtoolModuleFilenameTemplate: info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/client'),
+    devtoolModuleFilenameTemplate: info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -97,11 +96,11 @@ const clientConfig = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(paths.publicPath, './index.html'),
+      template: path.join(paths.publicPath, './server/tpl.html'),
     }),
     new ManifestPlugin({
       fileName: 'asset-manifest.json',
-      publicPath: '/client',
+      publicPath: '/',
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.HotModuleReplacementPlugin(),
@@ -116,11 +115,12 @@ const serverConfig = {
   devtool: false,
   entry: [path.join(paths.srcPath, './server')],
   output: {
-    filename: 'static/js/[name].js',
-    chunkFilename: 'static/js/[name].chunk.js',
-    publicPath: '/server',
+    libraryTarget: 'commonjs2',
+    filename: 'server/js/[name].js',
+    chunkFilename: 'server/js/[name].chunk.js',
+    publicPath: '/',
     // Point sourcemap entries to original disk location (format as URL on Windows)
-    devtoolModuleFilenameTemplate: info => path.relative(paths.srcPath, info.absoluteResourcePath).replace(/\\/g, '/server'),
+    devtoolModuleFilenameTemplate: info => path.relative(paths.srcPath, info.absoluteResourcePath).replace(/\\/g, '/'),
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
@@ -137,11 +137,9 @@ const serverConfig = {
   },
   optimization: {
     minimize: false,
-    splitChunks: {
-      chunks: 'async',
-    },
-    // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
+    splitChunks: false,
     runtimeChunk: false,
+    // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
   },
   module: {
     strictExportPresence: true,
@@ -154,30 +152,12 @@ const serverConfig = {
           transpileOnly: true,
         },
       },
-      {
-        test: /\.css$/,
-        use: getStyleLoaders({
-          importLoaders: 1,
-        }),
-      },
-      {
-        test: /\.less$/,
-        use: getStyleLoaders({ importLoaders: 2 }, 'less-loader'),
-      },
-      {
-        test: /\.(png|jpe?g|gif)$/,
-        include: paths.srcPath,
-        loader: require.resolve('url-loader'),
-        query: {
-          name: 'static/media/[name].[hash:8].[ext]',
-        },
-      },
     ],
   },
   plugins: [
     new ManifestPlugin({
       fileName: 'asset-manifest.json',
-      publicPath: paths.sitePath,
+      publicPath: '/',
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.ProgressPlugin(),

@@ -4,13 +4,14 @@
     "outDir": "build",
     "module": "esnext",
     "target": "es5",
-    "lib": ["esnext", "dom"],
+    "lib": ["es2017", "dom"],
     "sourceMap": true,
     "allowJs": true,
     "jsx": "react",
     "moduleResolution": "node",
     "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "noImplicitAny": true,
@@ -19,5 +20,5 @@
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true
   },
-  "exclude": ["node_modules", "build", "config", "scripts"]
+  "exclude": ["node_modules", "build", "config", "scripts", "public"]
 }
