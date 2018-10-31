@@ -3,9 +3,11 @@ const path = require('path');
 const fs = require('fs-extra');
 const paths = require('../config/paths');
 
+const appPackage = require(path.join(paths.rootPath, './package.json'));
+
 const webpackConfig = require(path.join(paths.configPath, './webpack.config.prod'));
 
-const compiler = webpack(webpackConfig);
+const compiler = webpack(appPackage.devServer.ssr ? webpackConfig : webpackConfig[0]);
 
 fs.emptyDirSync(paths.distPath);
 fs.copySync(paths.publicPath, paths.distPath, { dereference: true });

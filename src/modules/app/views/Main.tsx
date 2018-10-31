@@ -2,10 +2,13 @@ import RootState from "core/RootState";
 import {StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import * as React from "react";
-import {LoadingState} from "react-coat-pkg";
-import {connect} from "react-redux";
+import {loader, LoadingState} from "react-coat-pkg";
+import {connect, DispatchProp} from "react-redux";
+import {Redirect, Route, Switch} from "react-router-dom";
+import LoginForm from "./LoginForm";
 
-interface Props {
+const Photos = loader(() => import("modules/photos/views"));
+interface Props extends DispatchProp {
   curUser: CurUser;
   startupStep: StartupStep;
   globalLoading: LoadingState;
@@ -13,10 +16,13 @@ interface Props {
 
 class Component extends React.PureComponent<Props> {
   public render() {
-    const {curUser, startupStep} = this.props;
     return (
       <div id="application">
-        {curUser && curUser.username} - {startupStep}
+        <Switch>
+          <Redirect exact={true} path="/" to="/photos" />
+          <Route exact={true} path="/photos" component={Photos} />
+          <Route exact={true} path="/login" component={LoginForm} />
+        </Switch>
       </div>
     );
   }

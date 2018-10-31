@@ -1,13 +1,24 @@
+import {CustomError, RedirectError} from "core/Errors";
 import RootState from "core/RootState";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, globalLoading, loading, LoadingState, reducer} from "react-coat-pkg";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, globalLoading, loading, LoadingState, reducer, RouterState} from "react-coat-pkg";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 import {NAMESPACE} from "./exportNames";
 
+enum SubModule {
+  photos = "photos",
+  videos = "videos",
+  my = "my",
+}
+interface Router {
+  subModule: SubModule;
+}
+
 // 定义本模块的State
 export interface ModuleState extends BaseModuleState {
+  subModule: SubModule;
   projectConfig: ProjectConfig;
   curUser: CurUser;
   startupStep: StartupStep;
@@ -22,6 +33,7 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
   constructor() {
     // 定义本模块State的初始值
     const initState: ModuleState = {
+      subModule: null,
       projectConfig: null,
       curUser: null,
       startupStep: StartupStep.init,
@@ -54,12 +66,20 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
     return {...this.state, curUser};
   }
 
+  protected parseRouter(router: RouterState): Router {
+    return {subModule: SubModule[router.location.pathname.replace(/^\//, "")] || SubModule.photos};
+  }
   // 兼听自已的INIT Action，做一些异步数据请求，不需要手动触发，所以请使用protected或private
   @globalLoading // 使用全局loading状态
   @effect
   protected async [NAMESPACE + "/INIT"]() {
     const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);
-    this.dispatch(this.callThisAction(this.UPDATE, {...this.state, projectConfig, curUser, startupStep: StartupStep.configLoaded}));
+    const router = this.parseRouter(this.rootState.router);
+    if (router.subModule === SubModule.my && !curUser.hasLogin) {
+      throw new RedirectError("301", "/login");
+    }
+    this.dispatch(this.callThisAction(this.UPDATE, {...this.state, subModule: router.subModule, projectConfig, curUser, startupStep: StartupStep.configLoaded}));
+    await import(`modules/${router.subModule}/model`).then((subModel) => subModel.default(this.store));
     // const pathname = this.rootState.router.location.pathname;
     // const views = { level1: null };
     // if (pathname.startsWith("/admin")) {
@@ -77,9 +97,12 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
   // 兼听全局错误的Action，并发送给后台
   // 兼听外部模块的Action，不需要手动触发，所以请使用protected或private
   @effect
-  protected async [ERROR](payload: Error) {
-    alert(payload.message || payload);
-    await settingsService.api.reportError(payload);
+  protected async [ERROR](error: CustomError) {
+    if (error.code === "301" || error.code === "302") {
+      this.dispatch(this.routerActions.replace(error.detail));
+    } else {
+      await settingsService.api.reportError(error);
+    }
   }
 }
 

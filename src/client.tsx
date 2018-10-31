@@ -1,4 +1,14 @@
-import App from "modules/app/views";
+import Model from "modules/app/model";
+import {Main} from "modules/app/views";
 import {buildApp} from "react-coat-pkg";
 
-buildApp(App, "root");
+declare global {
+  interface Window {
+    reactCoatInitStore: {
+      api: string;
+      wh: [number, number];
+    };
+  }
+}
+
+buildApp(Model, Main, "root", {initData: window.reactCoatInitStore});

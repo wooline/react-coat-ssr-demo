@@ -15,7 +15,6 @@ export class API {
   }
   @delayPromise(3)
   public reportError(error: any): Promise<boolean> {
-    console.log("reportError", error);
     return Promise.resolve(true);
   }
 }

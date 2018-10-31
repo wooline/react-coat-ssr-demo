@@ -3,7 +3,9 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
 const PostcssFlexbugsFixes = require('postcss-flexbugs-fixes');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const PostcssPresetEnv = require('postcss-preset-env');
+
 const paths = require('./paths');
 
 const tsCompilerOptions = require(path.join(paths.rootPath, './tsconfig.json')).compilerOptions;
@@ -73,7 +75,8 @@ const clientConfig = {
   optimization: {
     minimize: false,
     splitChunks: {
-      chunks: 'async',
+      chunks: 'all',
+      minSize: 30000,
     },
     // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
     runtimeChunk: 'single',
@@ -115,11 +118,16 @@ const clientConfig = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(paths.publicPath, './server/tpl.html'),
+      template: path.join(paths.publicPath, './client/index.html'),
     }),
     new ManifestPlugin({
       fileName: 'asset-manifest.json',
       publicPath: paths.sitePath,
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      tsconfig: path.join(paths.rootPath, './tsconfig.json'),
+      tslint: path.join(paths.rootPath, './tslint.json'),
+      workers: ForkTsCheckerWebpackPlugin.TWO_CPUS_FREE,
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.ProgressPlugin(),
@@ -157,12 +165,12 @@ const serverConfig = {
   optimization: {
     minimize: false,
     splitChunks: {
-      chunks: 'async',
       cacheGroups: {
-        vendor: {
-          chunks: 'async',
-          name: 'vendor',
-          enforce: true,
+        default: false,
+        vendors: {
+          minChunks: 1,
+          minSize: 0,
+          name: 'vendors',
         },
       },
     },
@@ -179,11 +187,18 @@ const serverConfig = {
       {
         test: /\.(ts|tsx)$/,
         include: paths.srcPath,
-        loader: require.resolve('ts-loader'),
-        options: {
-          compilerOptions: tsCompilerOptions,
-          transpileOnly: true,
-        },
+        use: [
+          {
+            loader: require.resolve('ts-loader'),
+            options: {
+              compilerOptions: tsCompilerOptions,
+              transpileOnly: true,
+            },
+          },
+          {
+            loader: require.resolve('./import-transformers'),
+          },
+        ],
       },
     ],
   },

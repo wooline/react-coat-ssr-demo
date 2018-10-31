@@ -2,9 +2,13 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const PostcssFlexbugsFixes = require('postcss-flexbugs-fixes');
 const PostcssPresetEnv = require('postcss-preset-env');
 const paths = require('./paths');
+
+const tsCompilerOptions = require(path.join(paths.rootPath, './tsconfig.json')).compilerOptions;
+tsCompilerOptions.target = 'es2017';
 
 const getStyleLoaders = (cssOptions, preProcessor) => {
   const loaders = [
@@ -58,7 +62,7 @@ const clientConfig = {
   devtool: 'cheap-module-source-map',
   optimization: {
     splitChunks: {
-      chunks: 'async',
+      chunks: 'all',
     },
     runtimeChunk: true,
   },
@@ -96,11 +100,16 @@ const clientConfig = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(paths.publicPath, './server/tpl.html'),
+      template: path.join(paths.publicPath, './client/index.html'),
     }),
     new ManifestPlugin({
-      fileName: 'asset-manifest.json',
+      fileName: 'client/asset-manifest.json',
       publicPath: '/',
+    }),
+    new ForkTsCheckerWebpackPlugin({
+      tsconfig: path.join(paths.rootPath, './tsconfig.json'),
+      tslint: path.join(paths.rootPath, './tslint.json'),
+      workers: ForkTsCheckerWebpackPlugin.TWO_CPUS_FREE,
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new webpack.HotModuleReplacementPlugin(),
@@ -109,15 +118,15 @@ const clientConfig = {
 };
 
 const serverConfig = {
-  mode: 'development',
+  mode: 'production',
   target: 'node',
   bail: true,
   devtool: false,
   entry: [path.join(paths.srcPath, './server')],
   output: {
     libraryTarget: 'commonjs2',
-    filename: 'server/js/[name].js',
-    chunkFilename: 'server/js/[name].chunk.js',
+    filename: 'server/[name].js',
+    chunkFilename: 'server/[name].chunk.js',
     publicPath: '/',
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info => path.relative(paths.srcPath, info.absoluteResourcePath).replace(/\\/g, '/'),
@@ -137,7 +146,16 @@ const serverConfig = {
   },
   optimization: {
     minimize: false,
-    splitChunks: false,
+    splitChunks: {
+      cacheGroups: {
+        default: false,
+        vendors: {
+          minChunks: 1,
+          minSize: 0,
+          name: 'vendors',
+        },
+      },
+    },
     runtimeChunk: false,
     // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
   },
@@ -147,21 +165,22 @@ const serverConfig = {
       {
         test: /\.(ts|tsx)$/,
         include: paths.srcPath,
-        loader: require.resolve('ts-loader'),
-        options: {
-          transpileOnly: true,
-        },
+        use: [
+          {
+            loader: require.resolve('ts-loader'),
+            options: {
+              compilerOptions: tsCompilerOptions,
+              transpileOnly: true,
+            },
+          },
+          {
+            loader: require.resolve('./import-transformers'),
+          },
+        ],
       },
     ],
   },
-  plugins: [
-    new ManifestPlugin({
-      fileName: 'asset-manifest.json',
-      publicPath: '/',
-    }),
-    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-    new webpack.ProgressPlugin(),
-  ],
+  plugins: [new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/), new webpack.ProgressPlugin()],
 };
 
 module.exports = [clientConfig, serverConfig];

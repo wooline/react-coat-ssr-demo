@@ -5,7 +5,7 @@ export class API {
   // mock一个耗时3秒的异步请求
   @delayPromise(3)
   public getCurUser(): Promise<CurUser> {
-    return Promise.resolve({uid: "0", username: "guest", hasLogin: true});
+    return Promise.resolve({uid: "0", username: "guest", hasLogin: false});
   }
 
   // mock一个耗时3秒的异步请求
