@@ -75,12 +75,14 @@ const clientConfig = {
   optimization: {
     minimize: false,
     splitChunks: {
-      chunks: 'all',
-      minSize: 30000,
+      cacheGroups: {
+        vendors: false,
+      },
     },
     // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
     runtimeChunk: 'single',
   },
+  stats: { chunkModules: false },
   performance: {
     maxEntrypointSize: 1000000,
     maxAssetSize: 1000000,
@@ -91,10 +93,20 @@ const clientConfig = {
       {
         test: /\.(ts|tsx)$/,
         include: paths.srcPath,
-        loader: require.resolve('ts-loader'),
-        options: {
-          transpileOnly: true,
-        },
+        use: [
+          {
+            loader: require.resolve('ts-loader'),
+            options: {
+              transpileOnly: true,
+            },
+          },
+          {
+            loader: require.resolve('./auto-generate-index'),
+            options: {
+              root: paths.srcPath,
+            },
+          },
+        ],
       },
       {
         test: /\.css$/,
@@ -196,7 +208,10 @@ const serverConfig = {
             },
           },
           {
-            loader: require.resolve('./import-transformers'),
+            loader: require.resolve('./auto-generate-index'),
+            options: {
+              root: paths.srcPath,
+            },
           },
         ],
       },

@@ -30,11 +30,11 @@ const config = {
       if (!appPackage.devServer.ssr || req.url === '/index.html' || req.url.startsWith('/server/') || req.url.startsWith('/client/')) {
         next();
       } else {
-        Promise.all([request(`${req.protocol}://${req.headers.host}/server/main.js`), request(`${req.protocol}://${req.headers.host}/server/vendors.chunk.js`), request(`${req.protocol}://${req.headers.host}/index.html`)])
-          .then(([main, vendors, tpl]) => {
+        Promise.all([request(`${req.protocol}://${req.headers.host}/server/main.js`), request(`${req.protocol}://${req.headers.host}/index.html`)])
+          .then(([main, tpl]) => {
             const mainModule = new Module();
             mainModule._compile(main, 'main.js');
-            const vendorsModule = new Module();
+            /* const vendorsModule = new Module();
             vendorsModule._compile(vendors, 'vendors.chunk.js');
             const vendorsModulePath = path.join(paths.rootPath, 'server/vendors.chunk.js');
             Module._cache[vendorsModulePath] = vendorsModule;
@@ -44,11 +44,11 @@ const config = {
                 return vendorsModulePath;
               }
               return findPath.apply(this, args);
-            };
+            }; */
 
             return mainModule.exports.default(req.url).then((result) => {
               const { data, html } = result;
-              res.send(tpl.replace('<!--{{html}}-->', html).replace('<!--{{store}}-->', `<script>window.reactCoatInitStore = ${JSON.stringify(data)};</script>`));
+              res.send(tpl.replace('<!--{{react-coat}}-->', `<div id="root">${html}</div><script>window.reactCoatInitStore = ${JSON.stringify(data)};</script>`));
             });
           })
           .catch((err) => {

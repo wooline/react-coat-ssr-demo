@@ -39,6 +39,7 @@
   "dependencies": {
     "@types/prop-types": "^15.5.6",
     "fork-ts-checker-webpack-plugin": "^0.4.14",
+    "loader-utils": "^1.1.0",
     "react-coat-pkg": "^3.1.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.2",
@@ -50,6 +51,7 @@
     "not ie <= 11",
     "not op_mini all"
   ],
+  "moduleImport": "async",
   "devServer": {
     "port": 7443,
     "ssr": true,

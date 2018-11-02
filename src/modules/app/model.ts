@@ -2,7 +2,7 @@ import {CustomError, RedirectError} from "core/Errors";
 import RootState from "core/RootState";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, globalLoading, loading, LoadingState, reducer, RouterState} from "react-coat-pkg";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, getModel, globalLoading, loading, LoadingState, reducer, RouterState} from "react-coat-pkg";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 import {NAMESPACE} from "./exportNames";
@@ -79,7 +79,7 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
       throw new RedirectError("301", "/login");
     }
     this.dispatch(this.callThisAction(this.UPDATE, {...this.state, subModule: router.subModule, projectConfig, curUser, startupStep: StartupStep.configLoaded}));
-    await import(`modules/${router.subModule}/model`).then((subModel) => subModel.default(this.store));
+    await getModel(router.subModule).then((subModel) => subModel(this.store));
     // const pathname = this.rootState.router.location.pathname;
     // const views = { level1: null };
     // if (pathname.startsWith("/admin")) {

@@ -7,7 +7,7 @@ import {connect, DispatchProp} from "react-redux";
 import {Redirect, Route, Switch} from "react-router-dom";
 import LoginForm from "./LoginForm";
 
-const Photos = loader(() => import("modules/photos/views"));
+const Photos = loader("photos");
 interface Props extends DispatchProp {
   curUser: CurUser;
   startupStep: StartupStep;

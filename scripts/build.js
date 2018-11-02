@@ -20,7 +20,7 @@ compiler.run((error, stats) => {
     }
     process.exit(1);
   } else {
-    console.log(stats.toString({ chunks: false, colors: true }));
+    console.log(stats.toString({ chunks: true, colors: true }));
     /* if (env.profile) {
             console.info(chalk`{green.bold [task]} write stats.json`);
             fs.writeFileSync("stats.json", JSON.stringify(stats.toJson({}), null, 2));
