@@ -2,7 +2,7 @@ import {CustomError, RedirectError} from "core/Errors";
 import RootState from "core/RootState";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, getModel, globalLoading, loading, LoadingState, reducer, RouterState} from "react-coat-pkg";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, getModel, loading, LoadingState, reducer, RouterState} from "react-coat-pkg";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 import {NAMESPACE} from "./exportNames";
@@ -70,7 +70,7 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
     return {subModule: SubModule[router.location.pathname.replace(/^\//, "")] || SubModule.photos};
   }
   // 兼听自已的INIT Action，做一些异步数据请求，不需要手动触发，所以请使用protected或private
-  @globalLoading // 使用全局loading状态
+  @loading() // 使用全局loading状态
   @effect
   protected async [NAMESPACE + "/INIT"]() {
     const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);

@@ -9,7 +9,8 @@ const webpackConfig = require(path.join(paths.configPath, './webpack.config.prod
 
 const compiler = webpack(appPackage.devServer.ssr ? webpackConfig : webpackConfig[0]);
 
-fs.emptyDirSync(paths.distPath);
+fs.emptyDirSync(paths.distClientPath);
+fs.emptyDirSync(paths.distServerPath);
 fs.copySync(paths.publicPath, paths.distPath, { dereference: true });
 
 compiler.run((error, stats) => {

@@ -61,10 +61,7 @@ const clientConfig = {
   },
   devtool: 'cheap-module-source-map',
   optimization: {
-    splitChunks: {
-      chunks: 'all',
-    },
-    runtimeChunk: true,
+    runtimeChunk: 'single',
   },
   module: {
     strictExportPresence: true,
@@ -72,10 +69,20 @@ const clientConfig = {
       {
         test: /\.(ts|tsx)$/,
         include: paths.srcPath,
-        loader: require.resolve('ts-loader'),
-        options: {
-          transpileOnly: true,
-        },
+        use: [
+          {
+            loader: require.resolve('ts-loader'),
+            options: {
+              transpileOnly: true,
+            },
+          },
+          {
+            loader: require.resolve('./auto-generate-index'),
+            options: {
+              root: paths.srcPath,
+            },
+          },
+        ],
       },
       {
         test: /\.css$/,
@@ -174,9 +181,17 @@ const serverConfig = {
             },
           },
           {
-            loader: require.resolve('./import-transformers'),
+            loader: require.resolve('./auto-generate-index'),
+            options: {
+              root: paths.srcPath,
+              serverModel: true,
+            },
           },
         ],
+      },
+      {
+        test: /\.(less|css)$/,
+        loader: require.resolve('./server-ignore-loader'),
       },
     ],
   },

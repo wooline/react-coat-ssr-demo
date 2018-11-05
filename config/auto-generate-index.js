@@ -30,7 +30,7 @@ function loader(source) {
         );
       }
       `;
-      console.log(content);
+      // console.log(content);
       return content;
     }
     result = source.match(/generateClient\s*\((.*)\)/m);
@@ -55,7 +55,6 @@ function loader(source) {
       
       buildApp(
         {
-          moduleImportType: "${moduleImportType}",
           getModule: (name: string) => {${getModule}},
         },
         "${appModuleName}",
@@ -63,7 +62,7 @@ function loader(source) {
         "${ssrInitStoreKey}"
       );
       `;
-      console.log(content);
+      // console.log(content);
       return content;
     }
   }

@@ -7,7 +7,7 @@ export class API {
     return Promise.resolve({
       list: [
         {
-          title: "生化危机外传 第二卷",
+          title: "生化危机外传 第13卷",
           commentCount: 500,
           imageCount: 10,
           coverUrl: "http://103.90.137.51:8020/images/20180914203359610.PNG",

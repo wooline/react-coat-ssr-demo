@@ -27,7 +27,8 @@ const config = {
   },
   before: (app) => {
     app.use((req, res, next) => {
-      if (!appPackage.devServer.ssr || req.url === '/index.html' || req.url.startsWith('/server/') || req.url.startsWith('/client/')) {
+      const passUrls = ['^/index.html', '^/server/', '^/client/', '^/sockjs-node/', '^/[^/]+\\.hot-update\\.[^/]+$'];
+      if (!appPackage.devServer.ssr || passUrls.some(reg => new RegExp(reg).test(req.url))) {
         next();
       } else {
         Promise.all([request(`${req.protocol}://${req.headers.host}/server/main.js`), request(`${req.protocol}://${req.headers.host}/index.html`)])
@@ -47,8 +48,8 @@ const config = {
             }; */
 
             return mainModule.exports.default(req.url).then((result) => {
-              const { data, html } = result;
-              res.send(tpl.replace('<!--{{react-coat}}-->', `<div id="root">${html}</div><script>window.reactCoatInitStore = ${JSON.stringify(data)};</script>`));
+              const { ssrInitStoreKey, data, html } = result;
+              res.send(tpl.replace(/<!--{react-coat-html}-->/, `${html}`).replace(/<!--{react-coat-script}-->/, `<script>window.${ssrInitStoreKey} = ${JSON.stringify(data)};</script>`));
             });
           })
           .catch((err) => {

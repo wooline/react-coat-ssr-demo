@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ManifestPlugin = require('webpack-manifest-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const PostcssFlexbugsFixes = require('postcss-flexbugs-fixes');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const PostcssPresetEnv = require('postcss-preset-env');
@@ -11,9 +12,11 @@ const paths = require('./paths');
 const tsCompilerOptions = require(path.join(paths.rootPath, './tsconfig.json')).compilerOptions;
 tsCompilerOptions.target = 'es2017';
 
-const getStyleLoaders = (cssOptions, preProcessor) => {
+const getStyleLoaders = (cssOptions, preProcessor, preProcessorOptions) => {
   const loaders = [
-    require.resolve('style-loader'),
+    {
+      loader: MiniCssExtractPlugin.loader,
+    },
     {
       loader: require.resolve('css-loader'),
       options: cssOptions,
@@ -40,7 +43,10 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
     },
   ];
   if (preProcessor) {
-    loaders.push(require.resolve(preProcessor));
+    loaders.push({
+      loader: require.resolve(preProcessor),
+      options: preProcessorOptions,
+    });
   }
   return loaders;
 };
@@ -83,10 +89,7 @@ const clientConfig = {
     runtimeChunk: 'single',
   },
   stats: { chunkModules: false },
-  performance: {
-    maxEntrypointSize: 1000000,
-    maxAssetSize: 1000000,
-  },
+  performance: false,
   module: {
     strictExportPresence: true,
     rules: [
@@ -130,7 +133,11 @@ const clientConfig = {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      inject: true,
       template: path.join(paths.publicPath, './client/index.html'),
+    }),
+    new MiniCssExtractPlugin({
+      filename: 'css/[name].[contenthash:8].css',
     }),
     new ManifestPlugin({
       fileName: 'asset-manifest.json',
@@ -189,10 +196,7 @@ const serverConfig = {
     // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
     runtimeChunk: false,
   },
-  performance: {
-    maxEntrypointSize: 1000000,
-    maxAssetSize: 1000000,
-  },
+  performance: false,
   module: {
     strictExportPresence: true,
     rules: [
@@ -214,6 +218,10 @@ const serverConfig = {
             },
           },
         ],
+      },
+      {
+        test: /\.(less|css)$/,
+        loader: require.resolve('./server-ignore-loader'),
       },
     ],
   },
