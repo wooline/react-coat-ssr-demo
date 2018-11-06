@@ -5,6 +5,7 @@ import * as React from "react";
 import {loader, LoadingState} from "react-coat-pkg";
 import {connect, DispatchProp} from "react-redux";
 import {Redirect, Route, Switch} from "react-router-dom";
+import logo from "./imgs/aaa.png";
 import LoginForm from "./LoginForm";
 
 const Photos = loader("photos");
@@ -18,6 +19,7 @@ class Component extends React.PureComponent<Props> {
   public render() {
     return (
       <div id="application">
+        <img src={logo} />
         <Switch>
           <Redirect exact={true} path="/" to="/photos" />
           <Route exact={true} path="/photos" component={Photos} />

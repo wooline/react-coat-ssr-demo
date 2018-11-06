@@ -104,7 +104,7 @@ const clientConfig = {
             },
           },
           {
-            loader: require.resolve('./auto-generate-index'),
+            loader: require.resolve('react-coat-pkg/build/utils/auto-generate-index'),
             options: {
               root: paths.srcPath,
             },
@@ -126,6 +126,7 @@ const clientConfig = {
         include: paths.srcPath,
         loader: require.resolve('url-loader'),
         query: {
+          limit: 50,
           name: 'media/[name].[hash:8].[ext]',
         },
       },
@@ -212,7 +213,7 @@ const serverConfig = {
             },
           },
           {
-            loader: require.resolve('./auto-generate-index'),
+            loader: require.resolve('react-coat-pkg/build/utils/auto-generate-index'),
             options: {
               root: paths.srcPath,
             },
@@ -221,7 +222,16 @@ const serverConfig = {
       },
       {
         test: /\.(less|css)$/,
-        loader: require.resolve('./server-ignore-loader'),
+        loader: 'null-loader',
+      },
+      {
+        test: /\.(png|jpe?g|gif)$/,
+        include: paths.srcPath,
+        loader: require.resolve('url-loader'),
+        query: {
+          limit: 50,
+          name: 'media/[name].[hash:8].[ext]',
+        },
       },
     ],
   },

@@ -2,6 +2,9 @@ const webpack = require('webpack');
 const path = require('path');
 const fs = require('fs-extra');
 const paths = require('../config/paths');
+require('asset-require-hook')({
+  extensions: ['jpg', 'jpeg', 'png', 'gif'],
+});
 
 const appPackage = require(path.join(paths.rootPath, './package.json'));
 
@@ -28,6 +31,8 @@ compiler.run((error, stats) => {
         } */
     if (stats.hasErrors() || stats.hasWarnings()) {
       process.exit(1);
+    } else {
+      fs.removeSync(path.join(paths.distServerPath, 'media'));
     }
   }
 });

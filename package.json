@@ -6,6 +6,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production node scripts/build.js",
     "start": "cross-env NODE_ENV=development node scripts/start.js",
+    "prod-ssr-demo": "npm run build && node prod-express-demo",
     "test": "cross-env NODE_ENV=development node scripts/test.js"
   },
   "author": "",
@@ -38,9 +39,13 @@
   },
   "dependencies": {
     "@types/prop-types": "^15.5.6",
+    "asset-require-hook": "^1.2.0",
+    "connected-react-router": "^5.0.1",
+    "file-loader": "^2.0.0",
     "fork-ts-checker-webpack-plugin": "^0.4.14",
     "loader-utils": "^1.1.0",
     "mini-css-extract-plugin": "^0.4.4",
+    "null-loader": "^0.1.1",
     "react-coat-pkg": "^3.1.0",
     "request": "^2.88.0",
     "request-promise": "^4.2.2",

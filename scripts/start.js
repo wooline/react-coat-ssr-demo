@@ -3,6 +3,9 @@ const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
 const path = require('path');
 const paths = require('../config/paths');
+require('asset-require-hook')({
+  extensions: ['jpg', 'jpeg', 'png', 'gif'],
+});
 
 const appPackage = require(path.join(paths.rootPath, './package.json'));
 

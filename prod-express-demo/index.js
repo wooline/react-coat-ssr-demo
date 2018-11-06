@@ -1,10 +1,14 @@
 const express = require('express');
 const fs = require('fs');
-const mainModule = require('../build/server/main');
+const path = require('path');
 
-const htmlTpl = fs.readFileSync('../build/client/index.html', 'utf8');
+const paths = require(path.join(__dirname, '../config/paths'));
+const mainModule = require(path.join(paths.distServerPath, 'main'));
+
+const htmlTpl = fs.readFileSync(path.join(paths.distClientPath, 'index.html'), 'utf8');
 
 const app = express();
+app.use('/client', express.static(paths.distClientPath));
 app.get('*', (req, res) => {
   mainModule
     .default(req.url)
