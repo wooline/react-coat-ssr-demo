@@ -1,5 +1,5 @@
-import {view} from "react-coat-pkg";
+import {exportView} from "react-coat-pkg";
 import model from "../model";
 import MainComponent from "./Main";
 
-export const Main = view(MainComponent, model);
+export const Main = exportView(MainComponent, model);

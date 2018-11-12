@@ -24,11 +24,14 @@ compiler.run((error, stats) => {
     }
     process.exit(1);
   } else {
-    console.log(stats.toString({ chunks: true, colors: true }));
-    /* if (env.profile) {
-            console.info(chalk`{green.bold [task]} write stats.json`);
-            fs.writeFileSync("stats.json", JSON.stringify(stats.toJson({}), null, 2));
-        } */
+    console.log(
+      stats.toString({
+        entrypoints: false,
+        colors: true,
+        modules: false,
+        excludeAssets: /\.(?!js|html)\w+$/,
+      }),
+    );
     if (stats.hasErrors() || stats.hasWarnings()) {
       process.exit(1);
     } else {

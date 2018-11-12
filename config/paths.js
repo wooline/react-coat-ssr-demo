@@ -9,7 +9,6 @@ const distPath = path.join(rootPath, './build');
 const distClientPath = path.join(distPath, './client');
 const distServerPath = path.join(distPath, './server');
 const sitePath = '/client/';
-// const siteUrl = 'bbb/';
 
 module.exports = {
   rootPath,

@@ -1,14 +1,15 @@
-import RootState from "core/RootState";
 import {StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
+import {RootState} from "modules";
+import {ModuleGetter} from "modules";
 import * as React from "react";
-import {loader, LoadingState} from "react-coat-pkg";
+import {LoadingState, loadView} from "react-coat-pkg";
 import {connect, DispatchProp} from "react-redux";
 import {Redirect, Route, Switch} from "react-router-dom";
 import logo from "./imgs/aaa.png";
 import LoginForm from "./LoginForm";
 
-const Photos = loader("photos");
+const Photos = loadView(ModuleGetter.photos, "Main");
 interface Props extends DispatchProp {
   curUser: CurUser;
   startupStep: StartupStep;

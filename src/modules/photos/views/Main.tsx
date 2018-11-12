@@ -1,5 +1,5 @@
-import RootState from "core/RootState";
 import {PhotoList} from "entity/photo";
+import {RootState} from "modules";
 import * as React from "react";
 import {connect} from "react-redux";
 import "./index.less";

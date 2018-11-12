@@ -1,4 +1,4 @@
-import RootState from "core/RootState";
+import {RootState} from "modules";
 import thisModule from "modules/app/facade";
 import * as React from "react";
 import {LoadingState} from "react-coat-pkg";

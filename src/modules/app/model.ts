@@ -1,11 +1,11 @@
 import {CustomError, RedirectError} from "core/Errors";
-import RootState from "core/RootState";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, getModel, loading, LoadingState, reducer, RouterState} from "react-coat-pkg";
+import {ModuleGetter, RootState} from "modules";
+import {ModuleNames} from "modules/names";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, loading, LoadingState, loadModel, reducer, RouterState} from "react-coat-pkg";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
-import {NAMESPACE} from "./exportNames";
 
 enum SubModule {
   photos = "photos",
@@ -17,7 +17,7 @@ interface Router {
 }
 
 // 定义本模块的State
-export interface ModuleState extends BaseModuleState {
+export interface State extends BaseModuleState {
   subModule: SubModule;
   projectConfig: ProjectConfig;
   curUser: CurUser;
@@ -29,10 +29,10 @@ export interface ModuleState extends BaseModuleState {
 }
 
 // 定义本模块的Handlers
-class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
+class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   constructor() {
     // 定义本模块State的初始值
-    const initState: ModuleState = {
+    const initState: State = {
       subModule: null,
       projectConfig: null,
       curUser: null,
@@ -46,7 +46,7 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
     super(initState);
   }
   @reducer
-  public putStartup(startupStep: StartupStep): ModuleState {
+  public putStartup(startupStep: StartupStep): State {
     return {...this.state, startupStep};
   }
 
@@ -62,7 +62,7 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
   }
 
   @reducer
-  protected putCurUser(curUser: {uid: string; username: string; hasLogin: boolean}): ModuleState {
+  protected putCurUser(curUser: {uid: string; username: string; hasLogin: boolean}): State {
     return {...this.state, curUser};
   }
 
@@ -72,14 +72,14 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
   // 兼听自已的INIT Action，做一些异步数据请求，不需要手动触发，所以请使用protected或private
   @loading() // 使用全局loading状态
   @effect
-  protected async [NAMESPACE + "/INIT"]() {
+  protected async [ModuleNames.app + "/INIT"]() {
     const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);
     const router = this.parseRouter(this.rootState.router);
     if (router.subModule === SubModule.my && !curUser.hasLogin) {
       throw new RedirectError("301", "/login");
     }
     this.dispatch(this.callThisAction(this.UPDATE, {...this.state, subModule: router.subModule, projectConfig, curUser, startupStep: StartupStep.configLoaded}));
-    await getModel(router.subModule).then((subModel) => subModel(this.store));
+    await loadModel(ModuleGetter.photos).then((subModel) => subModel(this.store));
     // const pathname = this.rootState.router.location.pathname;
     // const views = { level1: null };
     // if (pathname.startsWith("/admin")) {
@@ -109,4 +109,4 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
 // 导出本模块的Actions
 export type ModuleActions = Actions<ModuleHandlers>;
 
-export default exportModel(NAMESPACE, ModuleHandlers);
+export default exportModel(ModuleNames.app, ModuleHandlers);

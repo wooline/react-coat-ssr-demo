@@ -1,5 +1,5 @@
-import RootState from "core/RootState";
 import {PhotoList} from "entity/photo";
+import {RootState} from "modules";
 import * as React from "react";
 import {connect} from "react-redux";
 
@@ -25,7 +25,7 @@ class Component extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: RootState) => {
-  const model = state.photos;
+  const model = state.videos;
   return {
     tableList: model.tableList,
   };

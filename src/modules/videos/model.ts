@@ -1,20 +1,20 @@
-import RootState from "core/RootState";
 import {PhotoList, PhotoListFilter, PhotoListItem} from "entity/photo";
+import {RootState} from "modules";
+import {ModuleNames} from "modules/names";
 import {Actions, BaseModuleHandlers, BaseModuleState, effect, exportModel, loading, reducer} from "react-coat-pkg";
 import api from "./api";
-import {NAMESPACE} from "./exportNames";
 
 // 定义本模块的State
-export interface ModuleState extends BaseModuleState {
+export interface State extends BaseModuleState {
   tableList: PhotoList;
   curItem: PhotoListItem;
 }
 
 // 定义本模块的Handlers
-class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
+class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   constructor() {
     // 定义本模块State的初始值
-    const initState: ModuleState = {
+    const initState: State = {
       tableList: null,
       curItem: null,
       loading: null,
@@ -22,11 +22,11 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
     super(initState);
   }
   @reducer
-  public putCurItem(curItem: PhotoListItem): ModuleState {
+  public putCurItem(curItem: PhotoListItem): State {
     return {...this.state, curItem};
   }
   @reducer
-  public putTableList(tableList: PhotoList): ModuleState {
+  public putTableList(tableList: PhotoList): State {
     return {...this.state, tableList};
   }
   @loading()
@@ -37,7 +37,7 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
   }
   @loading()
   @effect
-  protected async [NAMESPACE + "/INIT"]() {
+  protected async [ModuleNames.videos + "/INIT"]() {
     await this.dispatch(this.callThisAction(this.getTableList, null));
   }
 }
@@ -45,4 +45,4 @@ class ModuleHandlers extends BaseModuleHandlers<ModuleState, RootState> {
 // 导出本模块的Actions
 export type ModuleActions = Actions<ModuleHandlers>;
 
-export default exportModel(NAMESPACE, ModuleHandlers);
+export default exportModel(ModuleNames.videos, ModuleHandlers);

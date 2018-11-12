@@ -1,10 +1,6 @@
+import {ModuleNames} from "modules/names";
 import {exportModule} from "react-coat-pkg";
-import {NAMESPACE} from "./exportNames";
-import {ModuleActions, ModuleState} from "./model";
+import {ModuleActions, State} from "./model";
 
-// 导出本模块State数据格式
-export interface State {
-  [NAMESPACE]: ModuleState;
-}
-
-export default exportModule<ModuleActions>(NAMESPACE);
+export type ModuleState = State;
+export default exportModule<ModuleActions>(ModuleNames.videos);
