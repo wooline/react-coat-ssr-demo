@@ -1,3 +1,3 @@
+import model from "./model";
 import * as views from "./views";
-export {default as model} from "./model";
-export {views};
+export {views, model};

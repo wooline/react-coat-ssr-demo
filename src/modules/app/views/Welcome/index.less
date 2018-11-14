@@ -1,35 +1,44 @@
 .app-Welcome {
-    position: fixed;
-    z-index: 200;
-    height: 100%;
-    top: 0;
-    background: black;
-    overflow: hidden;
-    transition: transform 0.8s ease;
-  
-    &.startupCountEnd {
-      transform: translateY(-100%);
-    }
-    
-    .count {
-        display: inline-block;
-        color: #fff;
-        padding: 0.3rem 1rem;
-        background: rgba(0, 0, 0, 0.5);
-        border-radius: 2rem;
-        font-size: 0.9rem;
-        margin: 10px 20px;
-        
-        .times {
-            font-style: normal;
-            margin-left: 5px;
-          }
+  display: block;
+  position: fixed;
+  z-index: 200;
+  height: 100%;
+  top: 0;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  overflow: hidden;
+  transition: transform 0.8s ease;
 
-        .iconfont {
-          margin-right: 5px;
-        }
-      }
-  
-    
+  &.startupCountEnd {
+    transform: translateY(-100%);
   }
-  
+
+  .count {
+    cursor: pointer;
+    position: absolute;
+    right: 0.1rem;
+    top: 0.1rem;
+    color: #fff;
+    width: 5rem;
+    border-radius: 2rem;
+    font-size: 0.9rem;
+    background: #000;
+
+    .times {
+      font-style: normal;
+      margin-left: 5px;
+    }
+
+    .iconfont {
+      margin-right: 5px;
+    }
+  }
+
+  .link {
+    width: 100%;
+    height: 100%;
+    display: block;
+    background: rgba(0, 0, 0, 0.5);
+  }
+}

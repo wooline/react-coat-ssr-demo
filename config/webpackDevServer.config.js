@@ -1,13 +1,14 @@
-const { middleware } = require('react-coat-pkg/build/utils/dev-server-middleware');
-const path = require('path');
-const paths = require('./paths');
+const path = require("path");
+const paths = require("./paths");
 
-const appPackage = require(path.join(paths.rootPath, './package.json'));
+const middleware = require(path.join(paths.scriptsPath, "./middleware/dev-server")).default;
+
+const appPackage = require(path.join(paths.rootPath, "./package.json"));
 
 const config = {
   contentBase: paths.publicPath,
   watchContentBase: true,
-  publicPath: '/',
+  publicPath: "/",
   compress: true,
   historyApiFallback: !appPackage.devServer.ssr,
   hot: true,
@@ -19,11 +20,11 @@ const config = {
     colors: true,
   },
   // clientLogLevel: 'none',
-  quiet: false,
+  quiet: true,
   watchOptions: {
     ignored: /node_modules/,
   },
-  before: (app) => {
+  before: app => {
     app.use(middleware(appPackage.devServer.ssr));
   },
 };

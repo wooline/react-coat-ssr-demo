@@ -1,6 +1,7 @@
 import {StartupPageConfig, StartupStep} from "entity/global";
 import {RootState} from "modules";
 import thisModule from "modules/app/facade";
+import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {connect, DispatchProp} from "react-redux";
 import "./index.less";
@@ -20,19 +21,21 @@ class Component extends React.PureComponent<Props> {
     if (nid) {
       clearInterval(nid);
     }
+    console.log(thisModule.actions);
     this.props.dispatch(thisModule.actions.putStartup(StartupStep.startupCountEnd));
     setTimeout(() => {
       this.props.dispatch(thisModule.actions.putStartup(StartupStep.startupAnimateEnd));
     }, 1000);
-  }
+  };
   public render() {
     const {className} = this.props;
     const {extAdvertUrl, imageUrl, times} = this.props.config;
     const linkPops = extAdvertUrl ? {target: "_blank", href: extAdvertUrl} : {};
 
     return (
-      <a className={"app-Welcome g-body " + className} {...linkPops}>
-        <span
+      <div className={`${ModuleNames.app}-Welcome g-doc-width ${className}`} style={{backgroundImage: `url(${imageUrl})`}}>
+        <a className="link" {...linkPops} />
+        <div
           className="count"
           onClick={() => {
             this.onCountEnd();
@@ -42,36 +45,32 @@ class Component extends React.PureComponent<Props> {
           跳过:
           <em
             className="times"
-            ref={(node) => {
+            ref={node => {
               this.timer = node;
             }}
           >
             {times}
           </em>
-        </span>
-        <img
-          className="preImg"
-          src={imageUrl}
-          onLoad={() => {
-            this.props.dispatch(thisModule.actions.putStartup(StartupStep.startupImageLoaded));
-          }}
-        />
-      </a>
+        </div>
+      </div>
     );
   }
+
   public componentDidMount() {
-    let {times} = this.props.config;
-    const el = this.timer;
-    nid = setInterval(() => {
-      if (this.props.startupStep !== StartupStep.configLoaded) {
+    const initLoading = document.getElementById("g-init-loading");
+    if (initLoading) {
+      initLoading.parentNode.removeChild(initLoading);
+      let {times} = this.props.config;
+      const el = this.timer;
+      nid = setInterval(() => {
         if (times > 0) {
           times--;
           el.innerHTML = times + "";
         } else {
           this.onCountEnd();
         }
-      }
-    }, 1000);
+      }, 1000);
+    }
   }
 }
 

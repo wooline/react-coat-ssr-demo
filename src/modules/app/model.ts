@@ -79,7 +79,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
       throw new RedirectError("301", "/login");
     }
     this.dispatch(this.callThisAction(this.UPDATE, {...this.state, subModule: router.subModule, projectConfig, curUser, startupStep: StartupStep.configLoaded}));
-    await loadModel(ModuleGetter.photos).then((subModel) => subModel(this.store));
+    await loadModel(ModuleGetter.photos).then(subModel => subModel(this.store));
     // const pathname = this.rootState.router.location.pathname;
     // const views = { level1: null };
     // if (pathname.startsWith("/admin")) {

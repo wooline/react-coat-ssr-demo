@@ -13,7 +13,7 @@ class Component extends React.PureComponent<Props> {
     evt.stopPropagation();
     evt.preventDefault();
     this.props.dispatch(thisModule.actions.login({username: "", password: ""}));
-  }
+  };
 
   public render() {
     const {logining} = this.props;

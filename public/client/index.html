@@ -1,32 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="theme-color" content="#000000" />
+    <title>React App</title>
+    <style>
+      html {
+        margin: 0;
+        padding: 0;
+        background: #000;
+        height: 100%;
+      }
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta name="theme-color" content="#000000">
-  <!--
-      manifest.json provides metadata used when your web app is added to the
-      homescreen on Android. See https://developers.google.com/web/fundamentals/engage-and-retain/web-app-manifest/
-    -->
+      body {
+        background: #fff;
+        padding: 0;
+        margin: 0 auto;
+        overflow-x: hidden;
+      }
 
-  <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+      @keyframes g-init-loading-ball {
+        0% {
+          transform: translate(-50%, -50%) scale(0.5);
+        }
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-  <title>React App</title>
-</head>
+        50% {
+          opacity: 0.5;
+          transform: translate(-50%, -50%) scale(1);
+        }
 
-<body>
-  <div id="root">
-    <!--{react-coat-html}-->
-  </div>
-  <!--{react-coat-script}-->
-</body>
+        100% {
+          transform: translate(-50%, -50%) scale(0.5);
+        }
+      }
 
+      @keyframes g-init-loading-text {
+        0% {
+          opacity: 1;
+        }
+
+        20% {
+          opacity: 0.1;
+        }
+
+        50% {
+          opacity: 1;
+        }
+      }
+
+      .g-init-loading {
+        display: block;
+        position: fixed;
+        z-index: 2000;
+        height: 100%;
+        top: 0;
+        background: #eee;
+      }
+
+      .g-init-loading::before {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        content: ".";
+        font-size: 0;
+        width: 50px;
+        height: 50px;
+        background: #ddd;
+        border-radius: 50px;
+        transform: translate(-50%, -50%) scale(0.5);
+        animation: g-init-loading-ball 1s infinite;
+      }
+
+      .g-init-loading::after {
+        font-size: 12px;
+        color: #666;
+        position: absolute;
+        content: "Loading..";
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        animation: g-init-loading-text 2s infinite;
+      }
+
+      .g-doc-width {
+        width: 100%;
+        max-width: 700px;
+      }
+    </style>
+    <script>
+      (function() {
+        function setStyle(cssString) {
+          var style = document.createElement("style");
+          style.setAttribute("type", "text/css");
+          if (style.styleSheet) {
+            style.styleSheet.cssText = cssString;
+          } else {
+            var cssNode = document.createTextNode(cssString);
+            style.appendChild(cssNode);
+          }
+          var heads = document.getElementsByTagName("head");
+          if (heads.length) {
+            heads[0].appendChild(style);
+          } else {
+            document.documentElement.appendChild(style);
+          }
+        }
+        var rem = Math.min(document.documentElement.clientWidth, 700) / 10;
+        var styleArr = [];
+        styleArr.push("html{font-size:" + rem + "px;}");
+        setStyle(styleArr.join(" "));
+      })();
+    </script>
+  </head>
+
+  <body class="g-doc-width">
+    <div id="g-init-loading" class="g-init-loading g-doc-width"></div>
+    <!-- {react-coat-response-chunk} -->
+    <div id="root"><!-- {react-coat-html} --></div>
+    <!-- {react-coat-script} -->
+  </body>
 </html>

@@ -14,7 +14,7 @@ class Component extends React.PureComponent<Props> {
       tableList && (
         <div id="photo">
           <ul>
-            {tableList.list.map((item) => (
+            {tableList.list.map(item => (
               <li>{item.title}</li>
             ))}
           </ul>

@@ -1,6 +1,6 @@
 {
   "tabWidth": 2,
   "printWidth": 300,
-  "trailingComma": "es5",
+  "trailingComma": "all",
   "bracketSpacing": false
 }

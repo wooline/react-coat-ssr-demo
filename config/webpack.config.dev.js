@@ -1,36 +1,38 @@
-const path = require('path');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ManifestPlugin = require('webpack-manifest-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const PostcssFlexbugsFixes = require('postcss-flexbugs-fixes');
-const PostcssPresetEnv = require('postcss-preset-env');
-const paths = require('./paths');
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ManifestPlugin = require("webpack-manifest-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const PostcssFlexbugsFixes = require("postcss-flexbugs-fixes");
+const PostcssPresetEnv = require("postcss-preset-env");
+const StylelintPlugin = require("stylelint-webpack-plugin");
+const paths = require("./paths");
 
-const tsCompilerOptions = require(path.join(paths.rootPath, './tsconfig.json')).compilerOptions;
-tsCompilerOptions.target = 'es2017';
+const conPath = path.join(paths.configPath, "./dev");
+const tsCompilerOptions = require(path.join(paths.rootPath, "./tsconfig.json")).compilerOptions;
+tsCompilerOptions.target = "es2017";
 
 const getStyleLoaders = (cssOptions, preProcessor) => {
   const loaders = [
-    require.resolve('style-loader'),
+    require.resolve("style-loader"),
     {
-      loader: require.resolve('css-loader'),
+      loader: require.resolve("css-loader"),
       options: cssOptions,
     },
     {
       // Options for PostCSS as we reference these options twice
       // Adds vendor prefixing based on your specified browser support in
       // package.json
-      loader: require.resolve('postcss-loader'),
+      loader: require.resolve("postcss-loader"),
       options: {
         // Necessary for external CSS imports to work
         // https://github.com/facebook/create-react-app/issues/2677
-        ident: 'postcss',
+        ident: "postcss",
         plugins: () => [
           PostcssFlexbugsFixes,
           PostcssPresetEnv({
             autoprefixer: {
-              flexbox: 'no-2009',
+              flexbox: "no-2009",
             },
             stage: 3,
           }),
@@ -45,23 +47,26 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
 };
 
 const clientConfig = {
-  mode: 'development',
-  entry: [path.join(paths.srcPath, './client')],
+  mode: "development",
+  entry: [path.join(paths.srcPath, "./client")],
   output: {
     pathinfo: true, // 输入代码添加额外的路径注释，提高代码可读性
-    filename: 'client/js/[name].js',
-    chunkFilename: 'client/js/[name].chunk.js',
-    publicPath: '/',
+    filename: "client/js/[name].js",
+    chunkFilename: "client/js/[name].chunk.js",
+    publicPath: "/",
     // Point sourcemap entries to original disk location (format as URL on Windows)
-    devtoolModuleFilenameTemplate: info => path.resolve(info.absoluteResourcePath).replace(/\\/g, '/'),
+    devtoolModuleFilenameTemplate: info => path.resolve(info.absoluteResourcePath).replace(/\\/g, "/"),
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx'],
-    modules: [paths.srcPath, 'node_modules'],
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
+    modules: [paths.srcPath, "node_modules"],
+    alias: {
+      conf: conPath,
+    },
   },
-  devtool: 'cheap-module-source-map',
+  devtool: "cheap-module-source-map",
   optimization: {
-    runtimeChunk: 'single',
+    runtimeChunk: "single",
   },
   module: {
     strictExportPresence: true,
@@ -71,15 +76,9 @@ const clientConfig = {
         include: paths.srcPath,
         use: [
           {
-            loader: require.resolve('ts-loader'),
+            loader: require.resolve("ts-loader"),
             options: {
               transpileOnly: true,
-            },
-          },
-          {
-            loader: require.resolve('react-coat-pkg/build/utils/auto-generate-index'),
-            options: {
-              root: paths.srcPath,
             },
           },
         ],
@@ -92,30 +91,36 @@ const clientConfig = {
       },
       {
         test: /\.less$/,
-        use: getStyleLoaders({ importLoaders: 2 }, 'less-loader'),
+        use: getStyleLoaders({importLoaders: 2}, "less-loader"),
       },
       {
         test: /\.(png|jpe?g|gif)$/,
         include: paths.srcPath,
-        loader: require.resolve('url-loader'),
+        loader: require.resolve("url-loader"),
         query: {
           limit: 50,
-          name: 'client/media/[name].[hash:8].[ext]',
+          name: "client/media/[name].[hash:8].[ext]",
         },
       },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(paths.publicPath, './client/index.html'),
+      template: path.join(paths.publicPath, "./client/index.html"),
     }),
     new ManifestPlugin({
-      fileName: 'client/asset-manifest.json',
-      publicPath: '/',
+      fileName: "client/asset-manifest.json",
+      publicPath: "/",
+    }),
+    new StylelintPlugin({
+      configFile: path.join(paths.rootPath, "./.stylelintrc.json"),
+      context: paths.srcPath,
+      files: "**/*.less",
+      syntax: "less",
     }),
     new ForkTsCheckerWebpackPlugin({
-      tsconfig: path.join(paths.rootPath, './tsconfig.json'),
-      tslint: path.join(paths.rootPath, './tslint.json'),
+      tsconfig: path.join(paths.rootPath, "./tsconfig.json"),
+      tslint: path.join(paths.rootPath, "./tslint.json"),
       workers: ForkTsCheckerWebpackPlugin.TWO_CPUS_FREE,
     }),
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
@@ -125,22 +130,25 @@ const clientConfig = {
 };
 
 const serverConfig = {
-  mode: 'production',
-  target: 'node',
+  mode: "production",
+  target: "node",
   bail: true,
   devtool: false,
-  entry: [path.join(paths.srcPath, './server')],
+  entry: [path.join(paths.srcPath, "./server")],
   output: {
-    libraryTarget: 'commonjs2',
-    filename: 'server/[name].js',
-    chunkFilename: 'server/[name].chunk.js',
-    publicPath: '/',
+    libraryTarget: "commonjs2",
+    filename: "server/[name].js",
+    chunkFilename: "server/[name].chunk.js",
+    publicPath: "/",
     // Point sourcemap entries to original disk location (format as URL on Windows)
-    devtoolModuleFilenameTemplate: info => path.relative(paths.srcPath, info.absoluteResourcePath).replace(/\\/g, '/'),
+    devtoolModuleFilenameTemplate: info => path.relative(paths.srcPath, info.absoluteResourcePath).replace(/\\/g, "/"),
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx'],
-    modules: [paths.srcPath, 'node_modules'],
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".json"],
+    modules: [paths.srcPath, "node_modules"],
+    alias: {
+      conf: conPath,
+    },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
       // This often causes confusion because we only process files within src/ with babel.
@@ -159,7 +167,7 @@ const serverConfig = {
         vendors: {
           minChunks: 1,
           minSize: 0,
-          name: 'vendors',
+          name: "vendors",
         },
       },
     },
@@ -174,32 +182,28 @@ const serverConfig = {
         include: paths.srcPath,
         use: [
           {
-            loader: require.resolve('ts-loader'),
+            loader: require.resolve("ts-loader"),
             options: {
               compilerOptions: tsCompilerOptions,
               transpileOnly: true,
             },
           },
           {
-            loader: require.resolve('react-coat-pkg/build/utils/auto-generate-index'),
-            options: {
-              root: paths.srcPath,
-              serverModel: true,
-            },
+            loader: require.resolve(path.join(paths.scriptsPath, "./loader/server-replace-async")),
           },
         ],
       },
       {
         test: /\.(less|css)$/,
-        loader: 'null-loader',
+        loader: "null-loader",
       },
       {
         test: /\.(png|jpe?g|gif)$/,
         include: paths.srcPath,
-        loader: require.resolve('url-loader'),
+        loader: require.resolve("url-loader"),
         query: {
           limit: 50,
-          name: 'client/media/[name].[hash:8].[ext]',
+          name: "client/media/[name].[hash:8].[ext]",
         },
       },
     ],

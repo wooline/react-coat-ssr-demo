@@ -1,3 +1,4 @@
+import * as env from "conf/env";
 import {ProjectConfig} from "entity/global";
 import {delayPromise} from "react-coat-pkg";
 
@@ -8,7 +9,7 @@ export class API {
     return Promise.resolve({
       startupPage: {
         extAdvertUrl: "http://www.baidu.com/",
-        imageUrl: "/imgs/startup.jpg",
+        imageUrl: `${env.sitePath}imgs/startup.jpg`,
         times: 10,
       },
     });

@@ -1,6 +1,8 @@
 {
-  "extends": ["tslint:recommended", "tslint-react"],
+  "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
+  "rulesDirectory": ["tslint-plugin-prettier"],
   "rules": {
+    "prettier": true,
     "no-var-requires": false,
     "max-classes-per-file": false,
     "jsx-no-multiline-js": false,
@@ -9,5 +11,8 @@
     "interface-name": [true, "never-prefix"],
     "no-console": false,
     "jsx-no-lambda": false
+  },
+  "linterOptions": {
+    "exclude": [] //"scripts/**/*"
   }
 }

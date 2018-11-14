@@ -9,7 +9,6 @@ export interface ProjectConfig {
 export enum StartupStep {
   init = "init",
   configLoaded = "configLoaded",
-  startupImageLoaded = "startupImageLoaded",
   startupCountEnd = "startupCountEnd",
   startupAnimateEnd = "startupAnimateEnd",
 }
