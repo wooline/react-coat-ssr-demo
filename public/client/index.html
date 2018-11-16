@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <title>React App</title>
     <style>
@@ -85,11 +85,13 @@
 
       .g-doc-width {
         width: 100%;
-        max-width: 700px;
       }
     </style>
-    <script>
+
+    <script type="text/javascript">
+      // var vConsole = new VConsole();
       (function() {
+        alert(document.documentElement);
         function setStyle(cssString) {
           var style = document.createElement("style");
           style.setAttribute("type", "text/css");
@@ -106,10 +108,32 @@
             document.documentElement.appendChild(style);
           }
         }
-        var rem = Math.min(document.documentElement.clientWidth, 700) / 10;
-        var styleArr = [];
-        styleArr.push("html{font-size:" + rem + "px;}");
-        setStyle(styleArr.join(" "));
+        function setSize() {
+          var cwidth = document.documentElement.clientWidth;
+          var cheight = document.documentElement.clientHeight;
+          var maxWidth = Math.ceil((cheight * 320) / 454);
+          var width = Math.min(maxWidth, cwidth);
+          var rem = width / 10;
+          var styleArr = [];
+          styleArr.push("html{font-size:" + rem + "px;}");
+          styleArr.push(".g-doc-width{max-width:" + maxWidth + "px;}");
+          setStyle(styleArr.join(" "));
+        }
+        setSize();
+
+        var timer;
+        window.addEventListener(
+          "resize",
+          function() {
+            if (!timer) {
+              timer = setTimeout(function() {
+                setSize();
+                timer = null;
+              }, 1000);
+            }
+          },
+          false
+        );
       })();
     </script>
   </head>

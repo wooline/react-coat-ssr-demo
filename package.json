@@ -70,7 +70,7 @@
   "moduleImport": "async",
   "devServer": {
     "port": 7443,
-    "ssr": false,
+    "ssr": true,
     "mock": true,
     "proxy": {
       "/ajax": {

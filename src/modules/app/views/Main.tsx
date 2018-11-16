@@ -31,7 +31,7 @@ class Component extends React.PureComponent<Props> {
             </Switch>
           </div>
         )}
-        {(startupStep === StartupStep.configLoaded || startupStep === StartupStep.startupCountEnd) && <Welcome className={startupStep} />}
+        {(startupStep === StartupStep.configLoaded || startupStep === StartupStep.startupImageLoaded || startupStep === StartupStep.startupCountEnd) && <Welcome className={startupStep} />}
       </div>
     );
   }

@@ -10,7 +10,7 @@ export class API {
       startupPage: {
         extAdvertUrl: "http://www.baidu.com/",
         imageUrl: `${env.sitePath}imgs/startup.jpg`,
-        times: 10,
+        times: 1000,
       },
     });
   }

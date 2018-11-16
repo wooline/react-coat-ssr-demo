@@ -16,12 +16,12 @@ let nid: NodeJS.Timeout;
 
 class Component extends React.PureComponent<Props> {
   private timer: HTMLSpanElement;
+  private img: HTMLImageElement;
 
   public onCountEnd = () => {
     if (nid) {
       clearInterval(nid);
     }
-    console.log(thisModule.actions);
     this.props.dispatch(thisModule.actions.putStartup(StartupStep.startupCountEnd));
     setTimeout(() => {
       this.props.dispatch(thisModule.actions.putStartup(StartupStep.startupAnimateEnd));
@@ -33,8 +33,8 @@ class Component extends React.PureComponent<Props> {
     const linkPops = extAdvertUrl ? {target: "_blank", href: extAdvertUrl} : {};
 
     return (
-      <div className={`${ModuleNames.app}-Welcome g-doc-width ${className}`} style={{backgroundImage: `url(${imageUrl})`}}>
-        <a className="link" {...linkPops} />
+      <div className={`${ModuleNames.app}-Welcome g-doc-width ${className}`}>
+        <a className="link" {...linkPops} style={{backgroundImage: `url(${imageUrl})`}} />
         <div
           className="count"
           onClick={() => {
@@ -51,6 +51,13 @@ class Component extends React.PureComponent<Props> {
           >
             {times}
           </em>
+          <img
+            ref={node => {
+              this.img = node;
+            }}
+            style={{position: "absolute", width: "1px", height: "1px", visibility: "hidden"}}
+            src={imageUrl}
+          />
         </div>
       </div>
     );
@@ -59,15 +66,28 @@ class Component extends React.PureComponent<Props> {
   public componentDidMount() {
     const initLoading = document.getElementById("g-init-loading");
     if (initLoading) {
+      if (this.img.naturalWidth) {
+        this.props.dispatch(thisModule.actions.putStartup(StartupStep.startupImageLoaded));
+      } else {
+        this.img.onload = () => {
+          this.props.dispatch(thisModule.actions.putStartup(StartupStep.startupImageLoaded));
+        };
+        this.img.onerror = () => {
+          this.onCountEnd();
+        };
+      }
       initLoading.parentNode.removeChild(initLoading);
       let {times} = this.props.config;
       const el = this.timer;
       nid = setInterval(() => {
-        if (times > 0) {
-          times--;
-          el.innerHTML = times + "";
-        } else {
-          this.onCountEnd();
+        // 防止图片还未载入，倒计时就已经开始
+        if (this.props.startupStep !== StartupStep.configLoaded) {
+          if (times > 0) {
+            times--;
+            el.innerHTML = times + "";
+          } else {
+            this.onCountEnd();
+          }
         }
       }, 1000);
     }
