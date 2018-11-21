@@ -8,7 +8,6 @@
     "no-console": "off",
     "no-underscore-dangle": "off",
     "no-useless-concat": "off",
-    "no-param-reassign": "off",
-    "max-len": ["error", {"code": 300}]
+    "no-param-reassign": "off"
   }
 }

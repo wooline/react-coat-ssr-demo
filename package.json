@@ -6,7 +6,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production node scripts/build.js",
     "start": "cross-env NODE_ENV=development node scripts/start.js",
-    "prod-express-demo": "npm run build && node prod-express-demo",
+    "prod-express-demo": "node scripts/ssr-demo.js && npm run build && node prod-express-demo",
     "gen-icon": "node scripts/gen-icon.js",
     "test": "cross-env NODE_ENV=development node scripts/test.js"
   },
@@ -67,7 +67,6 @@
     "not ie <= 11",
     "not op_mini all"
   ],
-  "moduleImport": "async",
   "devServer": {
     "port": 7443,
     "ssr": true,

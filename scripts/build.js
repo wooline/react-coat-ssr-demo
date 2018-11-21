@@ -30,7 +30,7 @@ compiler.run((error, stats) => {
         colors: true,
         modules: false,
         excludeAssets: /\.(?!js|html)\w+$/,
-      }),
+      })
     );
     if (stats.hasErrors() || stats.hasWarnings()) {
       process.exit(1);

@@ -81,6 +81,9 @@ const clientConfig = {
               transpileOnly: true,
             },
           },
+          {
+            loader: require.resolve(path.join(paths.scriptsPath, "./loader/check-model")),
+          },
         ],
       },
       {

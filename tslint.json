@@ -6,11 +6,12 @@
     "no-var-requires": false,
     "max-classes-per-file": false,
     "jsx-no-multiline-js": false,
-    "max-line-length": [true, 300],
     "object-literal-sort-keys": false,
     "interface-name": [true, "never-prefix"],
     "no-console": false,
-    "jsx-no-lambda": false
+    "jsx-no-lambda": false,
+    "member-ordering": false,
+    "member-access": false
   },
   "linterOptions": {
     "exclude": [] //"scripts/**/*"

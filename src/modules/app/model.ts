@@ -1,24 +1,17 @@
-import {CustomError, RedirectError} from "core/Errors";
+import {CustomError, RedirectError} from "common/Errors";
+import {checkFastRedirect} from "common/utils";
+import * as env from "conf/env";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, loading, LoadingState, loadModel, reducer, RouterState} from "react-coat-pkg";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, GetModule, LoadingState, loadModel, reducer} from "react-coat-pkg";
+import {matchPath} from "react-router";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 
-enum SubModule {
-  photos = "photos",
-  videos = "videos",
-  my = "my",
-}
-interface Router {
-  subModule: SubModule;
-}
-
-// 定义本模块的State
+// 定义本模块的State类型
 export interface State extends BaseModuleState {
-  subModule: SubModule;
   projectConfig: ProjectConfig;
   curUser: CurUser;
   startupStep: StartupStep;
@@ -33,11 +26,9 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   constructor() {
     // 定义本模块State的初始值
     const initState: State = {
-      subModule: null,
       projectConfig: null,
       curUser: null,
       startupStep: StartupStep.init,
-
       loading: {
         global: LoadingState.Stop,
         login: LoadingState.Stop,
@@ -45,13 +36,13 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
     };
     super(initState);
   }
+
   @reducer
   public putStartup(startupStep: StartupStep): State {
     return {...this.state, startupStep};
   }
 
-  @loading("login") // 使用自定义loading状态
-  @effect
+  @effect("login") // 使用自定义loading状态
   public async login(payload: {username: string; password: string}) {
     const loginResult = await sessionService.api.login(payload);
     if (!loginResult.error) {
@@ -66,40 +57,83 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
     return {...this.state, curUser};
   }
 
-  protected parseRouter(router: RouterState): Router {
-    return {subModule: SubModule[router.location.pathname.replace(/^\//, "")] || SubModule.photos};
-  }
   // 兼听自已的INIT Action，做一些异步数据请求，不需要手动触发，所以请使用protected或private
-  @loading() // 使用全局loading状态
-  @effect
+  @effect()
   protected async [ModuleNames.app + "/INIT"]() {
-    const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);
-    const router = this.parseRouter(this.rootState.router);
-    if (router.subModule === SubModule.my && !curUser.hasLogin) {
-      throw new RedirectError("301", "/login");
+    const router = this.rootState.router;
+    // 对于一些不需要运算的重定向跳转，可以称之为前置快速重定向，
+    // 如果启用ssr，应当在服务器路由层就进行拦截跳转，如果路由层没有做，此处也会补救
+    if (
+      checkFastRedirect(
+        router.location.pathname,
+        [
+          {
+            path: "/",
+            exact: true,
+            module: "/photos",
+          },
+        ]
+      ) !== true
+    ) {
+      return;
     }
-    this.dispatch(this.callThisAction(this.UPDATE, {...this.state, subModule: router.subModule, projectConfig, curUser, startupStep: StartupStep.configLoaded}));
-    await loadModel(ModuleGetter.photos).then(subModel => subModel(this.store));
-    // const pathname = this.rootState.router.location.pathname;
-    // const views = { level1: null };
-    // if (pathname.startsWith("/admin")) {
-    //   if (hasAuth(pathname, curUser) === "Forbidden") {
-    //     views.level1 = "Login";
-    //   } else {
-    //     await import(/* webpackChunkName: "admin" */ "modules/admin/model").then(admin => admin.default());
-    //   }
-    // }
-    // this.dispatch(this.callThisAction(this.UPDATE, { ...this.state, views }));
-    // // 最后记得必须手动触发调用INITED
-    // this.dispatch(this.callThisAction(this.setInited));
+    const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);
+    this.dispatch(
+      this.callThisAction(this.UPDATE, {
+        ...this.state,
+        projectConfig,
+        curUser,
+        startupStep: StartupStep.configLoaded,
+      })
+    );
+    const routes: Array<{path?: string; exact?: boolean; module: GetModule}> = [
+      {
+        path: "/my",
+        exact: true,
+        module: () => {
+          if (!curUser.hasLogin) {
+            throw new RedirectError("301", "/login");
+          } else {
+            return ModuleGetter.photos();
+          }
+        },
+      },
+      {
+        path: "/login",
+        exact: true,
+        module: () => {
+          if (curUser.hasLogin) {
+            throw new RedirectError("301", "/");
+          } else {
+            return null;
+          }
+        },
+      },
+      {path: "/photos", exact: true, module: ModuleGetter.photos},
+      {path: "/videos", exact: true, module: ModuleGetter.videos},
+    ];
+    const matchs = routes.filter(route => matchPath(router.location.pathname, route));
+    if (!matchs.length) {
+      matchs.push({
+        module: () => {
+          throw new RedirectError("301", `${env.sitePath}404.html`);
+        },
+      });
+    }
+    await Promise.all(matchs.map(route => loadModel(route.module).then(subModel => subModel && subModel(this.store))));
   }
 
   // 兼听全局错误的Action，并发送给后台
   // 兼听外部模块的Action，不需要手动触发，所以请使用protected或private
-  @effect
+  @effect(null) // 不需要loading，设置为null
   protected async [ERROR](error: CustomError) {
     if (error.code === "301" || error.code === "302") {
-      this.dispatch(this.routerActions.replace(error.detail));
+      const url = error.detail as string;
+      if (url.endsWith("404.html")) {
+        window.location.href = error.detail;
+      } else {
+        this.dispatch(this.routerActions.replace(url));
+      }
     } else {
       await settingsService.api.reportError(error);
     }

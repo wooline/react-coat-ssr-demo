@@ -19,10 +19,18 @@ function middleware(ssr) {
           return mainModule.exports.default(req.url).then(result => {
             const {ssrInitStoreKey, data, html} = result;
             if (res.headersSent) {
-              res.write(htmlChunks[1].replace(/[^>]*<!--\s*{react-coat-html}\s*-->[^<]*/m, `${html}`).replace(/<!--\s*{react-coat-script}\s*-->/, `<script>window.${ssrInitStoreKey} = ${JSON.stringify(data)};</script>`));
+              res.write(
+                htmlChunks[1]
+                  .replace(/[^>]*<!--\s*{react-coat-html}\s*-->[^<]*/m, `${html}`)
+                  .replace(/<!--\s*{react-coat-script}\s*-->/, `<script>window.${ssrInitStoreKey} = ${JSON.stringify(data)};</script>`)
+              );
               res.end();
             } else {
-              res.send(htmlChunks[0].replace(/[^>]*<!--\s*{react-coat-html}\s*-->[^<]*/m, `${html}`).replace(/<!--\s*{react-coat-script}\s*-->/, `<script>window.${ssrInitStoreKey} = ${JSON.stringify(data)};</script>`));
+              res.send(
+                htmlChunks[0]
+                  .replace(/[^>]*<!--\s*{react-coat-html}\s*-->[^<]*/m, `${html}`)
+                  .replace(/<!--\s*{react-coat-script}\s*-->/, `<script>window.${ssrInitStoreKey} = ${JSON.stringify(data)};</script>`)
+              );
             }
           });
         })

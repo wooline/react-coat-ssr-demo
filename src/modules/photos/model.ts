@@ -1,7 +1,7 @@
 import {PhotoList, PhotoListFilter, PhotoListItem} from "entity/photo";
 import {RootState} from "modules";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, exportModel, loading, reducer} from "react-coat-pkg";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, exportModel, reducer} from "react-coat-pkg";
 import api from "./api";
 
 // 定义本模块的State
@@ -29,14 +29,12 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   public putTableList(tableList: PhotoList): State {
     return {...this.state, tableList};
   }
-  @loading()
-  @effect
+  @effect()
   public async getTableList(filter: PhotoListFilter) {
     const tableList = await api.getPhotoList(filter);
     this.dispatch(this.callThisAction(this.putTableList, tableList));
   }
-  @loading() // 使用全局loading状态
-  @effect
+  @effect()
   protected async [ModuleNames.photos + "/INIT"]() {
     await this.dispatch(this.callThisAction(this.getTableList, null));
   }
