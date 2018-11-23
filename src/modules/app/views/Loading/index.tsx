@@ -1,5 +1,5 @@
 import * as React from "react";
-import {LoadingState} from "react-coat-pkg";
+import {LoadingState} from "react-coat";
 import "./index.less";
 
 interface Props {

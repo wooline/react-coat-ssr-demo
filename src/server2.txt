@@ -1,7 +1,7 @@
 import * as app from "modules/app";
 import * as photos from "modules/photos";
 import * as videos from "modules/videos";
-import {renderApp} from "react-coat-pkg";
+import {renderApp} from "react-coat";
 
 const modules = {app, photos, videos};
 

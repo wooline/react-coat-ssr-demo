@@ -1,7 +1,7 @@
 import {ModuleState as AppState} from "modules/app/facade";
 import {ModuleState as PhotosState} from "modules/photos/facade";
 import {ModuleState as VideosState} from "modules/videos/facade";
-import {RootState as BaseState} from "react-coat-pkg";
+import {RootState as BaseState} from "react-coat";
 import {ModuleNames} from "./names";
 
 export const ModuleGetter = {

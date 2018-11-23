@@ -1,6 +1,6 @@
 import * as env from "conf/env";
 import {ProjectConfig} from "entity/global";
-import {delayPromise} from "react-coat-pkg";
+import {delayPromise} from "react-coat";
 
 export class API {
   // mock一个耗时3秒的异步请求

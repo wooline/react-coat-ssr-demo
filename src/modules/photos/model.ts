@@ -1,7 +1,7 @@
 import {PhotoList, PhotoListFilter, PhotoListItem} from "entity/photo";
 import {RootState} from "modules";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, exportModel, reducer} from "react-coat-pkg";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, exportModel, reducer} from "react-coat";
 import api from "./api";
 
 // 定义本模块的State

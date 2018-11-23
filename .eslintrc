@@ -3,7 +3,6 @@
   "plugins": ["prettier"],
   "rules": {
     "prettier/prettier": "error",
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": true}],
     "import/no-dynamic-require": "off",
     "no-console": "off",
     "no-underscore-dangle": "off",

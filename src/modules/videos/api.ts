@@ -1,5 +1,5 @@
 import {PhotoList, PhotoListFilter} from "entity/photo";
-import {delayPromise} from "react-coat-pkg";
+import {delayPromise} from "react-coat";
 
 export class API {
   @delayPromise(3)

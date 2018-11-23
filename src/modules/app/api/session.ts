@@ -1,5 +1,5 @@
 import {CurUser, LoginRequest, LoginResponse} from "entity/session";
-import {delayPromise} from "react-coat-pkg";
+import {delayPromise} from "react-coat";
 
 export class API {
   // mock一个耗时3秒的异步请求

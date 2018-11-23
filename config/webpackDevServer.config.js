@@ -1,7 +1,6 @@
+const middleware = require("react-coat-dev-utils/express-middleware/dev-server").default;
 const path = require("path");
 const paths = require("./paths");
-
-const middleware = require(path.join(paths.scriptsPath, "./middleware/dev-server")).default;
 
 const appPackage = require(path.join(paths.rootPath, "./package.json"));
 

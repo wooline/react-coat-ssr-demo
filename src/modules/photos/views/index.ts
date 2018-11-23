@@ -1,4 +1,4 @@
-import {exportView} from "react-coat-pkg";
+import {exportView} from "react-coat";
 import model from "../model";
 import MainComponent from "./Main";
 

@@ -1,4 +1,4 @@
-import {buildApp} from "react-coat-pkg";
+import {buildApp} from "react-coat";
 
 declare global {
   interface Window {

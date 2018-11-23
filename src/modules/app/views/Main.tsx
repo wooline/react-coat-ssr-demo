@@ -4,7 +4,7 @@ import {RootState} from "modules";
 import {ModuleGetter} from "modules";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
-import {LoadingState, loadView} from "react-coat-pkg";
+import {LoadingState, loadView} from "react-coat";
 import {connect, DispatchProp} from "react-redux";
 import {Redirect, Route, Switch} from "react-router-dom";
 import LoginForm from "./LoginForm";

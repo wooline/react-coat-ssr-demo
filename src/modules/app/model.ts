@@ -5,7 +5,7 @@ import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, GetModule, LoadingState, loadModel, reducer} from "react-coat-pkg";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, GetModule, LoadingState, loadModel, reducer} from "react-coat";
 import {matchPath} from "react-router";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";

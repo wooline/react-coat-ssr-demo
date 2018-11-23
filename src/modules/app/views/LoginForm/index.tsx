@@ -1,7 +1,7 @@
 import {RootState} from "modules";
 import thisModule from "modules/app/facade";
 import * as React from "react";
-import {LoadingState} from "react-coat-pkg";
+import {LoadingState} from "react-coat";
 import {connect, DispatchProp} from "react-redux";
 
 interface Props extends DispatchProp {

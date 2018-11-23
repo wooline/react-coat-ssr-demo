@@ -110,7 +110,7 @@ const clientConfig = {
             },
           },
           {
-            loader: require.resolve(path.join(paths.scriptsPath, "./loader/check-model")),
+            loader: require.resolve("react-coat-dev-utils/webpack-loader/server-replace-async"),
           },
         ],
       },
@@ -225,7 +225,7 @@ const serverConfig = {
             },
           },
           {
-            loader: require.resolve(path.join(paths.scriptsPath, "./loader/server-replace-async")),
+            loader: require.resolve("react-coat-dev-utils/webpack-loader/server-replace-async"),
           },
         ],
       },
