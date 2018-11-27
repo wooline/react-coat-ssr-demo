@@ -29,8 +29,8 @@ class Component extends React.PureComponent<Props> {
   };
   public render() {
     const {className} = this.props;
-    const {extAdvertUrl, imageUrl, times} = this.props.config;
-    const linkPops = extAdvertUrl ? {target: "_blank", href: extAdvertUrl} : {};
+    const {linkUrl, imageUrl, times} = this.props.config;
+    const linkPops = linkUrl ? {target: "_blank", href: linkUrl} : {};
 
     return (
       <div className={`${ModuleNames.app}-Welcome g-doc-width ${className}`}>
@@ -46,14 +46,14 @@ class Component extends React.PureComponent<Props> {
           <em
             className="times"
             ref={node => {
-              this.timer = node;
+              this.timer = node as HTMLSpanElement;
             }}
           >
             {times}
           </em>
           <img
             ref={node => {
-              this.img = node;
+              this.img = node as HTMLImageElement;
             }}
             style={{position: "absolute", width: "1px", height: "1px", visibility: "hidden"}}
             src={imageUrl}
@@ -76,7 +76,7 @@ class Component extends React.PureComponent<Props> {
           this.onCountEnd();
         };
       }
-      initLoading.parentNode.removeChild(initLoading);
+      initLoading.parentNode!.removeChild(initLoading);
       let {times} = this.props.config;
       const el = this.timer;
       nid = setInterval(() => {
@@ -97,7 +97,7 @@ class Component extends React.PureComponent<Props> {
 const mapStateToProps = (state: RootState) => {
   return {
     startupStep: state.app.startupStep,
-    config: state.app.projectConfig.startupPage,
+    config: state.app.projectConfig!.startupPage,
   };
 };
 

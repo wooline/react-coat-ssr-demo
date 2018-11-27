@@ -1,3 +1,4 @@
+import {Button} from "antd-mobile";
 import {PhotoList} from "entity/photo";
 import {RootState} from "modules";
 import * as React from "react";
@@ -13,11 +14,8 @@ class Component extends React.PureComponent<Props> {
     return (
       tableList && (
         <div id="photo">
-          <ul>
-            {tableList.list.map(item => (
-              <li key={item.title}>{item.title}</li>
-            ))}
-          </ul>
+          <Button>default</Button>
+          <div style={{width: 50, height: 50, background: "red"}}>aaa</div>
         </div>
       )
     );

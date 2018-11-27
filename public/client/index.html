@@ -16,7 +16,7 @@
       body {
         background: #fff;
         padding: 0;
-        margin: 0 auto;
+        margin: 0 auto !important;
         overflow-x: hidden;
       }
 
@@ -37,15 +37,15 @@
 
       @keyframes g-init-loading-text {
         0% {
-          opacity: 1;
-        }
-
-        20% {
-          opacity: 0.1;
+          opacity: 0.5;
         }
 
         50% {
           opacity: 1;
+        }
+
+        100% {
+          opacity: 0.5;
         }
       }
 
@@ -80,7 +80,7 @@
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        animation: g-init-loading-text 2s infinite;
+        animation: g-init-loading-text 1s infinite;
       }
 
       .g-doc-width {
@@ -134,6 +134,26 @@
           false
         );
       })();
+    </script>
+    <!-- {react-coat-init-env} -->
+    <script>
+      function getInitEnv(global, isDev) {
+        global.InitEnv = isDev
+          ? {
+              clientPublicPath: "/client/",
+              apiServer: {
+                "^/ajax/": "@@LOCALHOST" + "/ajax/",
+                "^/captcha/": "@@LOCALHOST" + "/captcha/",
+              },
+            }
+          : {
+              clientPublicPath: "/client/",
+              apiServer: {
+                "^/ajax/": "@@LOCALHOST" + "/ajax/",
+                "^/captcha/": "@@LOCALHOST" + "/captcha/",
+              },
+            };
+      }
     </script>
   </head>
 

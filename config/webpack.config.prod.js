@@ -1,16 +1,27 @@
 const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HtmlReplaceWebpackPlugin = require("html-replace-webpack-plugin");
+const PostcssPxtorem = require("postcss-pxtorem");
 const ManifestPlugin = require("webpack-manifest-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const PostcssFlexbugsFixes = require("postcss-flexbugs-fixes");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const PostcssPresetEnv = require("postcss-preset-env");
+const TSImportPlugin = require("ts-import-plugin");
 const StylelintPlugin = require("stylelint-webpack-plugin");
 const paths = require("./paths");
 
+const appPackage = require(path.join(paths.rootPath, "./package.json"));
+// const EnvDefine = {BBBB: JSON.stringify(appPackage.devServer.url || "http://localhost:7443"), IS_DEV: JSON.stringify(true)};
+const htmlReplace = [
+  {
+    pattern: "@@LOCALHOST",
+    replacement: appPackage.devServer.url || "http://localhost:7443",
+  },
+];
 const conPath = path.join(paths.configPath, "./prod");
-const conEnv = require(path.join(conPath, "./env.json"));
+const conEnv = require(path.join(conPath, "./env"));
 
 const tsCompilerOptions = require(path.join(paths.rootPath, "./tsconfig.json")).compilerOptions;
 tsCompilerOptions.target = "es2017";
@@ -41,6 +52,10 @@ const getStyleLoaders = (cssOptions, preProcessor, preProcessorOptions) => {
             },
             stage: 3,
           }),
+          PostcssPxtorem({
+            rootValue: 37.5,
+            propList: ["*"],
+          }),
         ],
       },
     },
@@ -64,7 +79,7 @@ const clientConfig = {
     path: paths.distClientPath,
     filename: "js/[name].[chunkhash:8].js",
     chunkFilename: "js/[name].[chunkhash:8].chunk.js",
-    publicPath: conEnv.sitePath,
+    publicPath: conEnv.clientPublicPath,
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info => path.relative(paths.srcPath, info.absoluteResourcePath).replace(/\\/g, "/"),
   },
@@ -87,6 +102,8 @@ const clientConfig = {
   optimization: {
     minimize: false,
     splitChunks: {
+      chunks: "async",
+      minSize: 0,
       cacheGroups: {
         vendors: false,
       },
@@ -107,6 +124,15 @@ const clientConfig = {
             loader: require.resolve("ts-loader"),
             options: {
               transpileOnly: true,
+              getCustomTransformers: () => ({
+                before: [
+                  TSImportPlugin({
+                    libraryName: "antd-mobile",
+                    libraryDirectory: "es",
+                    style: true,
+                  }),
+                ],
+              }),
             },
           },
           {
@@ -122,7 +148,7 @@ const clientConfig = {
       },
       {
         test: /\.less$/,
-        use: getStyleLoaders({importLoaders: 2}, "less-loader"),
+        use: getStyleLoaders({importLoaders: 2}, "less-loader", {modifyVars: {hd: "0.026666rem"}}),
       },
       {
         test: /\.(png|jpe?g|gif)$/,
@@ -140,12 +166,13 @@ const clientConfig = {
       inject: true,
       template: path.join(paths.publicPath, "./client/index.html"),
     }),
+    new HtmlReplaceWebpackPlugin(htmlReplace),
     new MiniCssExtractPlugin({
       filename: "css/[name].[contenthash:8].css",
     }),
     new ManifestPlugin({
       fileName: "asset-manifest.json",
-      publicPath: conEnv.sitePath,
+      publicPath: conEnv.clientPublicPath,
     }),
     new StylelintPlugin({
       configFile: path.join(paths.rootPath, "./.stylelintrc.json"),
@@ -174,7 +201,7 @@ const serverConfig = {
     path: paths.distServerPath,
     filename: "[name].js",
     chunkFilename: "[name].chunk.js",
-    publicPath: conEnv.sitePath,
+    publicPath: conEnv.clientPublicPath,
     // Point sourcemap entries to original disk location (format as URL on Windows)
     devtoolModuleFilenameTemplate: info => path.relative(paths.srcPath, info.absoluteResourcePath).replace(/\\/g, "/"),
   },
@@ -222,6 +249,15 @@ const serverConfig = {
             options: {
               compilerOptions: tsCompilerOptions,
               transpileOnly: true,
+              getCustomTransformers: () => ({
+                before: [
+                  TSImportPlugin({
+                    libraryName: "antd-mobile",
+                    libraryDirectory: "es",
+                    style: true,
+                  }),
+                ],
+              }),
             },
           },
           {

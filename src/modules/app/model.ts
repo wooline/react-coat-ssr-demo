@@ -1,6 +1,5 @@
 import {CustomError, RedirectError} from "common/Errors";
-import {checkFastRedirect} from "common/utils";
-import * as env from "conf/env";
+import {checkFastRedirect, emptyModule} from "common/utils";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState} from "modules";
@@ -12,8 +11,8 @@ import * as settingsService from "./api/settings";
 
 // 定义本模块的State类型
 export interface State extends BaseModuleState {
-  projectConfig: ProjectConfig;
-  curUser: CurUser;
+  projectConfig: ProjectConfig | null;
+  curUser: CurUser | null;
   startupStep: StartupStep;
   loading: {
     global: LoadingState;
@@ -53,7 +52,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   }
 
   @reducer
-  protected putCurUser(curUser: {uid: string; username: string; hasLogin: boolean}): State {
+  protected putCurUser(curUser: CurUser): State {
     return {...this.state, curUser};
   }
 
@@ -105,7 +104,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
           if (curUser.hasLogin) {
             throw new RedirectError("301", "/");
           } else {
-            return null;
+            return emptyModule;
           }
         },
       },
@@ -116,11 +115,11 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
     if (!matchs.length) {
       matchs.push({
         module: () => {
-          throw new RedirectError("301", `${env.sitePath}404.html`);
+          throw new RedirectError("301", `${InitEnv.clientPublicPath}404.html`);
         },
       });
     }
-    await Promise.all(matchs.map(route => loadModel(route.module).then(subModel => subModel && subModel(this.store))));
+    await Promise.all(matchs.map(route => loadModel(route.module).then(subModel => subModel(this.store))));
   }
 
   // 兼听全局错误的Action，并发送给后台

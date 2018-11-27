@@ -1,4 +1,5 @@
-const middleware = require("react-coat-dev-utils/express-middleware/dev-server").default;
+const devServer = require("react-coat-dev-utils/express-middleware/dev-server").default;
+const devMock = require("react-coat-dev-utils/express-middleware/dev-mock").default;
 const path = require("path");
 const paths = require("./paths");
 
@@ -23,8 +24,10 @@ const config = {
   watchOptions: {
     ignored: /node_modules/,
   },
+  proxy: appPackage.devServer.proxy,
   before: app => {
-    app.use(middleware(appPackage.devServer.ssr));
+    app.use(devServer(appPackage.devServer.ssr, appPackage.devServer.proxy));
+    app.use(devMock(appPackage.devServer.mock));
   },
 };
 module.exports = config;

@@ -14,7 +14,7 @@ interface Props extends HTMLAttributes<HTMLSpanElement> {
 
 export default class Component extends React.PureComponent<Props> {
   public static defaultProps: Props = {
-    type: null,
+    type: IconClass.RELOAD,
     textPosition: "right",
   };
 

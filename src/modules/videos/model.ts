@@ -6,8 +6,8 @@ import api from "./api";
 
 // 定义本模块的State
 export interface State extends BaseModuleState {
-  tableList: PhotoList;
-  curItem: PhotoListItem;
+  tableList: PhotoList | null;
+  curItem: PhotoListItem | null;
 }
 
 // 定义本模块的Handlers
@@ -17,7 +17,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
     const initState: State = {
       tableList: null,
       curItem: null,
-      loading: null,
+      loading: {},
     };
     super(initState);
   }
@@ -36,7 +36,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   }
   @effect()
   protected async [ModuleNames.videos + "/INIT"]() {
-    await this.dispatch(this.callThisAction(this.getTableList, null));
+    await this.dispatch(this.callThisAction(this.getTableList, {title: ""}));
   }
 }
 

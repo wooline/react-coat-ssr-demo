@@ -24,7 +24,7 @@ compiler.run((error, stats) => {
     }
     process.exit(1);
   } else {
-    console.log(
+    console.info(
       stats.toString({
         entrypoints: false,
         colors: true,

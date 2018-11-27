@@ -4,6 +4,7 @@ export interface CurUser {
   uid: string;
   username: string;
   hasLogin: boolean;
+  avatarUrl: string;
 }
 export interface LoginRequest {
   username: string;

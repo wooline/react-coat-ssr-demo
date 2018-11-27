@@ -7,5 +7,5 @@ export type Error_NotFound = ErrorType<"404 notFound">;
 
 export interface DefaultResult<Data = any, Error extends ErrorType = ErrorType> {
   data: Data;
-  error: Error;
+  error: Error | null;
 }

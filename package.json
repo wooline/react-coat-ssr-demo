@@ -14,6 +14,7 @@
   "license": "ISC",
   "peerDependencies": {
     "asset-require-hook": "^1.2.0",
+    "axios": "^0.15.0",
     "babel-eslint": "^10.0.0",
     "chalk": "^2.0.0",
     "cross-env": "^5.0.0",
@@ -27,6 +28,7 @@
     "file-loader": "^2.0.0",
     "fs-extra": "^7.0.0",
     "html-webpack-plugin": "^3.2.0",
+    "html-replace-webpack-plugin": "^2.5.0",
     "less": "^3.5.0",
     "less-loader": "^4.0.0",
     "mini-css-extract-plugin": "^0.4.0",
@@ -35,6 +37,7 @@
     "postcss-loader": "^3.0.0",
     "postcss-preset-env": "^6.1.0",
     "postcss-safe-parser": "^4.0.0",
+    "postcss-pxtorem": "^4.0.0",
     "prettier": "^1.15.0",
     "fork-ts-checker-webpack-plugin": "^0.4.10",
     "style-loader": "^0.23.0",
@@ -54,13 +57,14 @@
     "yargs": "^12.0.0"
   },
   "devDependencies": {
-    "react-coat-dev-utils": "1.0.0-alpha",
-    "react-coat-dev-pkg": "1.0.0-alpha"
+    "react-coat-dev-utils": "1.0.0-alpha.3",
+    "react-coat-dev-pkg": "1.0.0-alpha.3"
   },
   "dependencies": {
     "antd-mobile": "^2.2.6",
-    "react-coat": "4.0.0-alpha.1",
-    "react-coat-pkg": "4.0.0-alpha.2"
+    "react-coat": "4.0.0-alpha.2",
+    "react-coat-pkg": "4.0.0-alpha.2",
+    "ts-import-plugin": "^1.5.5"
   },
   "browserslist": [
     ">0.2%",
@@ -69,12 +73,12 @@
     "not op_mini all"
   ],
   "devServer": {
-    "port": 7443,
-    "ssr": false,
+    "url": "http://localhost:7443",
+    "ssr": true,
     "mock": true,
     "proxy": {
-      "/ajax": {
-        "target": "http://localhost:3003",
+      "^/ajax/": {
+        "target": "http://localhost:7443/",
         "secure": false,
         "changeOrigin": true
       }

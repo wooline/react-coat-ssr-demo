@@ -4,10 +4,13 @@ import {ModuleNames} from "modules/names";
 import {Actions, BaseModuleHandlers, BaseModuleState, effect, exportModel, reducer} from "react-coat";
 import api from "./api";
 
+const defaultFilter: PhotoListFilter = {
+  title: "",
+};
 // 定义本模块的State
 export interface State extends BaseModuleState {
-  tableList: PhotoList;
-  curItem: PhotoListItem;
+  tableList: PhotoList | null;
+  curItem: PhotoListItem | null;
 }
 
 // 定义本模块的Handlers
@@ -17,7 +20,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
     const initState: State = {
       tableList: null,
       curItem: null,
-      loading: null,
+      loading: {},
     };
     super(initState);
   }
@@ -30,13 +33,14 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
     return {...this.state, tableList};
   }
   @effect()
-  public async getTableList(filter: PhotoListFilter) {
-    const tableList = await api.getPhotoList(filter);
+  public async getTableList(filter: Partial<PhotoListFilter>) {
+    const request = {...defaultFilter, ...filter};
+    const tableList = await api.getPhotoList(request);
     this.dispatch(this.callThisAction(this.putTableList, tableList));
   }
   @effect()
   protected async [ModuleNames.photos + "/INIT"]() {
-    await this.dispatch(this.callThisAction(this.getTableList, null));
+    await this.dispatch(this.callThisAction(this.getTableList, {}));
   }
 }
 

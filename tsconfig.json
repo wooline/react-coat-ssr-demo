@@ -17,9 +17,10 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "importHelpers": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"]
 }

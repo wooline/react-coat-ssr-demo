@@ -5,6 +5,6 @@ const paths = require("../config/paths");
 const appPackage = require(path.join(paths.rootPath, "./package.json"));
 
 if (!appPackage.devServer.ssr) {
-  console.log(chalk.red("The SSR has been disabled. Please enable it on package.json. \n"));
+  console.info(chalk.red("The SSR has been disabled. Please enable it on package.json. \n"));
   process.exit(1);
 }

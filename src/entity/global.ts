@@ -1,9 +1,11 @@
 export interface StartupPageConfig {
-  extAdvertUrl: string;
+  linkUrl: string;
   imageUrl: string;
   times: number;
 }
 export interface ProjectConfig {
+  logoUrl: string;
+  newMessage: number;
   startupPage: StartupPageConfig;
 }
 export enum StartupStep {

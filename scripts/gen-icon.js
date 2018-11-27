@@ -77,7 +77,7 @@ function analyzeCSS(content) {
       assetURLs
         .map(url => transformToLocalURL(url))
         .filter(_ => _)
-        .join(","),
+        .join(",")
     );
   lessContent = lessContent.replace("/* {2} */", content.match(/\.icon-(.*?)\}/g).join("\n"));
   fs.writeFileSync(cssPath, lessContent);
@@ -102,7 +102,7 @@ function generatePreviewHtml(iconList, cssURL) {
       .toString()
       .replace("{1}", cssURL)
       .replace("{2}", icons.join(""))
-      .replace("{3}", new Date().toLocaleString()),
+      .replace("{3}", new Date().toLocaleString())
   );
 }
 

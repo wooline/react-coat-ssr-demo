@@ -1,18 +1,29 @@
 const path = require("path");
 const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const HtmlReplaceWebpackPlugin = require("html-replace-webpack-plugin");
+const PostcssPxtorem = require("postcss-pxtorem");
 const ManifestPlugin = require("webpack-manifest-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const PostcssFlexbugsFixes = require("postcss-flexbugs-fixes");
 const PostcssPresetEnv = require("postcss-preset-env");
 const StylelintPlugin = require("stylelint-webpack-plugin");
+const TSImportPlugin = require("ts-import-plugin");
 const paths = require("./paths");
 
+const appPackage = require(path.join(paths.rootPath, "./package.json"));
+// const EnvDefine = {"process.env.DEV_URL": JSON.stringify(appPackage.devServer.url || "http://localhost:7443")};
+const htmlReplace = [
+  {
+    pattern: "@@LOCALHOST",
+    replacement: appPackage.devServer.url || "http://localhost:7443",
+  },
+];
 const conPath = path.join(paths.configPath, "./dev");
 const tsCompilerOptions = require(path.join(paths.rootPath, "./tsconfig.json")).compilerOptions;
 tsCompilerOptions.target = "es2017";
 
-const getStyleLoaders = (cssOptions, preProcessor) => {
+const getStyleLoaders = (cssOptions, preProcessor, preProcessorOptions) => {
   const loaders = [
     require.resolve("style-loader"),
     {
@@ -36,12 +47,16 @@ const getStyleLoaders = (cssOptions, preProcessor) => {
             },
             stage: 3,
           }),
+          PostcssPxtorem({
+            rootValue: 37.5,
+            propList: ["*"],
+          }),
         ],
       },
     },
   ];
   if (preProcessor) {
-    loaders.push(require.resolve(preProcessor));
+    loaders.push({loader: require.resolve(preProcessor), options: preProcessorOptions});
   }
   return loaders;
 };
@@ -79,6 +94,15 @@ const clientConfig = {
             loader: require.resolve("ts-loader"),
             options: {
               transpileOnly: true,
+              getCustomTransformers: () => ({
+                before: [
+                  TSImportPlugin({
+                    libraryName: "antd-mobile",
+                    libraryDirectory: "es",
+                    style: true,
+                  }),
+                ],
+              }),
             },
           },
           {
@@ -94,7 +118,7 @@ const clientConfig = {
       },
       {
         test: /\.less$/,
-        use: getStyleLoaders({importLoaders: 2}, "less-loader"),
+        use: getStyleLoaders({importLoaders: 2}, "less-loader", {modifyVars: {hd: "0.026666rem"}}),
       },
       {
         test: /\.(png|jpe?g|gif)$/,
@@ -111,6 +135,7 @@ const clientConfig = {
     new HtmlWebpackPlugin({
       template: path.join(paths.publicPath, "./client/index.html"),
     }),
+    new HtmlReplaceWebpackPlugin(htmlReplace),
     new ManifestPlugin({
       fileName: "client/asset-manifest.json",
       publicPath: "/",
@@ -189,6 +214,15 @@ const serverConfig = {
             options: {
               compilerOptions: tsCompilerOptions,
               transpileOnly: true,
+              getCustomTransformers: () => ({
+                before: [
+                  TSImportPlugin({
+                    libraryName: "antd-mobile",
+                    libraryDirectory: "es",
+                    style: true,
+                  }),
+                ],
+              }),
             },
           },
           {

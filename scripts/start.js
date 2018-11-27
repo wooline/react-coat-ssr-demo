@@ -13,8 +13,9 @@ const webpackConfig = require(path.join(paths.configPath, "./webpack.config.dev"
 const devServerConfig = require(path.join(paths.configPath, "./webpackDevServer.config"));
 // const formatWebpackMessages = require('./formatWebpackMessages');
 
-const port = appPackage.devServer.port || 7443;
-webpackConfig[0].entry.unshift(`webpack-dev-server/client?http://0.0.0.0:${port}`, "webpack/hot/dev-server");
+const [, , port] = (appPackage.devServer.url || "http://localhost:7443").split(/:\/*/);
+
+webpackConfig[0].entry.unshift(`webpack-dev-server/client?http://0.0.0.0:7443`, "webpack/hot/dev-server");
 
 function clearConsole() {
   process.stdout.write(process.platform === "win32" ? "\x1B[2J\x1B[0f" : "\x1B[2J\x1B[3J\x1B[H");
@@ -64,7 +65,7 @@ devServer.listen(port, "0.0.0.0", error => {
     process.exit(1);
   }
   clearConsole();
-  console.log(chalk.cyan("Starting the development server...\n"));
+  console.info(chalk.cyan("Starting the development server...\n"));
   return null;
 });
 ["SIGINT", "SIGTERM"].forEach(sig => {
