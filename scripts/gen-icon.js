@@ -120,7 +120,7 @@ function spawn(command, args) {
 }
 
 async function generate() {
-  console.info(chalk`{white.bold usage:} 🎈 yarn icon \{icon-font-css-url\}`);
+  console.info(chalk`{white.bold usage:} 🎈 npm run gen-icon \{icon-font-css-url\}`);
   const cssURL = yargs.argv._[0];
 
   try {

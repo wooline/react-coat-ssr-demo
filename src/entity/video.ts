@@ -1,9 +1,8 @@
 import {Defined as ArticleDefined, Resource as ArticleResource} from "./article";
 
-export interface PhotoItem {
+export interface VideoItem {
   id: string;
-  photoId: string;
-  photoUrl: string;
+  url: string;
 }
 interface Item {
   title: string;
@@ -11,7 +10,7 @@ interface Item {
   commentCount: number;
   coverUrl: string;
   createTimeDesc: string;
-  photos: PhotoItem[];
+  video: VideoItem[];
 }
 export interface Defined extends ArticleDefined {
   ListItem: Item;

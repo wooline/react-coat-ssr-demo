@@ -1,9 +1,9 @@
 import request from "common/request";
-import {PhotoList, PhotoListFilter} from "entity/photo";
+import {ListData, ListSearch} from "entity/photo";
 
 export class API {
-  public getPhotoList(filter: PhotoListFilter): Promise<PhotoList> {
-    return request<PhotoList>("get", "/ajax/photos", filter);
+  public searchList(listSearch: ListSearch): Promise<ListData> {
+    return request("get", "/ajax/photos", listSearch);
   }
 }
 

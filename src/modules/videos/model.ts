@@ -1,42 +1,36 @@
-import {PhotoList, PhotoListFilter, PhotoListItem} from "entity/photo";
-import {RootState} from "modules";
+import ArticleHandlers from "common/ArticleHandlers";
+import {ListSearch, Resource, State} from "entity/video";
+export {State} from "entity/video";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, exportModel, reducer} from "react-coat";
+import {Actions, effect, exportModel, LoadingState} from "react-coat";
 import api from "./api";
 
-// 定义本模块的State
-export interface State extends BaseModuleState {
-  tableList: PhotoList | null;
-  curItem: PhotoListItem | null;
-}
+const defaultSearch: ListSearch = {
+  title: null,
+  page: 1,
+  pageSize: 10,
+};
 
-// 定义本模块的Handlers
-class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
+class ModuleHandlers extends ArticleHandlers<State, Resource> {
   constructor() {
-    // 定义本模块State的初始值
-    const initState: State = {
-      tableList: null,
-      curItem: null,
-      loading: {},
-    };
-    super(initState);
-  }
-  @reducer
-  public putCurItem(curItem: PhotoListItem): State {
-    return {...this.state, curItem};
-  }
-  @reducer
-  public putTableList(tableList: PhotoList): State {
-    return {...this.state, tableList};
-  }
-  @effect()
-  public async getTableList(filter: PhotoListFilter) {
-    const tableList = await api.getPhotoList(filter);
-    this.dispatch(this.callThisAction(this.putTableList, tableList));
+    super(
+      {
+        listData: {
+          search: {...defaultSearch},
+          items: null,
+          summary: null,
+        },
+        loading: {global: LoadingState.Stop},
+      },
+      {
+        defaultSearch,
+        api,
+      }
+    );
   }
   @effect()
   protected async [ModuleNames.videos + "/INIT"]() {
-    await this.dispatch(this.callThisAction(this.getTableList, {title: ""}));
+    await this.dispatch(this.callThisAction(this.searchList));
   }
 }
 

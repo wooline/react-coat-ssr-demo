@@ -1,7 +1,7 @@
 import {Icon, NavBar} from "antd-mobile";
 import {routerActions} from "connected-react-router";
 import {RootState} from "modules";
-import React from "react";
+import * as React from "react";
 import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
@@ -11,13 +11,13 @@ interface Props extends DispatchProp {
 }
 
 class Component extends React.PureComponent<Props> {
-  onShowUser = () => {
+  private onShowUser = () => {
     // this.props.dispatch(thisModule.actions.showCurModal(CurModal.userInfo));
   };
-  openBulletins = () => {
+  public openBulletins = () => {
     this.props.dispatch(routerActions.push("/bulletins"));
   };
-  render() {
+  public render() {
     const {logoUrl, avatarUrl} = this.props;
     return (
       <div className="app-TopNav">

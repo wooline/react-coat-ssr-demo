@@ -11,7 +11,7 @@
     "no-console": false,
     "jsx-no-lambda": false,
     "member-ordering": false,
-    "member-access": false
+    "member-access": true
   },
   "linterOptions": {
     "exclude": [] //"scripts/**/*"

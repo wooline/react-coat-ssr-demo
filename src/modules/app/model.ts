@@ -1,16 +1,18 @@
 import {CustomError, RedirectError} from "common/Errors";
+import {unserializeUrlQuery} from "common/request";
 import {checkFastRedirect, emptyModule} from "common/utils";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, GetModule, LoadingState, loadModel, reducer} from "react-coat";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, GetModule, LoadingState, loadModel, LOCATION_CHANGE, reducer, RouterState} from "react-coat";
 import {matchPath} from "react-router";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 
 // 定义本模块的State类型
 export interface State extends BaseModuleState {
+  query: {[moduleName: string]: {[key: string]: any}};
   projectConfig: ProjectConfig | null;
   curUser: CurUser | null;
   startupStep: StartupStep;
@@ -25,6 +27,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   constructor() {
     // 定义本模块State的初始值
     const initState: State = {
+      query: {},
       projectConfig: null,
       curUser: null,
       startupStep: StartupStep.init,
@@ -55,7 +58,29 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   protected putCurUser(curUser: CurUser): State {
     return {...this.state, curUser};
   }
-
+  private parseQuery(search: string): {[moduleName: string]: {[key: string]: any}} {
+    return search.split(/[&?]/).reduce((pre, cur) => {
+      const [key, val] = cur.split("=");
+      if (key) {
+        const arr = key.split("-");
+        const moduleName = arr.shift();
+        const moduleKey = arr.join("-");
+        if (moduleName && moduleKey) {
+          if (!pre[moduleName]) {
+            pre[moduleName] = {};
+          }
+          pre[moduleName][moduleKey] = unserializeUrlQuery(val);
+        }
+      }
+      return pre;
+    }, {});
+  }
+  @reducer
+  protected [LOCATION_CHANGE](router: RouterState): State {
+    // 集中解析url query参数
+    const query = this.parseQuery(router.location.search);
+    return {...this.state, query};
+  }
   // 兼听自已的INIT Action，做一些异步数据请求，不需要手动触发，所以请使用protected或private
   @effect()
   protected async [ModuleNames.app + "/INIT"]() {
@@ -76,10 +101,12 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
     ) {
       return;
     }
+    const query = this.parseQuery(router.location.search);
     const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);
     this.dispatch(
       this.callThisAction(this.UPDATE, {
         ...this.state,
+        query,
         projectConfig,
         curUser,
         startupStep: StartupStep.configLoaded,
@@ -136,6 +163,18 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
     } else {
       await settingsService.api.reportError(error);
     }
+  }
+  @reducer
+  protected MOUNT(): State {
+    console.log(this.namespace, "mount");
+    return this.state;
+    // this.dispatch(this.callThisAction(this.searchList, {options: {}, extend: "CURRENT"}));
+  }
+  @reducer
+  protected UNMOUNT(): State {
+    console.log(this.namespace, "UNMOUNT");
+    return this.state;
+    // this.dispatch(this.callThisAction(this.searchList, {options: {}, extend: "CURRENT"}));
   }
 }
 

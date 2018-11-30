@@ -118,7 +118,7 @@ const clientConfig = {
       },
       {
         test: /\.less$/,
-        use: getStyleLoaders({importLoaders: 2}, "less-loader", {modifyVars: {hd: "0.026666rem"}}),
+        use: getStyleLoaders({importLoaders: 2}, "less-loader", {javascriptEnabled: true, modifyVars: {hd: "0.026666rem"}}),
       },
       {
         test: /\.(png|jpe?g|gif)$/,
@@ -126,6 +126,13 @@ const clientConfig = {
         loader: require.resolve("url-loader"),
         query: {
           limit: 50,
+          name: "client/media/[name].[hash:8].[ext]",
+        },
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        loader: "file-loader",
+        options: {
           name: "client/media/[name].[hash:8].[ext]",
         },
       },

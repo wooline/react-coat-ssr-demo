@@ -8,9 +8,9 @@
     "connection": "close"
   },
   "response": {
-    "list": [
+    "items": [
       {
-        "title": "生化危机外传 第19卷",
+        "title": "afdsfdasfasdfdasfasdfasd",
         "commentCount": 500,
         "imageCount": 10,
         "coverUrl": "http://103.90.137.51:8020/images/20180914203359610.PNG",
@@ -18,7 +18,7 @@
         "clickCount": 500
       },
       {
-        "title": "梁朝伟 Tony Leung",
+        "title": "gfhgfhfh",
         "commentCount": 120,
         "imageCount": 5,
         "coverUrl": "http://103.90.137.51:8020/images/20180914203359610.PNG",

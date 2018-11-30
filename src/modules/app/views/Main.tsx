@@ -6,9 +6,12 @@ import * as React from "react";
 import {LoadingState, loadView} from "react-coat";
 import {connect, DispatchProp} from "react-redux";
 import {Redirect, Route, Switch} from "react-router-dom";
+import BottomNav from "./BottomNav";
 import LoginForm from "./LoginForm";
 import TopNav from "./TopNav";
 import Welcome from "./Welcome";
+
+import "asset/css/global.less";
 
 interface Props extends DispatchProp {
   curUser: CurUser;
@@ -18,6 +21,7 @@ interface Props extends DispatchProp {
 
 class Component extends React.PureComponent<Props> {
   private PhotosView = loadView(ModuleGetter.photos, "Main");
+  private VideosView = loadView(ModuleGetter.videos, "Main");
   public render() {
     const {startupStep} = this.props;
     return (
@@ -28,8 +32,10 @@ class Component extends React.PureComponent<Props> {
             <Switch>
               <Redirect exact={true} path="/" to="/photos" />
               <Route exact={true} path="/photos" component={this.PhotosView} />
+              <Route exact={true} path="/videos" component={this.VideosView} />
               <Route exact={true} path="/login" component={LoginForm} />
             </Switch>
+            <BottomNav />
           </div>
         )}
         {(startupStep === StartupStep.configLoaded || startupStep === StartupStep.startupImageLoaded || startupStep === StartupStep.startupCountEnd) && <Welcome className={startupStep} />}

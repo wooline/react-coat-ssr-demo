@@ -1,33 +1,31 @@
-import {PhotoList} from "entity/photo";
+import {ListData} from "entity/video";
 import {RootState} from "modules";
 import * as React from "react";
 import {connect} from "react-redux";
 
 interface Props {
-  tableList: PhotoList;
+  listData: ListData;
 }
 
 class Component extends React.PureComponent<Props> {
   public render() {
-    const {tableList} = this.props;
-    return (
-      tableList && (
-        <div id="photo">
-          <ul>
-            {tableList.list.map(item => (
-              <li>{item.title}</li>
-            ))}
-          </ul>
-        </div>
-      )
-    );
+    const {items} = this.props.listData;
+    return items ? (
+      <div id="videos">
+        <ul>
+          {items.map(item => (
+            <li key={item.title}>{item.title}</li>
+          ))}
+        </ul>
+      </div>
+    ) : null;
   }
 }
 
 const mapStateToProps = (state: RootState) => {
   const model = state.videos;
   return {
-    tableList: model.tableList,
+    listData: model.listData,
   };
 };
 
