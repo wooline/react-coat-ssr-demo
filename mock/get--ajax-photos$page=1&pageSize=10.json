@@ -8,6 +8,10 @@
     "connection": "close"
   },
   "response": {
+    "search": {
+      "page": 1,
+      "pageSize": 10
+    },
     "items": [
       {
         "title": "生化危机外传 第19卷",

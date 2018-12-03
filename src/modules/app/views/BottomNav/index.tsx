@@ -1,16 +1,31 @@
 import {TabBar} from "antd-mobile";
+import {isCur, toUrl} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import {routerActions} from "connected-react-router";
 import {RootState} from "modules";
+import {ModuleNames} from "modules/names";
 import React from "react";
 import {connect, DispatchProp} from "react-redux";
-
 import "./index.less";
 
 interface Props extends DispatchProp {
   pathname: string;
 }
-
+const PhotosLink = (
+  <a href={toUrl(ModuleNames.photos)} onClick={e => e.preventDefault()}>
+    <Icon type={IconClass.PICTURE} />
+  </a>
+);
+const VideosLink = (
+  <a href={toUrl(ModuleNames.videos)} onClick={e => e.preventDefault()}>
+    <Icon type={IconClass.LIVE} />
+  </a>
+);
+const MessageLink = (
+  <a href={toUrl(ModuleNames.messages)} onClick={e => e.preventDefault()}>
+    <Icon type={IconClass.MESSAGE} />
+  </a>
+);
 class Component extends React.PureComponent<Props> {
   public render() {
     const props = {...this.props, noRenderContent: true};
@@ -19,35 +34,33 @@ class Component extends React.PureComponent<Props> {
       <div className="app-BottomNav g-doc-width">
         <TabBar {...props}>
           <TabBar.Item
-            icon={<Icon type={IconClass.PICTURE} />}
-            selectedIcon={<Icon type={IconClass.PICTURE} />}
+            icon={PhotosLink}
+            selectedIcon={PhotosLink}
             title="风景"
             key="photos"
-            selected={pathname === "/photos"}
+            selected={isCur(pathname, ModuleNames.photos)}
             onPress={() => {
-              this.props.dispatch(routerActions.push("/photos"));
+              this.props.dispatch(routerActions.push(toUrl(ModuleNames.photos)));
             }}
           />
           <TabBar.Item
             title="视频"
             key="videos"
-            icon={<Icon type={IconClass.LIVE} />}
-            selectedIcon={<Icon type={IconClass.LIVE} />}
-            selected={pathname === "/videos"}
+            icon={VideosLink}
+            selectedIcon={VideosLink}
+            selected={isCur(pathname, ModuleNames.videos)}
             onPress={() => {
-              this.props.dispatch(routerActions.push("/videos"));
+              this.props.dispatch(routerActions.push(toUrl(ModuleNames.videos)));
             }}
           />
           <TabBar.Item
-            icon={<Icon type={IconClass.MESSAGE} />}
-            selectedIcon={<Icon type={IconClass.MESSAGE} />}
+            icon={MessageLink}
+            selectedIcon={MessageLink}
             title="消息"
             key="messages"
-            selected={pathname === "/support"}
+            selected={isCur(pathname, ModuleNames.messages)}
             onPress={() => {
-              if (pathname !== "/support") {
-                this.props.dispatch(routerActions.push("/support"));
-              }
+              this.props.dispatch(routerActions.push(toUrl(ModuleNames.messages)));
             }}
           />
         </TabBar>

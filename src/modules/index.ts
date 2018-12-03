@@ -14,6 +14,9 @@ export const ModuleGetter = {
   [ModuleNames.videos]: () => {
     return import(/* webpackChunkName: "videos" */ "modules/videos");
   },
+  [ModuleNames.messages]: () => {
+    return import(/* webpackChunkName: "videos" */ "modules/videos");
+  },
 };
 
 export type RootState = BaseState & {

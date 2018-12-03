@@ -10,19 +10,19 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
   }
 
   @reducer
-  public putListData(listData: R["ListData"]): S {
+  protected putListData(listData: R["ListData"]): S {
     return {...(this.state as any), listData};
   }
   @reducer
-  public putItemEditor(itemEditor?: R["ItemEditor"]): S {
+  protected putItemEditor(itemEditor?: R["ItemEditor"]): S {
     return {...(this.state as any), itemEditor};
   }
   @reducer
-  public putItemDetail(itemDetail: R["ItemDetail"]): S {
+  protected putItemDetail(itemDetail: R["ItemDetail"]): S {
     return {...(this.state as any), itemDetail};
   }
   @reducer
-  public putSelectedIds(selectedIds: string[]): S {
+  protected putSelectedIds(selectedIds: string[]): S {
     return {...(this.state as any), selectedIds};
   }
   @effect()
@@ -55,13 +55,13 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
     return listData;
   }
   @effect()
-  public async getItemDetail(id: string) {
+  protected async getItemDetail(id: string) {
     const itemDetail = await this.config.api.getItem!(id);
     this.dispatch(this.callThisAction(this.putItemDetail, itemDetail));
     this.config.api.hitItem!(id);
   }
   @effect()
-  public async createItem(data: R["ItemCreateData"]) {
+  protected async createItem(data: R["ItemCreateData"]) {
     const response = await this.config.api.createItem!(data);
     if (!response.error) {
       Toast.info("操作成功");
@@ -73,7 +73,7 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
     return response;
   }
   @effect()
-  public async updateItem(data: R["ItemUpdateData"]) {
+  protected async updateItem(data: R["ItemUpdateData"]) {
     const response = await this.config.api.updateItem!(data);
     if (!response.error) {
       Toast.info("操作成功");
@@ -85,24 +85,13 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
     return response;
   }
   @effect()
-  public async deleteItems(ids: string[]) {
+  protected async deleteItems(ids: string[]) {
     await this.config.api.deleteItems!(ids);
     Toast.info("操作成功");
     this.dispatch(this.callThisAction(this.putSelectedIds, [])); // 清空当前选中项
     this.dispatch(this.callThisAction(this.searchList, {options: {}, extend: "CURRENT"})); // 刷新当前页
   }
-  @reducer
-  protected MOUNT(): S {
-    console.log(this.namespace, "mount");
-    return this.state;
-    // this.dispatch(this.callThisAction(this.searchList, {options: {}, extend: "CURRENT"}));
-  }
-  @reducer
-  protected UNMOUNT(): S {
-    console.log(this.namespace, "UNMOUNT");
-    return this.state;
-    // this.dispatch(this.callThisAction(this.searchList, {options: {}, extend: "CURRENT"}));
-  }
+
   /* @effect()
   protected async [LOCATION_CHANGE](router: RouterState) {
     if (router.location.pathname === this.config.pathname) {

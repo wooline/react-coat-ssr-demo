@@ -8,6 +8,10 @@
     "connection": "close"
   },
   "response": {
+    "search": {
+      "page": 1,
+      "pageSize": 10
+    },
     "items": [
       {
         "title": "afdsfdasfasdfdasfasdfasd",

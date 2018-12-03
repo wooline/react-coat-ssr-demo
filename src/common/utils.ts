@@ -1,4 +1,3 @@
-import {Module} from "react-coat";
 import {matchPath} from "react-router";
 import {RedirectError} from "./Errors";
 
@@ -10,7 +9,6 @@ export function checkFastRedirect(pathname: string, rules: Array<{path?: string;
   });
   return true;
 }
-export const emptyModule: Module = {model: () => Promise.resolve(void 0), views: {}};
 
 export type PickOptional<T> = Pick<T, {[K in keyof T]-?: {} extends {[P in K]: T[K]} ? K : never}[keyof T]>;
 

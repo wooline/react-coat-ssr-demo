@@ -1,6 +1,7 @@
 import {CustomError, RedirectError} from "common/Errors";
 import {unserializeUrlQuery} from "common/request";
-import {checkFastRedirect, emptyModule} from "common/utils";
+import {emptyModule} from "common/routers";
+import {checkFastRedirect} from "common/routers";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState} from "modules";
@@ -43,7 +44,10 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   public putStartup(startupStep: StartupStep): State {
     return {...this.state, startupStep};
   }
-
+  @reducer
+  public putQuery(query: any): State {
+    return {...this.state, query};
+  }
   @effect("login") // 使用自定义loading状态
   public async login(payload: {username: string; password: string}) {
     const loginResult = await sessionService.api.login(payload);
@@ -75,32 +79,38 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
       return pre;
     }, {});
   }
-  @reducer
-  protected [LOCATION_CHANGE](router: RouterState): State {
+
+  @effect(null)
+  protected async [LOCATION_CHANGE](router: RouterState) {
+    const redirect = checkFastRedirect(router.location.pathname);
+    if (redirect) {
+      this.dispatch(this.routerActions.replace(redirect.url));
+    }
     // 集中解析url query参数
     const query = this.parseQuery(router.location.search);
-    return {...this.state, query};
+    this.dispatch(this.callThisAction(this.putQuery, query));
   }
+
+  // 兼听全局错误的Action，并发送给后台
+  // 兼听外部模块的Action，不需要手动触发，所以请使用protected或private
+  @effect(null) // 不需要loading，设置为null
+  protected async [ERROR](error: CustomError) {
+    if (error.code === "301" || error.code === "302") {
+      const url = error.detail as string;
+      if (url.endsWith("404.html")) {
+        window.location.href = error.detail;
+      } else {
+        this.dispatch(this.routerActions.replace(url));
+      }
+    } else {
+      await settingsService.api.reportError(error);
+    }
+  }
+
   // 兼听自已的INIT Action，做一些异步数据请求，不需要手动触发，所以请使用protected或private
   @effect()
   protected async [ModuleNames.app + "/INIT"]() {
     const router = this.rootState.router;
-    // 对于一些不需要运算的重定向跳转，可以称之为前置快速重定向，
-    // 如果启用ssr，应当在服务器路由层就进行拦截跳转，如果路由层没有做，此处也会补救
-    if (
-      checkFastRedirect(
-        router.location.pathname,
-        [
-          {
-            path: "/",
-            exact: true,
-            module: "/photos",
-          },
-        ]
-      ) !== true
-    ) {
-      return;
-    }
     const query = this.parseQuery(router.location.search);
     const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);
     this.dispatch(
@@ -147,34 +157,6 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
       });
     }
     await Promise.all(matchs.map(route => loadModel(route.module).then(subModel => subModel(this.store))));
-  }
-
-  // 兼听全局错误的Action，并发送给后台
-  // 兼听外部模块的Action，不需要手动触发，所以请使用protected或private
-  @effect(null) // 不需要loading，设置为null
-  protected async [ERROR](error: CustomError) {
-    if (error.code === "301" || error.code === "302") {
-      const url = error.detail as string;
-      if (url.endsWith("404.html")) {
-        window.location.href = error.detail;
-      } else {
-        this.dispatch(this.routerActions.replace(url));
-      }
-    } else {
-      await settingsService.api.reportError(error);
-    }
-  }
-  @reducer
-  protected MOUNT(): State {
-    console.log(this.namespace, "mount");
-    return this.state;
-    // this.dispatch(this.callThisAction(this.searchList, {options: {}, extend: "CURRENT"}));
-  }
-  @reducer
-  protected UNMOUNT(): State {
-    console.log(this.namespace, "UNMOUNT");
-    return this.state;
-    // this.dispatch(this.callThisAction(this.searchList, {options: {}, extend: "CURRENT"}));
   }
 }
 

@@ -5,11 +5,13 @@ import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {LoadingState, loadView} from "react-coat";
 import {connect, DispatchProp} from "react-redux";
-import {Redirect, Route, Switch} from "react-router-dom";
+import {Route, Switch} from "react-router-dom";
 import BottomNav from "./BottomNav";
 import LoginForm from "./LoginForm";
 import TopNav from "./TopNav";
 import Welcome from "./Welcome";
+
+import {toUrl} from "common/routers";
 
 import "asset/css/global.less";
 
@@ -30,10 +32,9 @@ class Component extends React.PureComponent<Props> {
           <div className="g-page">
             <TopNav />
             <Switch>
-              <Redirect exact={true} path="/" to="/photos" />
-              <Route exact={true} path="/photos" component={this.PhotosView} />
-              <Route exact={true} path="/videos" component={this.VideosView} />
-              <Route exact={true} path="/login" component={LoginForm} />
+              <Route exact={true} path={toUrl(ModuleNames.photos)} component={this.PhotosView} />
+              <Route exact={true} path={toUrl(ModuleNames.videos)} component={this.VideosView} />
+              <Route exact={true} path={toUrl(ModuleNames.app, "LoginForm")} component={LoginForm} />
             </Switch>
             <BottomNav />
           </div>

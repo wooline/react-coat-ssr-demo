@@ -1,9 +1,12 @@
 import {ListData} from "entity/photo";
 import {RootState} from "modules";
+import thisModule from "modules/photos/facade";
 import * as React from "react";
-import {connect} from "react-redux";
+import {connect, DispatchProp} from "react-redux";
 
-interface Props {
+let unmounted: boolean = false;
+
+interface Props extends DispatchProp {
   listData: ListData;
 }
 
@@ -19,6 +22,15 @@ class Component extends React.PureComponent<Props> {
         </ul>
       </div>
     ) : null;
+  }
+  public componentWillMount() {
+    if (unmounted) {
+      unmounted = false;
+      this.props.dispatch(thisModule.actions.searchList());
+    }
+  }
+  public componentWillUnmount() {
+    unmounted = true;
   }
 }
 
