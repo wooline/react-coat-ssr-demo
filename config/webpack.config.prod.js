@@ -13,11 +13,11 @@ const StylelintPlugin = require("stylelint-webpack-plugin");
 const paths = require("./paths");
 
 const appPackage = require(path.join(paths.rootPath, "./package.json"));
-// const EnvDefine = {BBBB: JSON.stringify(appPackage.devServer.url || "http://localhost:7443"), IS_DEV: JSON.stringify(true)};
+// const EnvDefine = {BBBB: JSON.stringify(appPackage.devServer.url), IS_DEV: JSON.stringify(true)};
 const htmlReplace = [
   {
     pattern: "@@LOCALHOST",
-    replacement: appPackage.devServer.url || "http://localhost:7443",
+    replacement: appPackage.devServer.url,
   },
 ];
 const conPath = path.join(paths.configPath, "./prod");

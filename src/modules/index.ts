@@ -19,8 +19,10 @@ export const ModuleGetter = {
   },
 };
 
-export type RootState = BaseState & {
+export type RootState = BaseState<{
   [ModuleNames.app]: AppState;
   [ModuleNames.photos]: PhotosState;
   [ModuleNames.videos]: VideosState;
-};
+}>;
+
+export type RouteData = RootState["router"]["data"];

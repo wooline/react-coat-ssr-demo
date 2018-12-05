@@ -73,12 +73,12 @@
     "not op_mini all"
   ],
   "devServer": {
-    "url": "http://localhost:7443",
-    "ssr": true,
+    "url": "http://localhost:7445",
+    "ssr": false,
     "mock": true,
     "proxy": {
       "^/ajax/": {
-        "target": "http://localhost:7443/",
+        "target": "http://localhost:7445/",
         "secure": false,
         "changeOrigin": true
       }

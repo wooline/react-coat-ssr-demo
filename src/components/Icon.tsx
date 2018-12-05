@@ -1,4 +1,3 @@
-import {PickOptional} from "common/utils";
 import * as React from "react";
 import {HTMLAttributes} from "react";
 
@@ -8,7 +7,11 @@ import {HTMLAttributes} from "react";
 export enum IconClass {LIVE = "icon-live",
 MESSAGE = "icon-message",
 PICTURE = "icon-picture",
-RELOAD = "icon-reload",}
+RELOAD = "icon-reload",
+LOCATION = "icon-location",
+HEART = "icon-heart",
+HEART_FILL = "icon-heart-fill",
+LOCATION_FILL = "icon-location-fill",}
 
 interface Props extends HTMLAttributes<HTMLSpanElement> {
   type: IconClass;
@@ -17,7 +20,8 @@ interface Props extends HTMLAttributes<HTMLSpanElement> {
 }
 
 export default class Component extends React.PureComponent<Props> {
-  public static defaultProps: PickOptional<Props> = {
+  public static defaultProps: Props = {
+    type: null as any,
     textPosition: "right",
   };
 

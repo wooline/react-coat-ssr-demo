@@ -20,7 +20,7 @@ class Component extends React.PureComponent<Props> {
   public render() {
     const {logoUrl, avatarUrl} = this.props;
     return (
-      <div className="app-TopNav">
+      <div className="app-TopNav g-doc-width">
         <NavBar onLeftClick={this.onShowUser} icon={<span className="avatar" style={{backgroundImage: `url(${avatarUrl})`}} />} rightContent={<Icon key="0" type="search" />}>
           <img src={logoUrl} className="logo" />
         </NavBar>

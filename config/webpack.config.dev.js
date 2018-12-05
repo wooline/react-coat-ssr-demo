@@ -12,11 +12,11 @@ const TSImportPlugin = require("ts-import-plugin");
 const paths = require("./paths");
 
 const appPackage = require(path.join(paths.rootPath, "./package.json"));
-// const EnvDefine = {"process.env.DEV_URL": JSON.stringify(appPackage.devServer.url || "http://localhost:7443")};
+// const EnvDefine = {"process.env.DEV_URL": JSON.stringify(appPackage.devServer.url)};
 const htmlReplace = [
   {
     pattern: "@@LOCALHOST",
-    replacement: appPackage.devServer.url || "http://localhost:7443",
+    replacement: appPackage.devServer.url,
   },
 ];
 const conPath = path.join(paths.configPath, "./dev");

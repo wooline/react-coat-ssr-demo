@@ -24,33 +24,9 @@ export default function ajax<T>(method: string, url: string, params: {[key: stri
 
   const config: AxiosRequestConfig = {method, url, params, data};
 
-  return axios
-    .request(config)
-    .then(response => response.data)
-    .catch(error => {
-      console.log(error);
-    });
+  return axios.request(config).then(response => response.data);
 }
 
-const ISO_DATE_FORMAT = /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(\.\d+)?(Z|[+-][01]\d:[0-5]\d)$/;
-
-export function unserializeUrlQuery(query: string): any {
-  if (!query) {
-    return "";
-  }
-  let args;
-  try {
-    args = JSON.parse(unescape(query), (prop: any, value: any) => {
-      if (typeof value === "string" && ISO_DATE_FORMAT.test(value)) {
-        return new Date(value);
-      }
-      return value;
-    });
-  } catch (e) {
-    args = "";
-  }
-  return args;
-}
 /* export function stringifyQuery<A>(key: string, args: A, defArgs: A, locationSearch: string): string {
   const parms = Object.keys(args).reduce((prev, cur) => {
     if (typeof args[cur] === "object") {
@@ -71,14 +47,14 @@ export function unserializeUrlQuery(query: string): any {
   return search.replace(/^&/, "?");
 } */
 
-export function pushQuery(moduleName: string, key: string, args: string | boolean | number | object | null, locationSearch: string): string {
+/* export function pushQuery(moduleName: string, key: string, args: string | boolean | number | object | null, locationSearch: string): string {
   const jsonStr = escape(JSON.stringify(args));
   const str = `${moduleName}-${key}=`;
   const search = locationSearch.replace(new RegExp("[&?]" + str + "[^&]*", "i"), "") + ("&" + str + jsonStr);
   return search.replace(/^&/, "?");
-}
+} */
 
-export function extractQuery(key: string, locationSearch: string): string | boolean | number | object | null {
+/* export function extractQuery(key: string, locationSearch: string): string | boolean | number | object | null {
   const str = key + "=";
   let [, query] = locationSearch.split(str);
   if (query) {
@@ -95,9 +71,9 @@ export function extractQuery(key: string, locationSearch: string): string | bool
   } else {
     return null;
   }
-}
+} */
 
-export function parseModuleRouteData(moduleName: string, search: string): {[key: string]: string | boolean | number | object | null} | null {
+/* export function parseModuleRouteData(moduleName: string, search: string): {[key: string]: string | boolean | number | object | null} | null {
   const arr = search.match(new RegExp(`\\b${moduleName}\\b[\\w-]*=`, "g"));
   if (arr) {
     return arr.reduce((pre, cur) => {
@@ -107,4 +83,4 @@ export function parseModuleRouteData(moduleName: string, search: string): {[key:
   } else {
     return null;
   }
-}
+} */

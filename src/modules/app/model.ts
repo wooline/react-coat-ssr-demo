@@ -1,26 +1,29 @@
+import {Toast} from "antd-mobile";
 import {CustomError, RedirectError} from "common/Errors";
-import {unserializeUrlQuery} from "common/request";
-import {emptyModule} from "common/routers";
-import {checkFastRedirect} from "common/routers";
+import {checkFastRedirect, emptyModule} from "common/routers";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, GetModule, LoadingState, loadModel, LOCATION_CHANGE, reducer, RouterState} from "react-coat";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, GetModule, LoadingState, loadModel, LOCATION_CHANGE, reducer} from "react-coat";
 import {matchPath} from "react-router";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 
 // 定义本模块的State类型
-export interface State extends BaseModuleState {
-  query: {[moduleName: string]: {[key: string]: any}};
+export interface State
+  extends BaseModuleState<
+    {
+      aaa?: number;
+    },
+    {
+      global: LoadingState;
+      login: LoadingState;
+    }
+  > {
   projectConfig: ProjectConfig | null;
   curUser: CurUser | null;
   startupStep: StartupStep;
-  loading: {
-    global: LoadingState;
-    login: LoadingState;
-  };
 }
 
 // 定义本模块的Handlers
@@ -28,7 +31,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   constructor() {
     // 定义本模块State的初始值
     const initState: State = {
-      query: {},
+      route: {},
       projectConfig: null,
       curUser: null,
       startupStep: StartupStep.init,
@@ -44,10 +47,6 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   public putStartup(startupStep: StartupStep): State {
     return {...this.state, startupStep};
   }
-  @reducer
-  public putQuery(query: any): State {
-    return {...this.state, query};
-  }
   @effect("login") // 使用自定义loading状态
   public async login(payload: {username: string; password: string}) {
     const loginResult = await sessionService.api.login(payload);
@@ -62,33 +61,13 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   protected putCurUser(curUser: CurUser): State {
     return {...this.state, curUser};
   }
-  private parseQuery(search: string): {[moduleName: string]: {[key: string]: any}} {
-    return search.split(/[&?]/).reduce((pre, cur) => {
-      const [key, val] = cur.split("=");
-      if (key) {
-        const arr = key.split("-");
-        const moduleName = arr.shift();
-        const moduleKey = arr.join("-");
-        if (moduleName && moduleKey) {
-          if (!pre[moduleName]) {
-            pre[moduleName] = {};
-          }
-          pre[moduleName][moduleKey] = unserializeUrlQuery(val);
-        }
-      }
-      return pre;
-    }, {});
-  }
 
   @effect(null)
-  protected async [LOCATION_CHANGE](router: RouterState) {
+  protected async [LOCATION_CHANGE](router: RootState["router"]) {
     const redirect = checkFastRedirect(router.location.pathname);
     if (redirect) {
       this.dispatch(this.routerActions.replace(redirect.url));
     }
-    // 集中解析url query参数
-    const query = this.parseQuery(router.location.search);
-    this.dispatch(this.callThisAction(this.putQuery, query));
   }
 
   // 兼听全局错误的Action，并发送给后台
@@ -103,6 +82,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
         this.dispatch(this.routerActions.replace(url));
       }
     } else {
+      Toast.fail(error.message);
       await settingsService.api.reportError(error);
     }
   }
@@ -111,12 +91,10 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   @effect()
   protected async [ModuleNames.app + "/INIT"]() {
     const router = this.rootState.router;
-    const query = this.parseQuery(router.location.search);
     const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);
     this.dispatch(
       this.callThisAction(this.UPDATE, {
         ...this.state,
-        query,
         projectConfig,
         curUser,
         startupStep: StartupStep.configLoaded,

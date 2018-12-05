@@ -28,11 +28,10 @@ const MessageLink = (
 );
 class Component extends React.PureComponent<Props> {
   public render() {
-    const props = {...this.props, noRenderContent: true};
     const {pathname} = this.props;
     return (
       <div className="app-BottomNav g-doc-width">
-        <TabBar {...props}>
+        <TabBar noRenderContent={true} barTintColor="#108ee9" tintColor="#ff0" unselectedTintColor="#fff">
           <TabBar.Item
             icon={PhotosLink}
             selectedIcon={PhotosLink}

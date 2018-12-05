@@ -7,11 +7,11 @@ export interface PhotoItem {
 }
 interface Item {
   title: string;
-  hits: number;
-  commentCount: number;
+  departure: string;
+  type: string;
+  hot: number;
+  price: number;
   coverUrl: string;
-  createTimeDesc: string;
-  photos: PhotoItem[];
 }
 export interface Defined extends ArticleDefined {
   ListItem: Item;

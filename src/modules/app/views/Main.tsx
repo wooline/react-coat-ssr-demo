@@ -14,6 +14,10 @@ import Welcome from "./Welcome";
 import {toUrl} from "common/routers";
 
 import "asset/css/global.less";
+import "./index.less";
+
+const PhotosView = loadView(ModuleGetter, ModuleNames.photos, "Main");
+const VideosView = loadView(ModuleGetter, ModuleNames.videos, "Main");
 
 interface Props extends DispatchProp {
   curUser: CurUser;
@@ -22,18 +26,16 @@ interface Props extends DispatchProp {
 }
 
 class Component extends React.PureComponent<Props> {
-  private PhotosView = loadView(ModuleGetter.photos, "Main");
-  private VideosView = loadView(ModuleGetter.videos, "Main");
   public render() {
     const {startupStep} = this.props;
     return (
-      <div id={ModuleNames.app}>
+      <div className={ModuleNames.app}>
         {startupStep !== StartupStep.init && (
           <div className="g-page">
             <TopNav />
             <Switch>
-              <Route exact={true} path={toUrl(ModuleNames.photos)} component={this.PhotosView} />
-              <Route exact={true} path={toUrl(ModuleNames.videos)} component={this.VideosView} />
+              <Route exact={true} path={toUrl(ModuleNames.photos)} component={PhotosView} />
+              <Route exact={true} path={toUrl(ModuleNames.videos)} component={VideosView} />
               <Route exact={true} path={toUrl(ModuleNames.app, "LoginForm")} component={LoginForm} />
             </Switch>
             <BottomNav />

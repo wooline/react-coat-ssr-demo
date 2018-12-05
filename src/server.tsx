@@ -1,5 +1,5 @@
 import {RedirectError} from "common/Errors";
-import {checkFastRedirect} from "common/routers";
+import {checkFastRedirect, parseQuery} from "common/routers";
 import {ModuleGetter} from "modules";
 import {ModuleNames} from "modules/names";
 import {renderApp} from "react-coat";
@@ -10,6 +10,6 @@ export default function render(path: string) {
   if (redirect) {
     throw new RedirectError(redirect.code, redirect.url);
   } else {
-    return renderApp(ModuleGetter, ModuleNames.app, [path]);
+    return renderApp(ModuleGetter, ModuleNames.app, [path], {routerParser: parseQuery});
   }
 }

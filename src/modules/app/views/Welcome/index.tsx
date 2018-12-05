@@ -33,7 +33,7 @@ class Component extends React.PureComponent<Props> {
     const linkPops = linkUrl ? {target: "_blank", href: linkUrl} : {};
 
     return (
-      <div className={`${ModuleNames.app}-Welcome g-doc-width ${className}`}>
+      <div className={`${ModuleNames.app}-Welcome g-doc-width g-pre-img ${className}`}>
         <a className="link" {...linkPops} style={{backgroundImage: `url(${imageUrl})`}} />
         <div
           className="count"

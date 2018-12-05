@@ -1,8 +1,10 @@
 import {Toast} from "antd-mobile";
-import {pushQuery} from "common/request";
+import {extendSearch, isCur, mergeSearch} from "common/routers";
+import {equal} from "common/utils";
 import {Resource} from "entity/resource";
 import {RootState} from "modules";
-import {BaseModuleHandlers, effect, reducer} from "react-coat";
+import {ModuleNames} from "modules/names";
+import {BaseModuleHandlers, effect, LOCATION_CHANGE, reducer, RouterState} from "react-coat";
 
 export default class Handlers<S extends R["State"], R extends Resource> extends BaseModuleHandlers<S, RootState> {
   constructor(initState: S, protected config: {api: R["API"]; defaultSearch: R["ListSearch"]}) {
@@ -25,25 +27,10 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
   protected putSelectedIds(selectedIds: string[]): S {
     return {...(this.state as any), selectedIds};
   }
-  @effect()
+  @effect(null)
   public async openList({options, extend}: {options: R["ListOptional"]; extend: "DEFAULT" | "CURRENT"}) {
-    const defaultSearch = this.config.defaultSearch;
-    const baseSearch = extend === "DEFAULT" ? defaultSearch : this.state.listData.search;
-    const search: R["ListSearch"] = {...(baseSearch as any), ...(options as any)};
-    /* 过滤与默认值相等的参数 */
-    const parms = Object.keys(search).reduce((prev, cur) => {
-      if (typeof search[cur] === "object") {
-        if (JSON.stringify(search[cur]) !== JSON.stringify(defaultSearch[cur])) {
-          prev[cur] = search[cur];
-        }
-      } else {
-        if (search[cur] !== defaultSearch[cur]) {
-          prev[cur] = search[cur];
-        }
-      }
-      return prev;
-    }, {});
-    this.dispatch(this.routerActions.push(pushQuery(this.namespace, "listOptional", parms, this.rootState.router.location.search)));
+    const search = mergeSearch(options, extend === "DEFAULT" ? this.config.defaultSearch : this.state.listData.search);
+    this.dispatch(this.routerActions.push(extendSearch(this.namespace as ModuleNames, this.rootState.router.data, search)));
   }
   @effect()
   public async searchList(playload?: {options: R["ListOptional"]; extend: "DEFAULT" | "CURRENT"}) {
@@ -91,16 +78,23 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
     this.dispatch(this.callThisAction(this.putSelectedIds, [])); // 清空当前选中项
     this.dispatch(this.callThisAction(this.searchList, {options: {}, extend: "CURRENT"})); // 刷新当前页
   }
-
+  @effect(null)
+  protected async [LOCATION_CHANGE](router: RouterState) {
+    if (isCur(router.location.pathname, this.namespace as ModuleNames)) {
+      const routeData = this.rootState.router.data[this.namespace] || {};
+      const search: R["ListSearch"] = {...(this.config.defaultSearch as any), ...routeData.search};
+      if (!equal(search, this.state.listData.search)) {
+        this.dispatch(this.callThisAction(this.searchList, {options: search, extend: "CURRENT"}));
+      }
+    }
+  }
   /* @effect()
   protected async [LOCATION_CHANGE](router: RouterState) {
     if (router.location.pathname === this.config.pathname) {
       const {listOptional} = this.parseRouter(router.location.search);
       // merge 默认参数
       const listSearch: R["ListSearch"] = {...(this.config.defaultSearch as any), ...(listOptional as any)};
-      if (!equal(listSearch, this.state.listData.search)) {
-        this.dispatch(this.callThisAction(this.searchList, {options: listSearch, extend: "CURRENT"}));
-      }
+      
     }
   } */
 }

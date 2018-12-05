@@ -1,10 +1,8 @@
 import {ListData} from "entity/video";
 import {RootState} from "modules";
-import thisModule from "modules/videos/facade";
+import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {connect, DispatchProp} from "react-redux";
-
-let unmounted: boolean = false;
 
 interface Props extends DispatchProp {
   listData: ListData;
@@ -14,7 +12,7 @@ class Component extends React.PureComponent<Props> {
   public render() {
     const {items} = this.props.listData;
     return items ? (
-      <div id="videos">
+      <div id={ModuleNames.videos}>
         <ul>
           {items.map(item => (
             <li key={item.title}>{item.title}</li>
@@ -22,15 +20,6 @@ class Component extends React.PureComponent<Props> {
         </ul>
       </div>
     ) : null;
-  }
-  public componentWillMount() {
-    if (unmounted) {
-      unmounted = false;
-      this.props.dispatch(thisModule.actions.searchList());
-    }
-  }
-  public componentWillUnmount() {
-    unmounted = true;
   }
 }
 

@@ -30,9 +30,10 @@ interface Base<D extends Defined> {
     pageSize: number | null;
   };
   ListSummary: D["ListSummary"] & {
+    page: number;
     pageSize: number;
-    totalItem: number;
-    totalPage: number;
+    totalItems: number;
+    totalPages: number;
   };
   ItemDetail: D["ItemDetail"] & {
     id: string;
@@ -64,6 +65,7 @@ export interface Resource<D extends Defined = Defined, B extends Base<D> = Base<
     selectedIds?: string[];
     listData: ListData<B["ListItem"], B["ListSearch"], B["ListSummary"]>;
     loading: {global: LoadingState};
+    route: {search?: B["ListSearch"]};
   };
   API: {
     hitItem?(id: string): Promise<void>;

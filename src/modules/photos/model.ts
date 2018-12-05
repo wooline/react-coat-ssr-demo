@@ -21,6 +21,7 @@ class ModuleHandlers extends ArticleHandlers<State, Resource> {
           summary: null,
         },
         loading: {global: LoadingState.Stop},
+        route: {},
       },
       {
         defaultSearch,

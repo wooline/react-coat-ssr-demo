@@ -1,5 +1,70 @@
 @import "./iconfont";
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
+.g-page {
+  font-family: Microsoft YaHei, Yahei, Arial, Helvetica, sans-serif;
+  background: white;
+  padding-bottom: 50px;
+}
+
+.g-pre-img {
+  background: url(~asset/imgs/loading.gif) no-repeat center center #000;
+}
+
+.g-pic-list {
+  .list-items {
+    & > * {
+      position: relative;
+      display: block;
+      height: 200px;
+      margin-top: 3px;
+    }
+  }
+
+  .g-pre-img {
+    & > * {
+      height: 100%;
+      display: block;
+      background: no-repeat center center;
+      background-size: cover;
+    }
+  }
+
+  .title {
+    font-size: 18px;
+    color: #fff;
+    font-weight: bold;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.7));
+    padding: 10px;
+    padding-bottom: 20px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .pagination {
+    padding: 10px;
+
+    .am-pagination-wrap {
+      font-size: 16px;
+    }
+
+    .am-button {
+      height: 40px;
+      line-height: 40px;
+      font-size: 14px;
+    }
+  }
+}
+
 .g-doc-width {
   a {
     color: inherit;
@@ -7,3 +72,5 @@
 }
 
 // .g-init-loading position: fixed 2000
+// .app-Welcome: 1000
+// .app-TopNav position: fixed 500
