@@ -1,0 +1,70 @@
+{
+  "url": "/ajax/session",
+  "statusCode": 200,
+  "statusMessage": "OK",
+  "headers": {
+    "x-delay": 2000,
+    "x-powered-by": "Express",
+    "content-type": "application/json; charset=utf-8",
+    "connection": "close"
+  },
+  "response": {
+    "search": {
+      "page": 1,
+      "pageSize": 10
+    },
+    "summary": {
+      "page": 2,
+      "pageSize": 5,
+      "totalItems": 10,
+      "totalPages": 2
+    },
+    "items": [
+      {
+        "id": "6",
+        "title": "桂林+阳朔+游轮百里大漓江+龙脊梯田+象鼻山+银子岩+古东瀑布+阳朔西街火车5日跟团游",
+        "departure": "桂林",
+        "type": "跟团游",
+        "price": 3456,
+        "hot": 67,
+        "coverUrl": "/client/imgs/6/1.jpg"
+      },
+      {
+        "id": "7",
+        "title": "厚道北京火车/双高/双动5日跟团游",
+        "departure": "北京",
+        "type": "个人游",
+        "price": 256,
+        "hot": 658,
+        "coverUrl": "/client/imgs/7/1.jpg"
+      },
+      {
+        "id": "8",
+        "title": "自驾出行更便捷【冬日暖泉季】",
+        "departure": "苏州",
+        "type": "自驾游",
+        "price": 399,
+        "hot": 3562,
+        "coverUrl": "/client/imgs/8/1.jpg"
+      },
+      {
+        "id": "9",
+        "title": "黄山+宏村+新安江大巴3日跟团游",
+        "departure": "黄山",
+        "type": "自助游",
+        "price": 6581,
+        "hot": 8942,
+        "coverUrl": "/client/imgs/9/1.jpg"
+      },
+      {
+        "id": "10",
+        "title": "海天佛国普陀山+紫竹林+南海观音",
+        "departure": "苏州",
+        "type": "跟团游",
+        "price": 3075,
+        "hot": 882,
+        "coverUrl": "/client/imgs/10/1.jpg"
+      }
+    ]
+  }
+}

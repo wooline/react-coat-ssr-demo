@@ -20,11 +20,6 @@ interface Props extends HTMLAttributes<HTMLSpanElement> {
 }
 
 export default class Component extends React.PureComponent<Props> {
-  public static defaultProps: Props = {
-    type: null as any,
-    textPosition: "right",
-  };
-
   public render() {
     const {type, text, textPosition, className, ...restProps} = this.props;
     if (text) {

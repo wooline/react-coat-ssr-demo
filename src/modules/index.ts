@@ -25,4 +25,4 @@ export type RootState = BaseState<{
   [ModuleNames.videos]: VideosState;
 }>;
 
-export type RouteData = RootState["router"]["data"];
+export type RootRouter = RootState["router"];

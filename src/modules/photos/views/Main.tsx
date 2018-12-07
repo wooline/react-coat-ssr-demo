@@ -2,7 +2,7 @@ import {extendSearch} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import Pagination from "components/Pagination";
 import {ListData} from "entity/photo";
-import {RootState, RouteData} from "modules";
+import {RootRouter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import thisModule from "modules/photos/facade";
 import * as React from "react";
@@ -10,7 +10,7 @@ import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  routeState: RouteData;
+  router: RootRouter;
   listData: ListData;
 }
 
@@ -20,7 +20,7 @@ class Component extends React.PureComponent<Props> {
   };
   public render() {
     const {
-      routeState,
+      router,
       listData: {items, summary, search},
     } = this.props;
     return items ? (
@@ -28,7 +28,7 @@ class Component extends React.PureComponent<Props> {
         <div className="list-items">
           {items.map(item => (
             <div key={item.id} className="g-pre-img">
-              <a href="#" style={{backgroundImage: `url(${item.coverUrl})`}}>
+              <div style={{backgroundImage: `url(${item.coverUrl})`}}>
                 <h5 className="title">{item.title}</h5>
                 <div className="listImg" />
                 <div className="props">
@@ -44,13 +44,13 @@ class Component extends React.PureComponent<Props> {
                     {item.price}
                   </em>
                 </div>
-              </a>
+              </div>
             </div>
           ))}
         </div>
         {summary && (
           <div className="pagination">
-            <Pagination baseUrl={extendSearch(ModuleNames.photos, routeState, {...search, page: NaN})} page={summary.page} totalPages={summary.totalPages} onChange={this.onPageChange} />
+            <Pagination baseUrl={extendSearch(ModuleNames.photos, router, {...search, page: NaN})} page={summary.page} totalPages={summary.totalPages} onChange={this.onPageChange} />
           </div>
         )}
       </div>
@@ -61,7 +61,7 @@ class Component extends React.PureComponent<Props> {
 const mapStateToProps = (state: RootState) => {
   const model = state.photos;
   return {
-    routeState: state.router.data,
+    router: state.router,
     listData: model.listData,
   };
 };

@@ -1,4 +1,3 @@
-import {LoadingState} from "react-coat";
 import {DefaultResult} from "./common";
 
 export interface ListData<Item, Search, Summary> {
@@ -63,9 +62,8 @@ export interface Resource<D extends Defined = Defined, B extends Base<D> = Base<
     itemDetail?: B["ItemDetail"];
     itemEditor?: B["ItemEditor"];
     selectedIds?: string[];
+    query: {search?: B["ListSearch"]};
     listData: ListData<B["ListItem"], B["ListSearch"], B["ListSummary"]>;
-    loading: {global: LoadingState};
-    route: {search?: B["ListSearch"]};
   };
   API: {
     hitItem?(id: string): Promise<void>;

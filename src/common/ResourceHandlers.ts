@@ -13,30 +13,30 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
 
   @reducer
   protected putListData(listData: R["ListData"]): S {
-    return {...(this.state as any), listData};
+    return {...this.state, listData};
   }
   @reducer
   protected putItemEditor(itemEditor?: R["ItemEditor"]): S {
-    return {...(this.state as any), itemEditor};
+    return {...this.state, itemEditor};
   }
   @reducer
   protected putItemDetail(itemDetail: R["ItemDetail"]): S {
-    return {...(this.state as any), itemDetail};
+    return {...this.state, itemDetail};
   }
   @reducer
   protected putSelectedIds(selectedIds: string[]): S {
-    return {...(this.state as any), selectedIds};
+    return {...this.state, selectedIds};
   }
   @effect(null)
   public async openList({options, extend}: {options: R["ListOptional"]; extend: "DEFAULT" | "CURRENT"}) {
     const search = mergeSearch(options, extend === "DEFAULT" ? this.config.defaultSearch : this.state.listData.search);
-    this.dispatch(this.routerActions.push(extendSearch(this.namespace as ModuleNames, this.rootState.router.data, search)));
+    this.dispatch(this.routerActions.push(extendSearch(this.namespace as ModuleNames, this.rootState.router, search)));
   }
   @effect()
   public async searchList(playload?: {options: R["ListOptional"]; extend: "DEFAULT" | "CURRENT"}) {
     const {options, extend} = playload || {options: {}, extend: "CURRENT"};
     const baseSearch = extend === "DEFAULT" ? this.config.defaultSearch : this.state.listData.search;
-    const search: R["ListSearch"] = {...(baseSearch as any), ...(options as any)};
+    const search: R["ListSearch"] = {...baseSearch, ...options};
     const listData = await this.config.api.searchList(search);
     this.dispatch(this.callThisAction(this.putListData, listData));
     return listData;
@@ -81,20 +81,16 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
   @effect(null)
   protected async [LOCATION_CHANGE](router: RouterState) {
     if (isCur(router.location.pathname, this.namespace as ModuleNames)) {
-      const routeData = this.rootState.router.data[this.namespace] || {};
-      const search: R["ListSearch"] = {...(this.config.defaultSearch as any), ...routeData.search};
+      const routeData = this.state.query || {};
+      const search: R["ListSearch"] = {...this.config.defaultSearch, ...routeData.search};
       if (!equal(search, this.state.listData.search)) {
         this.dispatch(this.callThisAction(this.searchList, {options: search, extend: "CURRENT"}));
       }
     }
   }
-  /* @effect()
-  protected async [LOCATION_CHANGE](router: RouterState) {
-    if (router.location.pathname === this.config.pathname) {
-      const {listOptional} = this.parseRouter(router.location.search);
-      // merge 默认参数
-      const listSearch: R["ListSearch"] = {...(this.config.defaultSearch as any), ...(listOptional as any)};
-      
-    }
-  } */
+  protected async onInit() {
+    const routeData = this.state.query || {};
+    const search: R["ListSearch"] = {...this.config.defaultSearch, ...routeData.search};
+    await this.dispatch(this.callThisAction(this.searchList, {options: search, extend: "CURRENT"}));
+  }
 }

@@ -27,7 +27,7 @@ const config = {
   proxy: appPackage.devServer.proxy,
   before: app => {
     app.use(devServer(appPackage.devServer.ssr, appPackage.devServer.proxy));
-    app.use(devMock(appPackage.devServer.mock));
+    app.use(devMock(appPackage.devServer.mock, appPackage.devServer.proxy));
   },
 };
 module.exports = config;

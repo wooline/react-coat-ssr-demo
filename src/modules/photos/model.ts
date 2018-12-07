@@ -2,7 +2,7 @@ import ArticleHandlers from "common/ArticleHandlers";
 import {ListSearch, Resource, State} from "entity/photo";
 export {State} from "entity/photo";
 import {ModuleNames} from "modules/names";
-import {Actions, effect, exportModel, LoadingState} from "react-coat";
+import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
 
 const defaultSearch: ListSearch = {
@@ -20,8 +20,7 @@ class ModuleHandlers extends ArticleHandlers<State, Resource> {
           items: null,
           summary: null,
         },
-        loading: {global: LoadingState.Stop},
-        route: {},
+        query: {},
       },
       {
         defaultSearch,
@@ -31,7 +30,7 @@ class ModuleHandlers extends ArticleHandlers<State, Resource> {
   }
   @effect()
   protected async [ModuleNames.photos + "/INIT"]() {
-    await this.dispatch(this.callThisAction(this.searchList));
+    await super.onInit();
   }
 }
 

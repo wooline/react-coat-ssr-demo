@@ -1,4 +1,6 @@
+import LinkButton from "components/LinkButton";
 import * as React from "react";
+import "./index.less";
 
 interface Props {
   onChange: (page: number) => void;
@@ -24,19 +26,23 @@ export default class Component extends React.PureComponent<Props> {
     const {page, totalPages, baseUrl} = this.props;
     return totalPages ? (
       <div className="comp-Pagination">
-        <a onClick={e => this.chagePage(e, page - 1)} href={page > 1 ? baseUrl.replace(/(%22page%22%3A)null/, `$1${page - 1}`) : "#"} className={`prev${page === 1 ? " disabled" : ""}`}>
+        <LinkButton
+          onClick={e => this.chagePage(e, page - 1)}
+          href={page > 1 ? baseUrl.replace(/(%22page%22%3A)null/, `$1${page - 1}`) : "#"}
+          className={`am-button-inline prev${page === 1 ? " disabled" : ""}`}
+        >
           上一页
-        </a>
+        </LinkButton>
         <div className="page">
-          <span>{page}</span>/{totalPages}
+          <span className="active">{page}</span>/{totalPages}
         </div>
-        <a
+        <LinkButton
           onClick={e => this.chagePage(e, page + 1)}
           href={page < totalPages ? baseUrl.replace(/(%22page%22%3A)null/, `$1${page + 1}`) : "#"}
-          className={`next${page === totalPages ? " disabled" : ""}`}
+          className={`am-button-inline next${page === totalPages ? " disabled" : ""}`}
         >
           下一页
-        </a>
+        </LinkButton>
       </div>
     ) : (
       <div className="comp-Pagination">没有更多内容</div>

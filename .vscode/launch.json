@@ -8,7 +8,7 @@
       "type": "node",
       "request": "launch",
       "name": "启动程序",
-      "program": "${workspaceFolder}/scripts/start.js"
+      "program": "${workspaceFolder}/prod-express-demo/index.js"
     }
   ]
 }

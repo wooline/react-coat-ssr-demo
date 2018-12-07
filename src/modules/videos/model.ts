@@ -2,7 +2,7 @@ import ArticleHandlers from "common/ArticleHandlers";
 import {ListSearch, Resource, State} from "entity/video";
 export {State} from "entity/video";
 import {ModuleNames} from "modules/names";
-import {Actions, effect, exportModel, LoadingState} from "react-coat";
+import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
 
 const defaultSearch: ListSearch = {
@@ -20,8 +20,7 @@ class ModuleHandlers extends ArticleHandlers<State, Resource> {
           items: null,
           summary: null,
         },
-        loading: {global: LoadingState.Stop},
-        route: {},
+        query: {},
       },
       {
         defaultSearch,

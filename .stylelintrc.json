@@ -1,6 +1,9 @@
 {
-  "extends": "stylelint-config-standard",
+  "extends": ["stylelint-config-standard", "stylelint-config-prettier"],
+  "plugins": ["stylelint-prettier"],
   "rules": {
-    "no-descending-specificity": null
+    "prettier/prettier": true,
+    "no-descending-specificity": null,
+    "unit-case": null
   }
 }

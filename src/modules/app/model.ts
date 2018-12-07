@@ -11,19 +11,15 @@ import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 
 // 定义本模块的State类型
-export interface State
-  extends BaseModuleState<
-    {
-      aaa?: number;
-    },
-    {
-      global: LoadingState;
-      login: LoadingState;
-    }
-  > {
+
+export interface State extends BaseModuleState {
   projectConfig: ProjectConfig | null;
   curUser: CurUser | null;
   startupStep: StartupStep;
+  loading: {
+    global: LoadingState;
+    login: LoadingState;
+  };
 }
 
 // 定义本模块的Handlers
@@ -31,7 +27,6 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   constructor() {
     // 定义本模块State的初始值
     const initState: State = {
-      route: {},
       projectConfig: null,
       curUser: null,
       startupStep: StartupStep.init,

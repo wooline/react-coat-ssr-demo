@@ -1,3 +1,4 @@
+import {Icon} from "antd-mobile";
 import * as React from "react";
 import {LoadingState} from "react-coat";
 import "./index.less";
@@ -10,12 +11,8 @@ const Component = (props: Props) => {
   const {loading} = props;
   return loading === LoadingState.Start || loading === LoadingState.Depth ? (
     <div className={"app-Loading " + loading}>
-      <div className="loading-icon">
-        <div />
-      </div>
-      <div className="wrap">
-        <div />
-      </div>
+      <Icon className="loading-icon" type="loading" />
+      <div className="wrap" />
     </div>
   ) : null;
 };

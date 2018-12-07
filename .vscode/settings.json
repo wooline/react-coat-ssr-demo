@@ -2,7 +2,6 @@
   "files.eol": "\n",
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.formatOnSave": true,
-  "prettier.stylelintIntegration": false,
   "typescript.updateImportsOnFileMove.enabled": "never",
   "stylelint.configOverrides": {
     "ignoreFiles": ["**/*.tsx"]

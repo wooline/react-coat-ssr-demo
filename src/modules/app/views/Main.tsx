@@ -1,3 +1,5 @@
+import "asset/css/global.less";
+import {toUrl} from "common/routers";
 import {StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState} from "modules";
@@ -7,14 +9,11 @@ import {LoadingState, loadView} from "react-coat";
 import {connect, DispatchProp} from "react-redux";
 import {Route, Switch} from "react-router-dom";
 import BottomNav from "./BottomNav";
+import "./index.less";
+import Loading from "./Loading";
 import LoginForm from "./LoginForm";
 import TopNav from "./TopNav";
 import Welcome from "./Welcome";
-
-import {toUrl} from "common/routers";
-
-import "asset/css/global.less";
-import "./index.less";
 
 const PhotosView = loadView(ModuleGetter, ModuleNames.photos, "Main");
 const VideosView = loadView(ModuleGetter, ModuleNames.videos, "Main");
@@ -27,7 +26,7 @@ interface Props extends DispatchProp {
 
 class Component extends React.PureComponent<Props> {
   public render() {
-    const {startupStep} = this.props;
+    const {startupStep, globalLoading} = this.props;
     return (
       <div className={ModuleNames.app}>
         {startupStep !== StartupStep.init && (
@@ -42,11 +41,12 @@ class Component extends React.PureComponent<Props> {
           </div>
         )}
         {(startupStep === StartupStep.configLoaded || startupStep === StartupStep.startupImageLoaded || startupStep === StartupStep.startupCountEnd) && <Welcome className={startupStep} />}
+        <Loading loading={globalLoading} />
       </div>
     );
   }
 }
-
+// todo document title处理
 const mapStateToProps = (state: RootState) => {
   const app = state.app;
   return {

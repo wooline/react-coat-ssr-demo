@@ -144,21 +144,23 @@
     <!-- {react-coat-init-env} -->
     <script>
       function getInitEnv(global, isDev) {
-        global.InitEnv = isDev
-          ? {
-              clientPublicPath: "/client/",
-              apiServer: {
-                "^/ajax/": "@@LOCALHOST" + "/ajax/",
-                "^/captcha/": "@@LOCALHOST" + "/captcha/",
-              },
-            }
-          : {
-              clientPublicPath: "/client/",
-              apiServer: {
-                "^/ajax/": "@@LOCALHOST" + "/ajax/",
-                "^/captcha/": "@@LOCALHOST" + "/captcha/",
-              },
-            };
+        if (!global.InitEnv) {
+          global.InitEnv = isDev
+            ? {
+                clientPublicPath: "/client/",
+                apiServer: {
+                  "^/ajax/": "@@LOCALHOST" + "/ajax/",
+                  "^/captcha/": "@@LOCALHOST" + "/captcha/",
+                },
+              }
+            : {
+                clientPublicPath: "/client/",
+                apiServer: {
+                  "^/ajax/": "@@LOCALHOST" + "/ajax/",
+                  "^/captcha/": "@@LOCALHOST" + "/captcha/",
+                },
+              };
+        }
       }
     </script>
   </head>
