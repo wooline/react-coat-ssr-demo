@@ -62,12 +62,12 @@ export interface Resource<D extends Defined = Defined, B extends Base<D> = Base<
     itemDetail?: B["ItemDetail"];
     itemEditor?: B["ItemEditor"];
     selectedIds?: string[];
-    query: {search?: B["ListSearch"]};
+    searchData: {search?: Partial<B["ListSearch"]>};
     listData: ListData<B["ListItem"], B["ListSearch"], B["ListSummary"]>;
   };
   API: {
     hitItem?(id: string): Promise<void>;
-    getItem?(id: string): Promise<B["ItemDetail"]>;
+    getItemDetail?(id: string): Promise<B["ItemDetail"]>;
     searchList(request: B["ListSearch"]): Promise<ListData<B["ListItem"], B["ListSearch"], B["ListSummary"]>>;
     createItem?(request: B["ItemCreateData"]): Promise<B["ItemCreateResult"]>;
     updateItem?(request: B["ItemUpdateData"]): Promise<B["ItemUpdateResult"]>;

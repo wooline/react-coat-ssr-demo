@@ -1,15 +1,3 @@
-import {matchPath} from "react-router";
-import {RedirectError} from "./Errors";
-
-export function checkFastRedirect(pathname: string, rules: Array<{path?: string; exact?: boolean; module: string}>) {
-  rules.forEach(route => {
-    if (matchPath(pathname, route)) {
-      throw new RedirectError("301", route.module);
-    }
-  });
-  return true;
-}
-
 export type PickOptional<T> = Pick<T, {[K in keyof T]-?: {} extends {[P in K]: T[K]} ? K : never}[keyof T]>;
 
 export type PickOptional2<T> = Pick<T, {[K in keyof T]-?: T[K] extends Exclude<T[K], undefined> ? never : K}[keyof T]>;

@@ -1,4 +1,4 @@
-import {extendSearch} from "common/routers";
+import {mergeSearch, replaceCurRouter} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import Pagination from "components/Pagination";
 import {ListData} from "entity/photo";
@@ -7,6 +7,7 @@ import {ModuleNames} from "modules/names";
 import thisModule from "modules/photos/facade";
 import * as React from "react";
 import {connect, DispatchProp} from "react-redux";
+import {defaultSearch} from "../model";
 import "./index.less";
 
 interface Props extends DispatchProp {
@@ -18,6 +19,9 @@ class Component extends React.PureComponent<Props> {
   private onPageChange = (page: number) => {
     this.props.dispatch(thisModule.actions.openList({options: {page}, extend: "CURRENT"}));
   };
+  private onShowItem = (id: string) => {
+    this.props.dispatch(thisModule.actions.getItemDetail(id));
+  };
   public render() {
     const {
       router,
@@ -27,7 +31,7 @@ class Component extends React.PureComponent<Props> {
       <div className={`${ModuleNames.photos} g-pic-list`}>
         <div className="list-items">
           {items.map(item => (
-            <div key={item.id} className="g-pre-img">
+            <div key={item.id} className="g-pre-img" onClick={() => this.onShowItem(item.id)}>
               <div style={{backgroundImage: `url(${item.coverUrl})`}}>
                 <h5 className="title">{item.title}</h5>
                 <div className="listImg" />
@@ -50,7 +54,12 @@ class Component extends React.PureComponent<Props> {
         </div>
         {summary && (
           <div className="pagination">
-            <Pagination baseUrl={extendSearch(ModuleNames.photos, router, {...search, page: NaN})} page={summary.page} totalPages={summary.totalPages} onChange={this.onPageChange} />
+            <Pagination
+              baseUrl={replaceCurRouter(router, ModuleNames.photos, {search: mergeSearch({...search, page: NaN}, defaultSearch)})}
+              page={summary.page}
+              totalPages={summary.totalPages}
+              onChange={this.onPageChange}
+            />
           </div>
         )}
       </div>

@@ -10,5 +10,5 @@ export interface Actions {
   comment: boolean;
 }
 export interface Resource<D extends Defined = Defined> extends CommonResource<D> {
-  State: CommonResource<D>["State"];
+  State: CommonResource<D>["State"] & {searchData: {showComment?: boolean}};
 }

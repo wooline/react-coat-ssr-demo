@@ -12,10 +12,11 @@ interface Item {
   hot: number;
   price: number;
   coverUrl: string;
+  comments: number;
 }
 export interface Defined extends ArticleDefined {
   ListItem: Item;
-  ItemDetail: Item & {remark: string};
+  ItemDetail: Item & {remark: string; picList: string[]};
 }
 export type Resource = ArticleResource<Defined>;
 
@@ -25,5 +26,5 @@ export type ListSummary = Resource["ListSummary"];
 export type ListOptional = Resource["ListOptional"];
 export type ItemDetail = Resource["ItemDetail"];
 export type ListData = Resource["ListData"];
-export type State = Resource["State"];
+export type State = Resource["State"] & {showComment: boolean};
 export type API = Resource["API"];

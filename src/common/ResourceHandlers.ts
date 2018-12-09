@@ -1,5 +1,5 @@
 import {Toast} from "antd-mobile";
-import {extendSearch, isCur, mergeSearch} from "common/routers";
+import {isCur, mergeSearch, replaceCurRouter} from "common/routers";
 import {equal} from "common/utils";
 import {Resource} from "entity/resource";
 import {RootState} from "modules";
@@ -30,7 +30,7 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
   @effect(null)
   public async openList({options, extend}: {options: R["ListOptional"]; extend: "DEFAULT" | "CURRENT"}) {
     const search = mergeSearch(options, extend === "DEFAULT" ? this.config.defaultSearch : this.state.listData.search);
-    this.dispatch(this.routerActions.push(extendSearch(this.namespace as ModuleNames, this.rootState.router, search)));
+    this.dispatch(this.routerActions.push(replaceCurRouter(this.rootState.router, this.namespace as any, {search})));
   }
   @effect()
   public async searchList(playload?: {options: R["ListOptional"]; extend: "DEFAULT" | "CURRENT"}) {
@@ -42,8 +42,8 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
     return listData;
   }
   @effect()
-  protected async getItemDetail(id: string) {
-    const itemDetail = await this.config.api.getItem!(id);
+  public async getItemDetail(id: string) {
+    const itemDetail = await this.config.api.getItemDetail!(id);
     this.dispatch(this.callThisAction(this.putItemDetail, itemDetail));
     this.config.api.hitItem!(id);
   }
@@ -81,16 +81,16 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
   @effect(null)
   protected async [LOCATION_CHANGE](router: RouterState) {
     if (isCur(router.location.pathname, this.namespace as ModuleNames)) {
-      const routeData = this.state.query || {};
-      const search: R["ListSearch"] = {...this.config.defaultSearch, ...routeData.search};
+      const searchData = this.state.searchData || {};
+      const search: R["ListSearch"] = {...this.config.defaultSearch, ...searchData.search};
       if (!equal(search, this.state.listData.search)) {
         this.dispatch(this.callThisAction(this.searchList, {options: search, extend: "CURRENT"}));
       }
     }
   }
   protected async onInit() {
-    const routeData = this.state.query || {};
-    const search: R["ListSearch"] = {...this.config.defaultSearch, ...routeData.search};
+    const searchData = this.state.searchData || {};
+    const search: R["ListSearch"] = {...this.config.defaultSearch, ...searchData.search};
     await this.dispatch(this.callThisAction(this.searchList, {options: search, extend: "CURRENT"}));
   }
 }

@@ -1,12 +1,8 @@
 import {Carousel, Icon} from "antd-mobile";
-import {routerActions} from "connected-react-router";
-import RootState from "core/RootState";
 import {ItemDetail} from "entity/photo";
-import {Actions} from "entity/media";
-import thisModule from "modules/photos";
-import commentsViews from "modules/comments/views";
+import {RootState} from "modules";
+import thisModule from "modules/photos/facade";
 import React from "react";
-import {stringifyQuery} from "utils";
 import {findDOMNode} from "react-dom";
 import {connect, DispatchProp} from "react-redux";
 import "./index.less";
@@ -18,31 +14,28 @@ interface Props extends DispatchProp {
 
 interface State {
   moreDetail: boolean;
-  maxSize: [number, number];
+  maxSize: [number, number] | null;
 }
 
 class Component extends React.PureComponent<Props, State> {
-  state: State = {
+  public state: State = {
     moreDetail: false,
     maxSize: null,
   };
-  player: HTMLDivElement;
-  onClose = () => {
-    this.props.dispatch(routerActions.push(stringifyQuery<Actions>("media", null)));
+  private player: HTMLDivElement;
+  private onClose = () => {
+    // this.props.dispatch(routerActions.push(stringifyQuery<Actions>("media", null)));
   };
-  closeComment = () => {
+  private closeComment = () => {
     this.props.dispatch(thisModule.actions.showComment(false));
   };
-  showComment = () => {
+  private showComment = () => {
     this.props.dispatch(thisModule.actions.showComment(true));
   };
-  moreRemark = () => {
+  private moreRemark = () => {
     this.setState({moreDetail: !this.state.moreDetail});
   };
-  onUpgradeVip = () => {
-    this.props.dispatch(routerActions.push("/support"));
-  };
-  componentWillReceiveProps(nextProps: Props) {
+  public componentWillReceiveProps(nextProps: Props) {
     if (!nextProps.dataSource) {
       this.setState({maxSize: null, moreDetail: false});
     }
@@ -52,7 +45,7 @@ class Component extends React.PureComponent<Props, State> {
     const {maxSize, moreDetail} = this.state;
     if (dataSource) {
       return (
-        <div className="g-detail photos-Detail max-width g-modal g-enter-in">
+        <div className="g-details photos-Details g-doc-width g-modal g-enter-in">
           <div className="subject">{dataSource.title}</div>
           <Icon size="md" className="close-button" type="cross-circle" onClick={this.onClose} />
           <div className={"g-remark" + (moreDetail ? " on" : "")} onClick={this.moreRemark}>
@@ -62,41 +55,35 @@ class Component extends React.PureComponent<Props, State> {
             <div>
               <i className="iconfont icon-collection_fill" />
               <br />
-              {dataSource.clickCount}
+              {dataSource.hot}
             </div>
             <div>
               <i className="iconfont icon-xiaoxi" />
               <br />
-              {dataSource.commentCount}
+              {dataSource.comments}
             </div>
           </div>
           <div className={"comment" + (showComment ? " on" : "")}>
             <div className="mask" onClick={this.closeComment} />
-            <div className="dialog">
-              <commentsViews.Main />
-            </div>
+            <div className="dialog">sdfsd</div>
           </div>
           <div
             className="bd"
             ref={el => {
-              this.player = el;
+              if (el) {
+                this.player = el;
+              }
             }}
           >
-            {dataSource.imagelist && maxSize && dataSource.imagelist.length ? (
-              <Carousel className="player" autoplay={false} infinite>
-                {dataSource.imagelist.map(item => (
-                  <div className="item" key={item.imageUrl} style={{width: maxSize[0] - 1, height: maxSize[1]}}>
-                    <a href={item.imageUrl} target="_blank" className="img" style={{backgroundImage: `url(${item.imageUrl})`}} />
+            {maxSize ? (
+              <Carousel className="player" autoplay={false} infinite={true}>
+                {dataSource.picList.map(url => (
+                  <div className="item" key={url} style={{width: maxSize[0] - 1, height: maxSize[1]}}>
+                    <a href={url} target="_blank" className="img" style={{backgroundImage: `url(${url})`}} />
                   </div>
                 ))}
               </Carousel>
-            ) : (
-              <div className="player">
-                <div className="msg" onClick={this.onUpgradeVip}>
-                  {dataSource.imagelist ? "未上传图片" : "请升级VIP会员"}
-                </div>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       );
@@ -104,7 +91,7 @@ class Component extends React.PureComponent<Props, State> {
       return null;
     }
   }
-  componentDidUpdate() {
+  public componentDidUpdate() {
     const dom = findDOMNode(this) as HTMLElement;
     if (dom && dom.className.indexOf("g-enter-in") > -1) {
       setTimeout(() => {
@@ -119,11 +106,9 @@ class Component extends React.PureComponent<Props, State> {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    showComment: state.project.photos.actions.comment,
-    dataSource: state.project.photos.curItem,
+    showComment: state.photos.showComment,
+    dataSource: state.photos.itemDetail,
   };
 };
 
 export default connect(mapStateToProps)(Component);
-
-// <img className="imgItem g-preImg g-listImg" src={item.imageUrl} alt="" />

@@ -20,7 +20,7 @@ class ModuleHandlers extends ArticleHandlers<State, Resource> {
           items: null,
           summary: null,
         },
-        query: {},
+        searchData: {},
       },
       {
         defaultSearch,

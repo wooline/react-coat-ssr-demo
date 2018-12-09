@@ -32,7 +32,50 @@ export function checkFastRedirect(pathname: string) {
 
 type ReturnModule<T extends () => any> = T extends () => Promise<infer R> ? R : T extends () => infer R ? R : Module;
 
-export function toUrl<N extends keyof MG, M extends ReturnModule<MG[N]>, V extends keyof M["views"], R extends RootRouter["query"], H extends RootRouter["hash"]>(
+function serialize(data: {[key: string]: any}): string {
+  const flatArr: string[] = [];
+  for (const mName in data) {
+    if (data.hasOwnProperty(mName)) {
+      const mRoute = data[mName];
+      if (mRoute) {
+        for (const mKey in mRoute) {
+          if (mRoute.hasOwnProperty(mKey)) {
+            flatArr.push(`${mName}-${mKey}=${escape(JSON.stringify(mRoute[mKey]))}`);
+          }
+        }
+      }
+    }
+  }
+  if (flatArr.length) {
+    return flatArr.sort().join("&");
+  } else {
+    return "";
+  }
+}
+
+export function replaceCurRouter<M extends keyof RootRouter["searchData"]>(
+  rootRouter: RootRouter,
+  moduleName: M,
+  newSearchData?: Partial<RootRouter["searchData"][M]>,
+  newHashData?: Partial<RootRouter["hashData"][M]>
+) {
+  const {pathname, search, hash} = rootRouter.location;
+  const {searchData, hashData} = rootRouter;
+  let url = pathname;
+  if (newSearchData) {
+    url += "?" + serialize({...searchData, [moduleName]: {...searchData[moduleName], ...newSearchData}});
+  } else {
+    url += search;
+  }
+  if (newHashData) {
+    url += "#" + serialize({...hashData, [moduleName]: {...hashData[moduleName], ...newHashData}});
+  } else {
+    url += hash;
+  }
+  return url;
+}
+
+export function toUrl<N extends keyof MG, M extends ReturnModule<MG[N]>, V extends keyof M["views"], R extends RootRouter["searchData"], H extends RootRouter["hashData"]>(
   moduleName: N,
   viewName?: V,
   params?: {[keys: string]: string},
@@ -57,22 +100,10 @@ export function toUrl<N extends keyof MG, M extends ReturnModule<MG[N]>, V exten
     });
   }
   if (query) {
-    const flatArr: string[] = [];
-    for (const mName in query) {
-      if (query.hasOwnProperty(mName)) {
-        const mRoute = query[mName];
-        if (mRoute) {
-          for (const mKey in mRoute) {
-            if (mRoute.hasOwnProperty(mKey)) {
-              flatArr.push(`${mName}-${mKey}=${escape(JSON.stringify(mRoute[mKey]))}`);
-            }
-          }
-        }
-      }
-    }
-    if (flatArr.length) {
-      url = url + "?" + flatArr.sort().join("&");
-    }
+    url = url + "?" + serialize(query);
+  }
+  if (hash) {
+    url = url + "#" + serialize(hash);
   }
   return url;
 }
@@ -101,7 +132,7 @@ export function unserializeUrlQuery(query: string): any {
   }
   return args;
 }
-export function mergeSearch<S, O>(options: O, base: S): Partial<S> {
+export function mergeSearch<S>(options: Partial<S>, base: S): Partial<S> {
   const search = {...base, ...options};
   /* 过滤与默认值相等的参数 */
   return Object.keys(search).reduce((prev, cur) => {
@@ -118,10 +149,7 @@ export function mergeSearch<S, O>(options: O, base: S): Partial<S> {
   }, {});
   // this.dispatch(this.routerActions.push(pushQuery(this.namespace, "listOptional", parms, this.rootState.router.location.search)));
 }
-export function extendSearch(moduleName: ModuleNames, route: RootRouter, search?: any, local?: any) {
-  const {query, hash} = route;
-  return toUrl(moduleName, "Main", {}, search ? {...query, [moduleName]: {...query[moduleName], search}} : query, local ? {...hash, [moduleName]: {...hash[moduleName], local}} : hash);
-}
+
 function parseRoute(pre: {}, cur: string) {
   const [key, val] = cur.split("=");
   if (key) {
