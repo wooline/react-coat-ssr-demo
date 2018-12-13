@@ -1,4 +1,60 @@
-.photos-Detail {
+.photos-Details {
+  .content {
+    position: absolute;
+    top: 85px;
+    bottom: 0;
+    width: 100%;
+
+    .g-pre-img {
+      height: 100%;
+    }
+    .pic {
+      height: 100%;
+      background: no-repeat center center;
+      background-size: contain;
+    }
+  }
+  .remark {
+    position: absolute;
+    overflow: hidden;
+    max-height: 3em;
+    line-height: 1.5em;
+    font-size: 12px;
+    background: #000;
+    z-index: 1;
+    padding: 0 1em;
+    box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.4);
+    left: 0;
+    top: 40px;
+    right: 0;
+
+    &::after {
+      content: " ...更多";
+      color: #ff0;
+      text-decoration: underline;
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      padding-left: 5em;
+      padding-right: 2em;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 50%);
+    }
+
+    &.on {
+      display: block;
+      max-height: none;
+      padding-bottom: 10px;
+
+      &::after {
+        position: initial;
+        padding-left: 0;
+        content: " ...收起";
+      }
+    }
+  }
+}
+
+/* .photos-Details {
   padding-bottom: 1rem;
   padding-top: 7rem;
   box-sizing: border-box;
@@ -16,44 +72,7 @@
     }
   }
 
-  .g-remark {
-    overflow: hidden;
-    max-height: 3em;
-    left: 0;
-    top: 4rem;
-    right: 0;
-    position: absolute;
-    line-height: 1.5em;
-    font-size: 0.9rem;
-    background: #000;
-    padding: 0 1rem;
-    z-index: 1;
-    box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.4);
-
-    &::after {
-      content: " ...更多";
-      color: #ff0;
-      text-decoration: underline;
-      position: absolute;
-      right: 1rem;
-      bottom: 0;
-      padding-left: 4em;
-      padding-right: 0.5rem;
-      background: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 1) 50%);
-    }
-
-    &.on {
-      display: block;
-      max-height: none;
-      padding-bottom: 1rem;
-
-      &::after {
-        position: initial;
-        padding-left: 0;
-        content: " ...收起";
-      }
-    }
-  }
+  
 
   .bd {
     height: 100%;
@@ -130,3 +149,4 @@
     }
   }
 }
+ */

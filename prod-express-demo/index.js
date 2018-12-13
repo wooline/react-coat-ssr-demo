@@ -13,6 +13,6 @@ const [, , port] = appPackage.devServer.url.split(/:\/*/);
 const app = express();
 app.use("/client", express.static(paths.distClientPath));
 app.use(devServer(htmlTpl, mainModule, appPackage.devServer.proxy));
-app.use(devMock(appPackage.devServer.mock, appPackage.devServer.proxy));
+app.use(devMock(appPackage.devServer.mock, appPackage.devServer.proxy, true));
 
 app.listen(port, () => console.info(chalk`.....${new Date().toLocaleString()} starting {red SSR Server} on {green http://localhost:${port}/} \n`));

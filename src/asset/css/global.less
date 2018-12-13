@@ -9,6 +9,14 @@ h6 {
   margin: 0;
 }
 
+.am-carousel {
+  height: 100% !important;
+  .slider-slide,
+  .slider-list,
+  .slider-frame {
+    height: 100% !important;
+  }
+}
 .g-page {
   font-family: Microsoft YaHei, Yahei, Arial, Helvetica, sans-serif;
   background: white;
@@ -17,6 +25,15 @@ h6 {
 
 .g-pre-img {
   background: url(~asset/imgs/loading.gif) no-repeat center center #000;
+}
+
+.g-modal {
+  opacity: 1;
+  transition: opacity 0.6s ease;
+
+  &.g-enter-in {
+    opacity: 0;
+  }
 }
 
 .g-pic-list {
@@ -70,8 +87,39 @@ h6 {
     color: inherit;
   }
 }
+.g-details {
+  position: fixed;
+  height: 100%;
+  background: #000;
+  top: 0;
+  color: #fff;
+  z-index: 750;
 
+  .subject {
+    display: flex;
+    margin-top: 10px;
+    align-items: center;
+
+    h2 {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex-grow: 1;
+      margin-left: 15px;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .close-button {
+      width: 18px;
+      color: #fff;
+      flex-shrink: 0;
+      margin: 0 15px;
+    }
+  }
+}
 // .g-init-loading position: fixed 2000
 // .app-Welcome: 1000
 // .app-Loading: 900
 // .app-TopNav position: fixed 500
+// .g-detail position: fixed 750;

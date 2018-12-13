@@ -9,68 +9,74 @@ export interface ListData<Item, Search, Summary> {
 export type EditorType = "create" | "update";
 
 export interface Defined {
-  ListItem: {};
-  ListSearch: {};
-  ListSummary: {};
-  ItemDetail: {};
-  ItemEditor: {};
-  ItemCreateData: {};
-  ItemUpdateData: {};
-  ItemCreateResult: {};
-  ItemUpdateResult: {};
+  State?: {};
+  SearchData?: {};
+  PathData?: {};
+  HashData?: {};
+  ListItem?: {};
+  ListSearch?: {};
+  ListSummary?: {};
+  ItemDetail?: {};
+  ItemEditor?: {};
+  ItemCreateData?: {};
+  ItemUpdateData?: {};
+  ItemCreateResult?: {};
+  ItemUpdateResult?: {};
 }
 
-interface Base<D extends Defined> {
-  ListItem: D["ListItem"] & {
+export type ResourceDefined = Defined & {
+  PathData: {itemId?: string};
+  ListItem: {
     id: string;
   };
-  ListSearch: D["ListSearch"] & {
+  ListSearch: {
     page: number | null;
     pageSize: number | null;
   };
-  ListSummary: D["ListSummary"] & {
+  ListSummary: {
     page: number;
     pageSize: number;
     totalItems: number;
     totalPages: number;
   };
-  ItemDetail: D["ItemDetail"] & {
+  ItemDetail: {
     id: string;
   };
-  ItemEditor: D["ItemEditor"] & {
+  ItemEditor: {
     type: EditorType;
   };
-  ItemCreateData: D["ItemCreateData"];
-  ItemUpdateData: D["ItemUpdateData"] & {
+  ItemUpdateData: {
     id: string;
   };
-  ItemCreateResult: D["ItemCreateResult"] & DefaultResult;
-  ItemUpdateResult: D["ItemUpdateResult"] & DefaultResult;
-}
-export interface Resource<D extends Defined = Defined, B extends Base<D> = Base<D>> {
-  ListItem: B["ListItem"];
-  ListSearch: B["ListSearch"];
-  ListSummary: B["ListSummary"];
-  ListOptional: Partial<B["ListSearch"]>;
-  ItemDetail: B["ItemDetail"];
-  ItemEditor: B["ItemEditor"];
-  ItemCreateData: B["ItemCreateData"];
-  ItemUpdateData: B["ItemUpdateData"];
-  ItemCreateResult: B["ItemCreateResult"];
-  ListData: ListData<B["ListItem"], B["ListSearch"], B["ListSummary"]>;
-  State: {
-    itemDetail?: B["ItemDetail"];
-    itemEditor?: B["ItemEditor"];
+  ItemCreateResult: DefaultResult;
+  ItemUpdateResult: DefaultResult;
+};
+export interface Resource<D extends ResourceDefined = ResourceDefined> {
+  ListItem: D["ListItem"];
+  ListSearch: D["ListSearch"];
+  ListSummary: D["ListSummary"];
+  ListOptional: Partial<D["ListSearch"]>;
+  ItemDetail: D["ItemDetail"];
+  ItemEditor: D["ItemEditor"];
+  ItemCreateData: D["ItemCreateData"];
+  ItemUpdateData: D["ItemUpdateData"];
+  ItemCreateResult: D["ItemCreateResult"];
+  ListData: ListData<D["ListItem"], D["ListSearch"], D["ListSummary"]>;
+  State: D["State"] & {
+    itemDetail?: D["ItemDetail"];
+    itemEditor?: D["ItemEditor"];
     selectedIds?: string[];
-    searchData: {search?: Partial<B["ListSearch"]>};
-    listData: ListData<B["ListItem"], B["ListSearch"], B["ListSummary"]>;
+    searchData?: D["SearchData"] & {search?: Partial<D["ListSearch"]>};
+    hashData?: D["HashData"];
+    pathData?: D["PathData"];
+    listData: ListData<D["ListItem"], D["ListSearch"], D["ListSummary"]>;
   };
   API: {
     hitItem?(id: string): Promise<void>;
-    getItemDetail?(id: string): Promise<B["ItemDetail"]>;
-    searchList(request: B["ListSearch"]): Promise<ListData<B["ListItem"], B["ListSearch"], B["ListSummary"]>>;
-    createItem?(request: B["ItemCreateData"]): Promise<B["ItemCreateResult"]>;
-    updateItem?(request: B["ItemUpdateData"]): Promise<B["ItemUpdateResult"]>;
+    getItemDetail?(id: string): Promise<D["ItemDetail"]>;
+    searchList(request: D["ListSearch"]): Promise<ListData<D["ListItem"], D["ListSearch"], D["ListSummary"]>>;
+    createItem?(request: D["ItemCreateData"]): Promise<D["ItemCreateResult"]>;
+    updateItem?(request: D["ItemUpdateData"]): Promise<D["ItemUpdateResult"]>;
     deleteItems?(ids: string[]): Promise<void>;
   };
 }

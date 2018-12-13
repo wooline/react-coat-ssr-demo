@@ -7,8 +7,22 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "启动程序",
+      "name": "Launch via NPM",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "start"],
+      "port": 9229
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "demo",
       "program": "${workspaceFolder}/prod-express-demo/index.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "start",
+      "program": "${workspaceFolder}/scripts/start.js"
     }
   ]
 }

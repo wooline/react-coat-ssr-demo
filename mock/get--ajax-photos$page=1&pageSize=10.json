@@ -1,5 +1,4 @@
 {
-  "url": "/ajax/session",
   "statusCode": 200,
   "statusMessage": "OK",
   "headers": {
@@ -27,7 +26,7 @@
         "type": "跟团游",
         "price": 2499,
         "hot": 265,
-        "coverUrl": "/client/imgs/1/4.jpg"
+        "coverUrl": "/client/imgs/1/1.jpg"
       },
       {
         "id": "2",

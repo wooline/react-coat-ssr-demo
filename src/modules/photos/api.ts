@@ -6,10 +6,10 @@ export class API {
     return request("get", "/ajax/photos", listSearch);
   }
   public getItemDetail(id: string): Promise<ItemDetail> {
-    return request("get", "/ajax/photos/:id");
+    return request("get", "/ajax/photos/:id", {id});
   }
   public hitItem(id: string): Promise<void> {
-    return request("post", "/ajax/photos/:id/hit");
+    return request("post", "/ajax/photos/:id/hit", {id});
   }
 }
 

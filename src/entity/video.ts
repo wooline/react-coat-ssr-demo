@@ -1,22 +1,18 @@
-import {Defined as ArticleDefined, Resource as ArticleResource} from "./article";
+import {ArticleDefined, ArticleResource} from "./article";
 
-export interface VideoItem {
-  id: string;
-  url: string;
-}
 interface Item {
   title: string;
   hits: number;
   commentCount: number;
   coverUrl: string;
   createTimeDesc: string;
-  video: VideoItem[];
+  videoUrl: string;
 }
-export interface Defined extends ArticleDefined {
+export type VideoDefined = ArticleDefined & {
   ListItem: Item;
-  ItemDetail: Item & {remark: string};
-}
-export type Resource = ArticleResource<Defined>;
+  ItemDetail: Item;
+};
+export type Resource = ArticleResource<VideoDefined>;
 
 export type ListItem = Resource["ListItem"];
 export type ListSearch = Resource["ListSearch"];

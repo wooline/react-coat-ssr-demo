@@ -1,6 +1,6 @@
 import ArticleHandlers from "common/ArticleHandlers";
-import {replaceCurRouter} from "common/routers";
-import {ListSearch, Resource, State} from "entity/photo";
+import {replaceQuery} from "common/routers";
+import {ListSearch, PhotoResource, State} from "entity/photo";
 import {ModuleNames} from "modules/names";
 import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
@@ -12,7 +12,7 @@ export const defaultSearch: ListSearch = {
   pageSize: 10,
 };
 
-class ModuleHandlers extends ArticleHandlers<State, Resource> {
+class ModuleHandlers extends ArticleHandlers<State, PhotoResource> {
   constructor() {
     super(
       {
@@ -21,7 +21,6 @@ class ModuleHandlers extends ArticleHandlers<State, Resource> {
           items: null,
           summary: null,
         },
-        searchData: {},
         showComment: false,
       },
       {
@@ -32,7 +31,7 @@ class ModuleHandlers extends ArticleHandlers<State, Resource> {
   }
   @effect()
   public async showComment(showComment: boolean) {
-    this.dispatch(this.routerActions.push(replaceCurRouter(this.rootState.router, ModuleNames.photos, {showComment})));
+    this.dispatch(this.routerActions.push(replaceQuery(this.rootState.router, ModuleNames.photos, {showComment}, true)));
   }
   @effect()
   protected async [ModuleNames.photos + "/INIT"]() {

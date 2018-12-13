@@ -1,18 +1,18 @@
 import {Toast} from "antd-mobile";
 import {CustomError, RedirectError} from "common/Errors";
-import {checkFastRedirect, emptyModule} from "common/routers";
+import {checkFastRedirect, isCur} from "common/routers";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, GetModule, LoadingState, loadModel, LOCATION_CHANGE, reducer} from "react-coat";
-import {matchPath} from "react-router";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, LoadingState, loadModel, LOCATION_CHANGE, reducer} from "react-coat";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 
 // 定义本模块的State类型
 
 export interface State extends BaseModuleState {
+  pathData?: {views: string[]};
   projectConfig: ProjectConfig | null;
   curUser: CurUser | null;
   startupStep: StartupStep;
@@ -23,7 +23,7 @@ export interface State extends BaseModuleState {
 }
 
 // 定义本模块的Handlers
-class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
+class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   constructor() {
     // 定义本模块State的初始值
     const initState: State = {
@@ -85,7 +85,6 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
   // 兼听自已的INIT Action，做一些异步数据请求，不需要手动触发，所以请使用protected或private
   @effect()
   protected async [ModuleNames.app + "/INIT"]() {
-    const router = this.rootState.router;
     const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);
     this.dispatch(
       this.callThisAction(this.UPDATE, {
@@ -95,41 +94,24 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState> {
         startupStep: StartupStep.configLoaded,
       })
     );
-    const routes: Array<{path?: string; exact?: boolean; module: GetModule}> = [
-      {
-        path: "/my",
-        exact: true,
-        module: () => {
-          if (!curUser.hasLogin) {
-            throw new RedirectError("301", "/login");
-          } else {
-            return ModuleGetter.photos();
-          }
-        },
-      },
-      {
-        path: "/login",
-        exact: true,
-        module: () => {
-          if (curUser.hasLogin) {
-            throw new RedirectError("301", "/");
-          } else {
-            return emptyModule;
-          }
-        },
-      },
-      {path: "/photos", exact: true, module: ModuleGetter.photos},
-      {path: "/videos", exact: true, module: ModuleGetter.videos},
-    ];
-    const matchs = routes.filter(route => matchPath(router.location.pathname, route));
-    if (!matchs.length) {
-      matchs.push({
-        module: () => {
-          throw new RedirectError("301", `${InitEnv.clientPublicPath}404.html`);
-        },
-      });
+    const views = this.rootState.router.views;
+    if (isCur(views, ModuleNames.app, "LoginForm") && curUser.hasLogin) {
+      throw new RedirectError("301", "/");
     }
-    await Promise.all(matchs.map(route => loadModel(route.module).then(subModel => subModel(this.store))));
+    const subModules: ModuleNames[] = [ModuleNames.photos, ModuleNames.videos];
+    let noMatch: boolean = true;
+    console.log(this.rootState.router.views);
+    for (const subModule of subModules) {
+      if (isCur(views, subModule)) {
+        noMatch = false;
+        await loadModel(ModuleGetter[subModule as any]).then(subModel => subModel(this.store));
+        break;
+      }
+    }
+    if (noMatch) {
+      console.log("-------------");
+      throw new RedirectError("301", `${InitEnv.clientPublicPath}404.html`);
+    }
   }
 }
 

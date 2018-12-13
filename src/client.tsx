@@ -1,4 +1,4 @@
-import {checkFastRedirect, parseHash, parseQuery} from "common/routers";
+import {checkFastRedirect, hashParser, pathParser, searchParser} from "common/routers";
 import {ModuleGetter} from "modules";
 import {ModuleNames} from "modules/names";
 import {buildApp} from "react-coat";
@@ -8,5 +8,5 @@ const redirect = checkFastRedirect(window.location.pathname);
 if (redirect) {
   window.location.href = redirect.url;
 } else {
-  buildApp(ModuleGetter, ModuleNames.app, {queryParser: parseQuery, hashParser: parseHash});
+  buildApp(ModuleGetter, ModuleNames.app, {pathParser, searchParser, hashParser});
 }

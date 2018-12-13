@@ -1,7 +1,3 @@
-export type PickOptional<T> = Pick<T, {[K in keyof T]-?: {} extends {[P in K]: T[K]} ? K : never}[keyof T]>;
-
-export type PickOptional2<T> = Pick<T, {[K in keyof T]-?: T[K] extends Exclude<T[K], undefined> ? never : K}[keyof T]>;
-
 export function equal(obj1: any, obj2: any): boolean {
   if (obj1 === obj2) {
     return true;
@@ -13,10 +9,19 @@ export function equal(obj1: any, obj2: any): boolean {
     if (keys1.length !== keys2.length) {
       return false;
     } else {
-      if (keys1.every(key => obj1[key] === obj2[key])) {
+      let result = true;
+      for (const key of keys1) {
+        if (obj1[key] !== obj2[key]) {
+          result = false;
+          if (typeof obj1[key] !== "object" || typeof obj2[key] !== "object") {
+            return false;
+          }
+        }
+      }
+      if (result) {
         return true;
       } else {
-        return JSON.stringify(obj1) === JSON.stringify(obj1);
+        return JSON.stringify(obj1) === JSON.stringify(obj2);
       }
     }
   }

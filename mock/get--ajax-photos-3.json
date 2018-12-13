@@ -1,0 +1,20 @@
+{
+  "statusCode": 200,
+  "statusMessage": "OK",
+  "headers": {
+    "x-powered-by": "Express",
+    "content-type": "application/json; charset=utf-8",
+    "connection": "close"
+  },
+  "response": {
+    "id": "3",
+    "title": "厦门+鼓浪屿自驾4日游",
+    "departure": "苏州",
+    "type": "自驾游",
+    "price": 800,
+    "hot": 6895,
+    "coverUrl": "/client/imgs/3/1.jpg",
+    "remark": "精华的地方都玩到了，随手一拍就是风景大片，美不胜收！但是呢，最大的感受就是厦门的景点过于分散，自己玩容易走回头路，非常浪费时间，我个人觉得现在国内的成熟的旅游景点比如厦门这样的，最好还是结伴玩，毕竟出来玩，重要的是轻松和开心嘛！",
+    "picList": ["/client/imgs/3/1.jpg", "/client/imgs/3/2.jpg", "/client/imgs/3/3.jpg"]
+  }
+}

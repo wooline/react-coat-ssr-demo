@@ -1,12 +1,13 @@
 import {Toast} from "antd-mobile";
-import {isCur, mergeSearch, replaceCurRouter} from "common/routers";
+import {isCur} from "common/routers";
 import {equal} from "common/utils";
 import {Resource} from "entity/resource";
 import {RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import {BaseModuleHandlers, effect, LOCATION_CHANGE, reducer, RouterState} from "react-coat";
+//  mergeSearch, replaceQuery
 
-export default class Handlers<S extends R["State"], R extends Resource> extends BaseModuleHandlers<S, RootState> {
+export default class Handlers<S extends R["State"], R extends Resource> extends BaseModuleHandlers<S, RootState, ModuleNames> {
   constructor(initState: S, protected config: {api: R["API"]; defaultSearch: R["ListSearch"]}) {
     super(initState);
   }
@@ -20,25 +21,29 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
     return {...this.state, itemEditor};
   }
   @reducer
-  protected putItemDetail(itemDetail: R["ItemDetail"]): S {
+  protected putItemDetail(itemDetail: R["ItemDetail"] | undefined): S {
     return {...this.state, itemDetail};
   }
   @reducer
   protected putSelectedIds(selectedIds: string[]): S {
     return {...this.state, selectedIds};
   }
-  @effect(null)
+  /* @effect(null)
   public async openList({options, extend}: {options: R["ListOptional"]; extend: "DEFAULT" | "CURRENT"}) {
     const search = mergeSearch(options, extend === "DEFAULT" ? this.config.defaultSearch : this.state.listData.search);
-    this.dispatch(this.routerActions.push(replaceCurRouter(this.rootState.router, this.namespace as any, {search})));
-  }
+    this.dispatch(this.routerActions.push(replaceQuery(this.rootState.router, this.namespace as any, {search})));
+  } */
+  /* @effect(null)
+  public async openItemDetail(id: string) {
+    this.dispatch(this.routerActions.push(replaceCurRouter(this.rootState.router, this.namespace as any, {item: id})));
+  } */
   @effect()
   public async searchList(playload?: {options: R["ListOptional"]; extend: "DEFAULT" | "CURRENT"}) {
     const {options, extend} = playload || {options: {}, extend: "CURRENT"};
     const baseSearch = extend === "DEFAULT" ? this.config.defaultSearch : this.state.listData.search;
     const search: R["ListSearch"] = {...baseSearch, ...options};
     const listData = await this.config.api.searchList(search);
-    this.dispatch(this.callThisAction(this.putListData, listData));
+    this.dispatch(this.callThisAction(this.putListData, {...listData, search}));
     return listData;
   }
   @effect()
@@ -53,7 +58,7 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
     if (!response.error) {
       Toast.info("操作成功");
       this.dispatch(this.callThisAction(this.putItemEditor)); // 关闭当前创建窗口
-      this.dispatch(this.callThisAction(this.openList, {options: {page: 1}, extend: "DEFAULT"})); // 返回第一页
+      // this.dispatch(this.callThisAction(this.openList, {options: {page: 1}, extend: "DEFAULT"})); // 返回第一页
     } else {
       Toast.info(response.error.message);
     }
@@ -78,19 +83,20 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
     this.dispatch(this.callThisAction(this.putSelectedIds, [])); // 清空当前选中项
     this.dispatch(this.callThisAction(this.searchList, {options: {}, extend: "CURRENT"})); // 刷新当前页
   }
-  @effect(null)
+  @effect()
   protected async [LOCATION_CHANGE](router: RouterState) {
-    if (isCur(router.location.pathname, this.namespace as ModuleNames)) {
-      const searchData = this.state.searchData || {};
-      const search: R["ListSearch"] = {...this.config.defaultSearch, ...searchData.search};
-      if (!equal(search, this.state.listData.search)) {
-        this.dispatch(this.callThisAction(this.searchList, {options: search, extend: "CURRENT"}));
-      }
-    }
+    await this.onInit();
   }
   protected async onInit() {
-    const searchData = this.state.searchData || {};
-    const search: R["ListSearch"] = {...this.config.defaultSearch, ...searchData.search};
-    await this.dispatch(this.callThisAction(this.searchList, {options: search, extend: "CURRENT"}));
+    if (isCur(this.rootState.router.views, this.namespace, "Details" as any)) {
+      const itemId = this.state.pathData!.itemId;
+      await this.getItemDetail(itemId!);
+    } else if (isCur(this.rootState.router.views, this.namespace, "Main")) {
+      const searchData = this.state.searchData || {};
+      const search: R["ListSearch"] = {...this.config.defaultSearch, ...searchData.search};
+      if (!this.state.listData.items || !equal(search, this.state.listData.search)) {
+        await this.searchList({options: search, extend: "CURRENT"});
+      }
+    }
   }
 }

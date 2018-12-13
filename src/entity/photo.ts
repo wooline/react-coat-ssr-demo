@@ -1,10 +1,5 @@
-import {Defined as ArticleDefined, Resource as ArticleResource} from "./article";
+import {ArticleDefined, ArticleResource} from "./article";
 
-export interface PhotoItem {
-  id: string;
-  photoId: string;
-  photoUrl: string;
-}
 interface Item {
   title: string;
   departure: string;
@@ -14,17 +9,22 @@ interface Item {
   coverUrl: string;
   comments: number;
 }
-export interface Defined extends ArticleDefined {
+
+export type PhotoDefined = ArticleDefined & {
+  State: {showComment: boolean};
   ListItem: Item;
   ItemDetail: Item & {remark: string; picList: string[]};
-}
-export type Resource = ArticleResource<Defined>;
+  SearchData: {showComment?: boolean};
+};
 
-export type ListItem = Resource["ListItem"];
-export type ListSearch = Resource["ListSearch"];
-export type ListSummary = Resource["ListSummary"];
-export type ListOptional = Resource["ListOptional"];
-export type ItemDetail = Resource["ItemDetail"];
-export type ListData = Resource["ListData"];
-export type State = Resource["State"] & {showComment: boolean};
-export type API = Resource["API"];
+export type PhotoResource = ArticleResource<PhotoDefined>;
+
+export type ListItem = PhotoResource["ListItem"];
+export type ListSearch = PhotoResource["ListSearch"];
+export type ListSummary = PhotoResource["ListSummary"];
+export type ListOptional = PhotoResource["ListOptional"];
+export type ItemDetail = PhotoResource["ItemDetail"];
+export type ListData = PhotoResource["ListData"];
+export type State = PhotoResource["State"];
+export type SearchData = State["searchData"];
+export type API = PhotoResource["API"];

@@ -1,14 +1,9 @@
-import {Defined as CommonDefined, Resource as CommonResource} from "./resource";
+import {Resource, ResourceDefined} from "./resource";
 
-export interface Defined extends CommonDefined {
+export type ArticleDefined = ResourceDefined & {
   ListSearch: {
     title: string | null;
   };
-}
-export interface Actions {
-  id: string;
-  comment: boolean;
-}
-export interface Resource<D extends Defined = Defined> extends CommonResource<D> {
-  State: CommonResource<D>["State"] & {searchData: {showComment?: boolean}};
-}
+};
+
+export interface ArticleResource<D extends ArticleDefined = ArticleDefined> extends Resource<D> {}

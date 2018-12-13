@@ -1,29 +1,53 @@
 import {ModuleGetter, RootRouter} from "modules";
 import {ModuleNames} from "modules/names";
-import {Module, RouterState} from "react-coat";
+import {HashParser, Module, PathParser, SearchParser} from "react-coat";
 import {matchPath} from "react-router";
 
 type MG = typeof ModuleGetter;
 
-export const emptyModule: Module = {model: () => Promise.resolve(void 0), views: {}};
-
 const moduleToUrl: {[K in keyof MG]+?: string | {[V in keyof ReturnModule<MG[K]>["views"]]+?: string}} = {
-  [ModuleNames.app]: {LoginForm: "/login"},
-  [ModuleNames.photos]: "/photos",
-  [ModuleNames.videos]: "/videos",
+  [ModuleNames.app]: {Main: "/", LoginForm: "/login"},
+  [ModuleNames.photos]: {Main: "/photos", Details: "/photos/:itemId"},
+  [ModuleNames.videos]: {Main: "/videos"},
   [ModuleNames.messages]: "/message",
 };
 
-const fastRedirect: Array<{path?: string; exact?: boolean; to: {code: "301" | "302"; url: string}}> = [
-  {
-    path: "/",
-    exact: true,
-    to: {code: "301", url: "/photos"},
-  },
-];
+const modulePaths = ((maps: {[mName: string]: string | {[vName: string]: string}}) => {
+  const urls: {[pathname: string]: [string, string]} = {};
+  for (const mName in maps) {
+    if (maps.hasOwnProperty(mName)) {
+      const item = maps[mName];
+      if (typeof item === "string") {
+        urls[item] = [mName, "Main"];
+      } else {
+        for (const vName in item) {
+          if (item.hasOwnProperty(vName)) {
+            urls[item[vName]] = [mName, vName];
+          }
+        }
+      }
+    }
+  }
+  return urls;
+})(moduleToUrl as any);
+
+let fastRedirect: Array<{path: RegExp; to: {code: "301" | "302"; url: string}}> = [];
+
 export function checkFastRedirect(pathname: string) {
+  if (!fastRedirect.length) {
+    fastRedirect = [
+      {
+        path: /^\/$/,
+        to: {code: "301", url: "/photos"},
+      },
+      {
+        path: /^\/(?!photos|videos|login)/,
+        to: {code: "301", url: `${InitEnv.clientPublicPath}404.html`},
+      },
+    ];
+  }
   for (const route of fastRedirect) {
-    if (matchPath(pathname, route)) {
+    if (route.path.test(pathname)) {
       return route.to;
     }
   }
@@ -40,7 +64,9 @@ function serialize(data: {[key: string]: any}): string {
       if (mRoute) {
         for (const mKey in mRoute) {
           if (mRoute.hasOwnProperty(mKey)) {
-            flatArr.push(`${mName}-${mKey}=${escape(JSON.stringify(mRoute[mKey]))}`);
+            if (mRoute[mKey] !== undefined) {
+              flatArr.push(`${mName}-${mKey}=${escape(JSON.stringify(mRoute[mKey]))}`);
+            }
           }
         }
       }
@@ -53,35 +79,54 @@ function serialize(data: {[key: string]: any}): string {
   }
 }
 
-export function replaceCurRouter<M extends keyof RootRouter["searchData"]>(
+export function replaceQuery<M extends keyof RootRouter["searchData"]>(
   rootRouter: RootRouter,
   moduleName: M,
   newSearchData?: Partial<RootRouter["searchData"][M]>,
-  newHashData?: Partial<RootRouter["hashData"][M]>
+  extendSearchData?: boolean,
+  newHashData?: Partial<RootRouter["hashData"][M]>,
+  extendHashData?: boolean
 ) {
   const {pathname, search, hash} = rootRouter.location;
   const {searchData, hashData} = rootRouter;
   let url = pathname;
   if (newSearchData) {
-    url += "?" + serialize({...searchData, [moduleName]: {...searchData[moduleName], ...newSearchData}});
+    let str = "";
+    if (extendSearchData) {
+      str = serialize({...searchData, [moduleName]: {...searchData[moduleName], ...newSearchData}});
+    } else {
+      str = serialize({...searchData, [moduleName]: newSearchData});
+    }
+    if (str) {
+      url += "?" + str;
+    }
   } else {
     url += search;
   }
   if (newHashData) {
-    url += "#" + serialize({...hashData, [moduleName]: {...hashData[moduleName], ...newHashData}});
+    let str = "";
+    if (extendHashData) {
+      str = serialize({...hashData, [moduleName]: {...hashData[moduleName], ...newHashData}});
+    } else {
+      str = serialize({...hashData, [moduleName]: newHashData});
+    }
+    if (str) {
+      url += "#" + str;
+    }
   } else {
     url += hash;
   }
   return url;
 }
 
-export function toUrl<N extends keyof MG, M extends ReturnModule<MG[N]>, V extends keyof M["views"], R extends RootRouter["searchData"], H extends RootRouter["hashData"]>(
-  moduleName: N,
-  viewName?: V,
-  params?: {[keys: string]: string},
-  query?: R,
-  hash?: H
-): string {
+export function toUrl<
+  N extends keyof RootRouter["pathData"],
+  M extends ReturnModule<MG[N]>,
+  V extends keyof M["views"],
+  P extends RootRouter["pathData"][N],
+  R extends RootRouter["searchData"],
+  H extends RootRouter["hashData"]
+>(moduleName: N, viewName?: V, params?: P, query?: R | string, hash?: H | string): string {
   viewName = viewName || ("Main" as any);
   let pathExp: string | {[viewName: string]: string} = moduleToUrl[moduleName] as string;
   if (typeof pathExp !== "string") {
@@ -92,25 +137,37 @@ export function toUrl<N extends keyof MG, M extends ReturnModule<MG[N]>, V exten
     url = pathExp.replace(/:\w+/g, flag => {
       const key = flag.substr(1);
       if (params[key]) {
-        const val = params[key];
-        return encodeURIComponent(val);
+        return params[key];
       } else {
         return "";
       }
     });
   }
   if (query) {
-    url = url + "?" + serialize(query);
+    if (typeof query === "string") {
+      url += query;
+    } else {
+      const str = serialize(query);
+      if (str) {
+        url = url + "?" + serialize(query);
+      }
+    }
   }
   if (hash) {
-    url = url + "#" + serialize(hash);
+    if (typeof hash === "string") {
+      url += hash;
+    } else {
+      const str = serialize(hash);
+      if (str) {
+        url = url + "#" + serialize(hash);
+      }
+    }
   }
   return url;
 }
 
-export function isCur<N extends keyof MG, M extends ReturnModule<MG[N]>, V extends keyof M["views"]>(pathname: string, moduleName: N, viewName?: V): boolean {
-  const path = toUrl(moduleName, viewName);
-  return matchPath(pathname, path) !== null;
+export function isCur<N extends keyof MG, M extends ReturnModule<MG[N]>, V extends keyof M["views"]>(views: RootRouter["views"], moduleName: N, viewName?: V): boolean {
+  return views[[moduleName, viewName || "Main"].join(".")];
 }
 
 const ISO_DATE_FORMAT = /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(\.\d+)?(Z|[+-][01]\d:[0-5]\d)$/;
@@ -165,9 +222,46 @@ function parseRoute(pre: {}, cur: string) {
   }
   return pre;
 }
-export function parseHash({location: {hash}}: RouterState): {[moduleName: string]: {[key: string]: any}} {
-  return hash.split(/[&#]/).reduce(parseRoute, {});
-}
-export function parseQuery({location: {search}}: RouterState): {[moduleName: string]: {[key: string]: any}} {
+
+export const searchParser: SearchParser = (search: string) => {
   return search.split(/[&?]/).reduce(parseRoute, {});
-}
+};
+export const hashParser: HashParser = (hash: string) => {
+  return hash.split(/[&#]/).reduce(parseRoute, {});
+};
+export const pathParser: PathParser = (pathname: string) => {
+  const views: {[viewName: string]: boolean} = {};
+  const data: {[moduleName: string]: {[key: string]: any}} = {};
+  Object.keys(modulePaths).forEach(url => {
+    const match = matchPath(pathname, url);
+    if (match) {
+      const result = modulePaths[url];
+      views[result.join(".")] = true;
+      if (match.params) {
+        data[result[0]] = match.params;
+      }
+    }
+  });
+  return {views, data};
+};
+
+/* export const pathParser2: PathParser = (pathname: string) => {
+  let searchData: {[mName: string]: any} = {};
+  let hashData: {[mName: string]: any} = {};
+  let pathData: {[mName: string]: any} = {};
+  if (prev.search !== cur.search || prev.pathname !== cur.pathname) {
+    searchData = cur.search.split(/[&?]/).reduce(parseRoute, {});
+    pathData = parsePath(cur.pathname, searchData);
+  } else {
+    pathData = data.pathData;
+    searchData = data.searchData;
+  }
+  if (prev.hash !== cur.hash) {
+    hashData = cur.hash.split(/[&#]/).reduce(parseRoute, {});
+  } else {
+    hashData = data.hashData;
+  }
+
+  return {searchData, hashData, pathData};
+};
+ */

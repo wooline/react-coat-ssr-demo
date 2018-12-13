@@ -1,0 +1,21 @@
+{
+  "url": "get--ajax-photos-\\w+",
+  "statusCode": 200,
+  "statusMessage": "OK",
+  "headers": {
+    "x-powered-by": "Express",
+    "content-type": "application/json; charset=utf-8",
+    "connection": "close"
+  },
+  "response": {
+    "id": "4",
+    "title": "住无锡318文化大院，游灵山小镇拈花湾",
+    "departure": "无锡",
+    "type": "自驾游",
+    "price": 800,
+    "hot": 6895,
+    "coverUrl": "/client/imgs/4/1.jpg",
+    "remark": "无锡，江苏省地级市，简称“锡”，古称新吴、梁溪、金匮，被誉为“太湖明珠”。无锡位于江苏省南部，地处长江三角洲平原。北倚长江，南滨太湖，京杭大运河从无锡穿过；境内以平原为主，星散分布着低山、残丘；属北亚热带湿润季风气候区，四季分明，热量充足。无锡市辖5个区及2个县级市",
+    "picList": ["/client/imgs/4/1.jpg", "/client/imgs/4/2.jpg", "/client/imgs/4/3.jpg"]
+  }
+}

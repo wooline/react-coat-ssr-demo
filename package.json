@@ -57,12 +57,12 @@
     "yargs": "^12.0.0"
   },
   "devDependencies": {
-    "react-coat-dev-utils": "1.0.0-beta.3",
+    "react-coat-dev-utils": "1.0.0-beta.5",
     "react-coat-dev-pkg": "1.0.0-beta.3"
   },
   "dependencies": {
     "antd-mobile": "^2.2.6",
-    "react-coat": "4.0.0-beta.2",
+    "react-coat": "4.0.0-beta.3",
     "react-coat-pkg": "4.0.0-beta.1",
     "ts-import-plugin": "^1.5.5"
   },
@@ -78,7 +78,7 @@
     "mock": true,
     "proxy": {
       "/ajax/**": {
-        "target": "http://localhost:7445/",
+        "target": "http://localhost:7446/",
         "secure": false,
         "changeOrigin": true
       }
