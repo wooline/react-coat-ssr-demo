@@ -8,12 +8,14 @@ import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {connect, DispatchProp} from "react-redux";
 import {defaultSearch} from "../model";
-import "./index.less";
+import "./Main.less";
 
 interface Props extends DispatchProp {
   rootRouter: RootRouter;
   listData: ListData;
 }
+
+let scrollTop = 0;
 
 class Component extends React.PureComponent<Props> {
   private onPageChange = (url: string) => {
@@ -23,6 +25,12 @@ class Component extends React.PureComponent<Props> {
     e.preventDefault();
     this.props.dispatch(routerActions.push(e.currentTarget.getAttribute("href") as string));
   };
+  public componentWillUnmount() {
+    scrollTop = window.pageYOffset;
+  }
+  public componentDidMount() {
+    window.scrollTo(0, scrollTop);
+  }
   public render() {
     const {
       rootRouter,

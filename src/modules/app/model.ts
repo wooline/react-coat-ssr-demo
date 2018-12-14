@@ -1,11 +1,11 @@
 import {Toast} from "antd-mobile";
 import {CustomError, RedirectError} from "common/Errors";
-import {checkFastRedirect, isCur} from "common/routers";
+import {isCur} from "common/routers";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, LoadingState, loadModel, LOCATION_CHANGE, reducer} from "react-coat";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, LoadingState, loadModel, reducer} from "react-coat";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 
@@ -57,14 +57,6 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
     return {...this.state, curUser};
   }
 
-  @effect(null)
-  protected async [LOCATION_CHANGE](router: RootState["router"]) {
-    const redirect = checkFastRedirect(router.location.pathname);
-    if (redirect) {
-      this.dispatch(this.routerActions.replace(redirect.url));
-    }
-  }
-
   // 兼听全局错误的Action，并发送给后台
   // 兼听外部模块的Action，不需要手动触发，所以请使用protected或private
   @effect(null) // 不需要loading，设置为null
@@ -99,18 +91,11 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
       throw new RedirectError("301", "/");
     }
     const subModules: ModuleNames[] = [ModuleNames.photos, ModuleNames.videos];
-    let noMatch: boolean = true;
-    console.log(this.rootState.router.views);
     for (const subModule of subModules) {
       if (isCur(views, subModule)) {
-        noMatch = false;
         await loadModel(ModuleGetter[subModule as any]).then(subModel => subModel(this.store));
         break;
       }
-    }
-    if (noMatch) {
-      console.log("-------------");
-      throw new RedirectError("301", `${InitEnv.clientPublicPath}404.html`);
     }
   }
 }

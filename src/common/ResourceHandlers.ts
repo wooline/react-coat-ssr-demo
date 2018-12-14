@@ -90,7 +90,9 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
   protected async onInit() {
     if (isCur(this.rootState.router.views, this.namespace, "Details" as any)) {
       const itemId = this.state.pathData!.itemId;
-      await this.getItemDetail(itemId!);
+      if (!this.state.itemDetail || this.state.itemDetail!.id !== itemId) {
+        await this.getItemDetail(itemId!);
+      }
     } else if (isCur(this.rootState.router.views, this.namespace, "Main")) {
       const searchData = this.state.searchData || {};
       const search: R["ListSearch"] = {...this.config.defaultSearch, ...searchData.search};

@@ -11,7 +11,6 @@ interface Item {
 }
 
 export type PhotoDefined = ArticleDefined & {
-  State: {showComment: boolean};
   ListItem: Item;
   ItemDetail: Item & {remark: string; picList: string[]};
   SearchData: {showComment?: boolean};

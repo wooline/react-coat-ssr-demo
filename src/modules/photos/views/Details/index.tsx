@@ -1,10 +1,9 @@
-import {Carousel, Icon} from "antd-mobile";
-import {toUrl} from "common/routers";
-import {routerActions} from "connected-react-router";
+import {Carousel, Icon as MIcon} from "antd-mobile";
+import {linkTo, replaceQuery, toUrl} from "common/routers";
+import Icon, {IconClass} from "components/Icon";
 import {ItemDetail} from "entity/photo";
-import {RootState} from "modules";
+import {RootRouter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
-import thisModule from "modules/photos/facade";
 import React from "react";
 import {findDOMNode} from "react-dom";
 import {connect, DispatchProp} from "react-redux";
@@ -13,6 +12,7 @@ import "./index.less";
 interface Props extends DispatchProp {
   search: string;
   showComment: boolean;
+  rootRouter: RootRouter;
   dataSource: ItemDetail | undefined;
 }
 
@@ -31,28 +31,21 @@ class Component extends React.PureComponent<Props, State> {
     moreDetail: false,
   };
 
-  private onClose = () => {
-    this.props.dispatch(routerActions.push(toUrl(ModuleNames.photos, "Main", {itemId: undefined}, this.props.search)));
-  };
-  private closeComment = () => {
-    this.props.dispatch(thisModule.actions.showComment(false));
-  };
-  private showComment = () => {
-    this.props.dispatch(thisModule.actions.showComment(true));
-  };
   private moreRemark = () => {
     this.setState({moreDetail: !this.state.moreDetail});
   };
 
   public render() {
-    const {dataSource, showComment} = this.props;
+    const {dataSource, showComment, rootRouter, dispatch} = this.props;
     const {moreDetail} = this.state;
     if (dataSource) {
       return (
         <div className={`${ModuleNames.photos}-Details g-details g-doc-width g-modal g-enter-in`}>
           <div className="subject">
             <h2>{dataSource.title}</h2>
-            <Icon size="md" className="close-button" type="cross-circle" onClick={this.onClose} />
+            <a href={toUrl(ModuleNames.photos, "Main", {itemId: undefined}, this.props.search)} onClick={e => linkTo(e, dispatch)} className="close-button">
+              <MIcon size="md" type="cross-circle" />
+            </a>
           </div>
           <div className={"remark" + (moreDetail ? " on" : "")} onClick={this.moreRemark}>
             {dataSource.remark}
@@ -67,21 +60,23 @@ class Component extends React.PureComponent<Props, State> {
             </Carousel>
           </div>
 
-          <div className="comment-bar" onClick={this.showComment}>
-            <div>
-              <i className="iconfont icon-collection_fill" />
+          <a href={replaceQuery(rootRouter, ModuleNames.photos, {showComment: true}, true)} className="comment-bar" onClick={e => linkTo(e, dispatch)}>
+            <span>
+              <Icon type={IconClass.HEART} />
               <br />
               {dataSource.hot}
-            </div>
-            <div>
-              <i className="iconfont icon-xiaoxi" />
+            </span>
+            <span>
+              <Icon type={IconClass.MESSAGE} />
               <br />
               {dataSource.comments}
+            </span>
+          </a>
+          <div className={"comments" + (showComment ? " on" : "")}>
+            <a href={replaceQuery(rootRouter, ModuleNames.photos, {showComment: undefined}, true)} className="mask" onClick={e => linkTo(e, dispatch)} />
+            <div className="dialog" style={{height: 200}}>
+              sdfsd
             </div>
-          </div>
-          <div className={"comment" + (showComment ? " on" : "")}>
-            <div className="mask" onClick={this.closeComment} />
-            <div className="dialog">sdfsd</div>
           </div>
         </div>
       );
@@ -107,8 +102,9 @@ class Component extends React.PureComponent<Props, State> {
 
 const mapStateToProps = (state: RootState) => {
   return {
+    rootRouter: state.router,
     search: state.router.location.search,
-    showComment: state.photos.showComment,
+    showComment: Boolean(state.photos.searchData && state.photos.searchData.showComment),
     dataSource: state.photos.itemDetail,
   };
 };

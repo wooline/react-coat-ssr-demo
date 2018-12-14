@@ -35,7 +35,7 @@ class Component extends React.PureComponent<Props> {
             <TopNav />
             <Switch>
               <Route exact={true} path={toUrl(ModuleNames.photos)} component={PhotosView} />
-              <Route exact={true} path={toUrl(ModuleNames.photos, "Details")} component={PhotosDetails} />
+              <Route exact={false} path={toUrl(ModuleNames.photos, "Details")} component={PhotosDetails} />
               <Route exact={true} path={toUrl(ModuleNames.videos)} component={VideosView} />
               <Route exact={true} path={toUrl(ModuleNames.app, "LoginForm")} component={LoginForm} />
             </Switch>

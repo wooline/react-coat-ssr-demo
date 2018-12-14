@@ -1,7 +1,9 @@
+import {routerActions} from "connected-react-router";
 import {ModuleGetter, RootRouter} from "modules";
 import {ModuleNames} from "modules/names";
 import {HashParser, Module, PathParser, SearchParser} from "react-coat";
 import {matchPath} from "react-router";
+import {Dispatch} from "redux";
 
 type MG = typeof ModuleGetter;
 
@@ -10,6 +12,7 @@ const moduleToUrl: {[K in keyof MG]+?: string | {[V in keyof ReturnModule<MG[K]>
   [ModuleNames.photos]: {Main: "/photos", Details: "/photos/:itemId"},
   [ModuleNames.videos]: {Main: "/videos"},
   [ModuleNames.messages]: "/message",
+  [ModuleNames.comments]: "/:type/:itemId/comments",
 };
 
 const modulePaths = ((maps: {[mName: string]: string | {[vName: string]: string}}) => {
@@ -30,29 +33,6 @@ const modulePaths = ((maps: {[mName: string]: string | {[vName: string]: string}
   }
   return urls;
 })(moduleToUrl as any);
-
-let fastRedirect: Array<{path: RegExp; to: {code: "301" | "302"; url: string}}> = [];
-
-export function checkFastRedirect(pathname: string) {
-  if (!fastRedirect.length) {
-    fastRedirect = [
-      {
-        path: /^\/$/,
-        to: {code: "301", url: "/photos"},
-      },
-      {
-        path: /^\/(?!photos|videos|login)/,
-        to: {code: "301", url: `${InitEnv.clientPublicPath}404.html`},
-      },
-    ];
-  }
-  for (const route of fastRedirect) {
-    if (route.path.test(pathname)) {
-      return route.to;
-    }
-  }
-  return null;
-}
 
 type ReturnModule<T extends () => any> = T extends () => Promise<infer R> ? R : T extends () => infer R ? R : Module;
 
@@ -245,23 +225,33 @@ export const pathParser: PathParser = (pathname: string) => {
   return {views, data};
 };
 
-/* export const pathParser2: PathParser = (pathname: string) => {
-  let searchData: {[mName: string]: any} = {};
-  let hashData: {[mName: string]: any} = {};
-  let pathData: {[mName: string]: any} = {};
-  if (prev.search !== cur.search || prev.pathname !== cur.pathname) {
-    searchData = cur.search.split(/[&?]/).reduce(parseRoute, {});
-    pathData = parsePath(cur.pathname, searchData);
-  } else {
-    pathData = data.pathData;
-    searchData = data.searchData;
+export function advanceRouter(url: string): RootRouter | string {
+  let [pathname, search, hash] = url.split(/[?#]/);
+  pathname = pathname.replace(/^.+:\/\/[^/]+/, "");
+  search = search ? "?" + search : "";
+  hash = hash ? "#" + hash : "";
+  const redirects = [
+    {
+      path: /^\/$/,
+      replace: "/photos",
+    },
+    {
+      path: /\/$/,
+      replace: "",
+    },
+  ];
+  for (const rule of redirects) {
+    if (rule.path.test(pathname)) {
+      return pathname.replace(rule.path, rule.replace);
+    }
   }
-  if (prev.hash !== cur.hash) {
-    hashData = cur.hash.split(/[&#]/).reduce(parseRoute, {});
-  } else {
-    hashData = data.hashData;
+  const {views, data} = pathParser(pathname);
+  if (Object.keys(views).length < 2) {
+    return `${InitEnv.clientPublicPath}404.html`;
   }
-
-  return {searchData, hashData, pathData};
-};
- */
+  return {location: {pathname, search, hash, state: null}, action: "POP", views, pathData: data, searchData: searchParser(search), hashData: hashParser(hash)};
+}
+export function linkTo(e: React.MouseEvent<HTMLAnchorElement>, dispatch: Dispatch) {
+  e.preventDefault();
+  dispatch(routerActions.push(e.currentTarget.getAttribute("href") as string));
+}

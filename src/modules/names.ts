@@ -3,4 +3,5 @@ export enum ModuleNames {
   photos = "photos",
   videos = "videos",
   messages = "messages",
+  comments = "comments",
 }
