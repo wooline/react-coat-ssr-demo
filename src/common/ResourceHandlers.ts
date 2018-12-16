@@ -28,15 +28,6 @@ export default class Handlers<S extends R["State"], R extends Resource> extends 
   protected putSelectedIds(selectedIds: string[]): S {
     return {...this.state, selectedIds};
   }
-  /* @effect(null)
-  public async openList({options, extend}: {options: R["ListOptional"]; extend: "DEFAULT" | "CURRENT"}) {
-    const search = mergeSearch(options, extend === "DEFAULT" ? this.config.defaultSearch : this.state.listData.search);
-    this.dispatch(this.routerActions.push(replaceQuery(this.rootState.router, this.namespace as any, {search})));
-  } */
-  /* @effect(null)
-  public async openItemDetail(id: string) {
-    this.dispatch(this.routerActions.push(replaceCurRouter(this.rootState.router, this.namespace as any, {item: id})));
-  } */
   @effect()
   public async searchList(playload?: {options: R["ListOptional"]; extend: "DEFAULT" | "CURRENT"}) {
     const {options, extend} = playload || {options: {}, extend: "CURRENT"};

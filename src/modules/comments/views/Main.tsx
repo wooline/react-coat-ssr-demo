@@ -1,6 +1,5 @@
 import {mergeSearch, replaceQuery} from "common/routers";
 import Pagination from "components/Pagination";
-import {routerActions} from "connected-react-router";
 import {ListData} from "entity/comment";
 import {RootRouter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
@@ -14,11 +13,9 @@ interface Props extends DispatchProp {
 }
 
 class Component extends React.PureComponent<Props> {
-  private onPageChange = (url: string) => {
-    this.props.dispatch(routerActions.push(url));
-  };
   public render() {
     const {
+      dispatch,
       rootRouter,
       listData: {items, summary, search},
     } = this.props;
@@ -38,10 +35,10 @@ class Component extends React.PureComponent<Props> {
         {summary && (
           <div className="pagination">
             <Pagination
+              dispatch={dispatch}
               baseUrl={replaceQuery(rootRouter, ModuleNames.comments, {search: mergeSearch({...search, page: NaN}, defaultSearch)})}
               page={summary.page}
               totalPages={summary.totalPages}
-              onChange={this.onPageChange}
             />
           </div>
         )}

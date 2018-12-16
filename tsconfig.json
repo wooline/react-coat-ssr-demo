@@ -8,6 +8,7 @@
     "sourceMap": true,
     "allowJs": true,
     "jsx": "react",
+    "newLine": "LF",
     "moduleResolution": "node",
     "rootDir": "src",
     "resolveJsonModule": true,

@@ -74,7 +74,7 @@
   ],
   "devServer": {
     "url": "http://localhost:7445",
-    "ssr": true,
+    "ssr": false,
     "mock": true,
     "proxy": {
       "/ajax/**": {

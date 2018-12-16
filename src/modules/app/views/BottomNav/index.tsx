@@ -11,18 +11,20 @@ import "./index.less";
 interface Props extends DispatchProp {
   views: RootRouter["views"];
 }
+const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault();
+
 const PhotosLink = (
-  <a href={toUrl(ModuleNames.photos)} onClick={e => e.preventDefault()}>
+  <a href={toUrl(ModuleNames.photos)} onClick={onClick}>
     <Icon type={IconClass.PICTURE} />
   </a>
 );
 const VideosLink = (
-  <a href={toUrl(ModuleNames.videos)} onClick={e => e.preventDefault()}>
+  <a href={toUrl(ModuleNames.videos)} onClick={onClick}>
     <Icon type={IconClass.LIVE} />
   </a>
 );
 const MessageLink = (
-  <a href={toUrl(ModuleNames.videos)} onClick={e => e.preventDefault()}>
+  <a href={toUrl(ModuleNames.videos)} onClick={onClick}>
     <Icon type={IconClass.MESSAGE} />
   </a>
 );

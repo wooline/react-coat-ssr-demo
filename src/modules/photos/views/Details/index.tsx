@@ -1,8 +1,10 @@
 import {Carousel, Icon as MIcon} from "antd-mobile";
-import {linkTo, replaceQuery, toUrl} from "common/routers";
+import {replaceQuery, toUrl} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
+import LinkButton from "components/LinkButton";
 import {ItemDetail} from "entity/photo";
 import {RootRouter, RootState} from "modules";
+import {Main as Comments} from "modules/comments/views";
 import {ModuleNames} from "modules/names";
 import React from "react";
 import {findDOMNode} from "react-dom";
@@ -10,7 +12,6 @@ import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  search: string;
   showComment: boolean;
   rootRouter: RootRouter;
   dataSource: ItemDetail | undefined;
@@ -37,15 +38,20 @@ class Component extends React.PureComponent<Props, State> {
 
   public render() {
     const {dataSource, showComment, rootRouter, dispatch} = this.props;
+    const searchData = rootRouter.searchData;
     const {moreDetail} = this.state;
     if (dataSource) {
       return (
         <div className={`${ModuleNames.photos}-Details g-details g-doc-width g-modal g-enter-in`}>
           <div className="subject">
             <h2>{dataSource.title}</h2>
-            <a href={toUrl(ModuleNames.photos, "Main", {itemId: undefined}, this.props.search)} onClick={e => linkTo(e, dispatch)} className="close-button">
+            <LinkButton
+              dispatch={dispatch}
+              href={toUrl(ModuleNames.photos, "Main", {itemId: undefined}, {...searchData, [ModuleNames.photos]: {...searchData[ModuleNames.photos], showComment: undefined}})}
+              className="close-button"
+            >
               <MIcon size="md" type="cross-circle" />
-            </a>
+            </LinkButton>
           </div>
           <div className={"remark" + (moreDetail ? " on" : "")} onClick={this.moreRemark}>
             {dataSource.remark}
@@ -60,7 +66,7 @@ class Component extends React.PureComponent<Props, State> {
             </Carousel>
           </div>
 
-          <a href={replaceQuery(rootRouter, ModuleNames.photos, {showComment: true}, true)} className="comment-bar" onClick={e => linkTo(e, dispatch)}>
+          <LinkButton dispatch={dispatch} href={replaceQuery(rootRouter, ModuleNames.photos, {showComment: true}, true)} className="comment-bar">
             <span>
               <Icon type={IconClass.HEART} />
               <br />
@@ -71,11 +77,11 @@ class Component extends React.PureComponent<Props, State> {
               <br />
               {dataSource.comments}
             </span>
-          </a>
+          </LinkButton>
           <div className={"comments" + (showComment ? " on" : "")}>
-            <a href={replaceQuery(rootRouter, ModuleNames.photos, {showComment: undefined}, true)} className="mask" onClick={e => linkTo(e, dispatch)} />
-            <div className="dialog" style={{height: 200}}>
-              sdfsd
+            <LinkButton dispatch={dispatch} href={replaceQuery(rootRouter, ModuleNames.photos, {showComment: undefined}, true)} className="mask" />
+            <div className="dialog">
+              <Comments />
             </div>
           </div>
         </div>
@@ -103,7 +109,6 @@ class Component extends React.PureComponent<Props, State> {
 const mapStateToProps = (state: RootState) => {
   return {
     rootRouter: state.router,
-    search: state.router.location.search,
     showComment: Boolean(state.photos.searchData && state.photos.searchData.showComment),
     dataSource: state.photos.itemDetail,
   };
