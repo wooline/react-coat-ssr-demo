@@ -1,15 +1,10 @@
 import ArticleHandlers from "common/ArticleHandlers";
-import {ListSearch, PhotoResource, State} from "entity/photo";
+import {PhotoResource, State} from "entity/photo";
 import {ModuleNames} from "modules/names";
 import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
+import {defaultSearch} from "./facade";
 export {State} from "entity/photo";
-
-export const defaultSearch: ListSearch = {
-  title: null,
-  page: 1,
-  pageSize: 10,
-};
 
 class ModuleHandlers extends ArticleHandlers<State, PhotoResource> {
   constructor() {

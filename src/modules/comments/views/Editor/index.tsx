@@ -36,7 +36,7 @@ class Component extends React.PureComponent<Props> {
       ],
     });
     return (
-      <div className={`${ModuleNames.photos}-Editor`}>
+      <div className={`${ModuleNames.comments}-Editor`}>
         <div className="input">
           <InputItem placeholder="我来说两句..." {...content} />
         </div>

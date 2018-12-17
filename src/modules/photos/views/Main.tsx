@@ -4,10 +4,11 @@ import LinkButton from "components/LinkButton";
 import Pagination from "components/Pagination";
 import {ListData} from "entity/photo";
 import {RootRouter, RootState} from "modules";
+import {defaultSearch as commentsDefaultSearch} from "modules/comments/facade";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {connect, DispatchProp} from "react-redux";
-import {defaultSearch} from "../model";
+import {defaultSearch} from "../facade";
 import "./Main.less";
 
 interface Props extends DispatchProp {
@@ -33,13 +34,18 @@ class Component extends React.PureComponent<Props> {
 
     let itemBaseUrl: string;
     if (items) {
-      itemBaseUrl = toUrl(ModuleNames.photos, "Details", {itemId: "---"}, rootRouter.searchData);
+      itemBaseUrl = toUrl(
+        ModuleNames.comments,
+        "Main",
+        {type: ModuleNames.photos, itemId: "---"},
+        {...rootRouter.searchData, [ModuleNames.comments]: {search: mergeSearch({articleId: "---"}, commentsDefaultSearch)}}
+      );
     }
     return items ? (
       <div className={`${ModuleNames.photos} g-pic-list`}>
         <div className="list-items">
           {items.map(item => (
-            <LinkButton dispatch={dispatch} href={itemBaseUrl.replace("---", item.id)} key={item.id} className="g-pre-img">
+            <LinkButton dispatch={dispatch} href={itemBaseUrl.replace(/---/g, item.id)} key={item.id} className="g-pre-img">
               <div style={{backgroundImage: `url(${item.coverUrl})`}}>
                 <h5 className="title">{item.title}</h5>
                 <div className="listImg" />
@@ -61,7 +67,7 @@ class Component extends React.PureComponent<Props> {
           ))}
         </div>
         {summary && (
-          <div className="pagination">
+          <div className="g-pagination">
             <Pagination
               dispatch={dispatch}
               baseUrl={replaceQuery(rootRouter, ModuleNames.photos, {search: mergeSearch({...search, page: NaN}, defaultSearch), showComment: undefined})}

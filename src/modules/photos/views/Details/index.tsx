@@ -78,7 +78,7 @@ class Component extends React.PureComponent<Props, State> {
               {dataSource.comments}
             </span>
           </LinkButton>
-          <div className={"comments" + (showComment ? " on" : "")}>
+          <div className={"comments-panel" + (showComment ? " on" : "")}>
             <LinkButton dispatch={dispatch} href={replaceQuery(rootRouter, ModuleNames.photos, {showComment: undefined}, true)} className="mask" />
             <div className="dialog">
               <Comments />

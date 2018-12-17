@@ -1,15 +1,10 @@
 import ResourceHandlers from "common/ResourceHandlers";
-import {CommentResource, ListSearch, State} from "entity/comment";
+import {CommentResource, State} from "entity/comment";
 import {ModuleNames} from "modules/names";
 import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
+import {defaultSearch} from "./facade";
 export {State} from "entity/comment";
-
-export const defaultSearch: ListSearch = {
-  isNewest: false,
-  page: 1,
-  pageSize: 10,
-};
 
 class ModuleHandlers extends ResourceHandlers<State, CommentResource> {
   constructor() {

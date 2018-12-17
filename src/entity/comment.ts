@@ -7,12 +7,14 @@ interface Item {
   avatarUrl: string;
   content: string;
   createdTime: string;
+  replies: number;
 }
 
 export type CommentDefined = ResourceDefined & {
   PathData: {type: ModuleNames.photos | ModuleNames.videos; itemId: string};
   ListItem: Item;
   ListSearch: {
+    articleId: string;
     isNewest: boolean;
   };
 };

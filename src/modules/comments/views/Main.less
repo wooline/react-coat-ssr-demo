@@ -1,0 +1,68 @@
+.comments {
+  height: 100%;
+  color: #000;
+  display: flex;
+  flex-direction: column;
+  > .wrap {
+    padding: 10px;
+    flex: 1 1 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .list-header {
+    padding: 10px 5px;
+
+    .on {
+      font-weight: bold;
+    }
+    > * {
+      display: inline-block;
+      margin-right: 10px;
+    }
+  }
+  .list-items {
+    .avatar {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      left: 0;
+      background-size: cover;
+      display: block;
+      border-radius: 30px;
+      background-position: center center;
+    }
+    .content {
+      max-height: 4.5em;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .user {
+      font-size: 13px;
+      color: rgb(160, 196, 0);
+      .date {
+        font-size: 12px;
+        padding-right: 5px;
+        float: right;
+        color: #999;
+      }
+    }
+    .reply {
+      font-size: 12px;
+      color: #999;
+      .act {
+        color: rgb(0, 116, 145);
+        text-decoration: underline;
+      }
+    }
+    > div {
+      line-height: 1.5;
+      padding: 15px 5px 14px 50px;
+      position: relative;
+    }
+  }
+  .g-pagination {
+    // prettier-ignore
+    border-top: 1Px solid #eee;
+  }
+}

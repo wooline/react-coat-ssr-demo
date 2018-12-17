@@ -1,5 +1,5 @@
 .photos-Details {
-  .content {
+  > .content {
     position: absolute;
     top: 85px;
     bottom: 0;
@@ -14,7 +14,7 @@
       background-size: contain;
     }
   }
-  .remark {
+  > .remark {
     position: absolute;
     overflow: hidden;
     max-height: 3em;
@@ -25,7 +25,7 @@
     padding: 0 1em;
     box-shadow: 0 0.5rem 0.5rem rgba(0, 0, 0, 0.4);
     left: 0;
-    top: 40px;
+    top: 50px;
     right: 0;
 
     &::after {
@@ -53,7 +53,7 @@
       }
     }
   }
-  .comment-bar {
+  > .comment-bar {
     z-index: 10;
     font-size: 12px;
     text-align: center;
@@ -73,7 +73,7 @@
       padding-bottom: 5px;
     }
   }
-  .comments {
+  > .comments-panel {
     position: absolute;
     left: 0;
     top: 0;

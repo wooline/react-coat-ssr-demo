@@ -12,7 +12,7 @@ const moduleToUrl: {[K in keyof MG]+?: string | {[V in keyof ReturnModule<MG[K]>
   [ModuleNames.photos]: {Main: "/photos", Details: "/photos/:itemId"},
   [ModuleNames.videos]: {Main: "/videos"},
   [ModuleNames.messages]: "/message",
-  [ModuleNames.comments]: "/:type/:itemId/comments",
+  [ModuleNames.comments]: {Main: "/:type/:itemId/comments"},
 };
 
 const modulePaths = ((maps: {[mName: string]: string | {[vName: string]: string}}) => {
