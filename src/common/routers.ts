@@ -11,7 +11,6 @@ const moduleToUrl: {[K in keyof MG]+?: string | {[V in keyof ReturnModule<MG[K]>
   [ModuleNames.app]: {Main: "/", LoginForm: "/login"},
   [ModuleNames.photos]: {Main: "/photos", Details: "/photos/:itemId"},
   [ModuleNames.videos]: {Main: "/videos"},
-  [ModuleNames.messages]: "/message",
   [ModuleNames.comments]: {Main: "/:type/:itemId/comments"},
 };
 

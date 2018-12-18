@@ -103,10 +103,6 @@ const clientConfig = {
     minimize: false,
     splitChunks: {
       chunks: "async",
-      minSize: 0,
-      cacheGroups: {
-        vendors: false,
-      },
     },
     // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
     runtimeChunk: "single",
@@ -136,7 +132,7 @@ const clientConfig = {
             },
           },
           {
-            loader: require.resolve("react-coat-dev-utils/webpack-loader/server-replace-async"),
+            loader: require.resolve("react-coat-dev-utils/webpack-loader/check-model"),
           },
         ],
       },
@@ -170,7 +166,8 @@ const clientConfig = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      inject: true,
+      chunks: ["runtime", "main"],
+      chunksSortMode: "manual",
       template: path.join(paths.publicPath, "./client/index.html"),
     }),
     new HtmlReplaceWebpackPlugin(htmlReplace),

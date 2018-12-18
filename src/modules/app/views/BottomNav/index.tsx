@@ -59,7 +59,7 @@ class Component extends React.PureComponent<Props> {
             selectedIcon={MessageLink}
             title="消息"
             key="messages"
-            selected={isCur(views, ModuleNames.messages)}
+            selected={isCur(views, ModuleNames.videos)}
             onPress={() => {
               this.props.dispatch(routerActions.push(toUrl(ModuleNames.videos)));
             }}

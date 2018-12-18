@@ -140,6 +140,8 @@ const clientConfig = {
   },
   plugins: [
     new HtmlWebpackPlugin({
+      chunks: ["runtime", "main"],
+      chunksSortMode: "manual",
       template: path.join(paths.publicPath, "./client/index.html"),
     }),
     new HtmlReplaceWebpackPlugin(htmlReplace),

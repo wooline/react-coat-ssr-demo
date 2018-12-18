@@ -46,7 +46,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   public async login(payload: {username: string; password: string}) {
     const loginResult = await sessionService.api.login(payload);
     if (!loginResult.error) {
-      this.dispatch(this.callThisAction(this.putCurUser, loginResult.data));
+      this.updateState({curUser: loginResult.data});
     } else {
       alert(loginResult.error.message);
     }
@@ -78,14 +78,11 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   @effect()
   protected async [ModuleNames.app + "/INIT"]() {
     const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);
-    this.dispatch(
-      this.callThisAction(this.UPDATE, {
-        ...this.state,
-        projectConfig,
-        curUser,
-        startupStep: StartupStep.configLoaded,
-      })
-    );
+    this.updateState({
+      projectConfig,
+      curUser,
+      startupStep: StartupStep.configLoaded,
+    });
     const views = this.rootState.router.views;
     if (isCur(views, ModuleNames.app, "LoginForm") && curUser.hasLogin) {
       throw new RedirectError("301", "/");
