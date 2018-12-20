@@ -8,7 +8,10 @@ import React from "react";
 import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
-interface Props extends DispatchProp, RCForm {}
+interface Props extends DispatchProp, RCForm {
+  articleId: string;
+  commentId: string;
+}
 
 class Component extends React.PureComponent<Props> {
   private onSubmit = () => {
@@ -25,6 +28,7 @@ class Component extends React.PureComponent<Props> {
     });
   };
   public render() {
+    const {commentId} = this.props;
     const {getFieldProps} = this.props.form;
     const content = getFieldProps("content", {
       initialValue: "",
@@ -42,7 +46,7 @@ class Component extends React.PureComponent<Props> {
         </div>
         <div className="con">
           <Button type="primary" onClick={this.onSubmit}>
-            提交
+            {commentId ? "回复" : "评论"}
           </Button>
         </div>
       </div>
@@ -51,7 +55,10 @@ class Component extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: RootState) => {
-  return {};
+  return {
+    articleId: state.comments.pathData!.typeId,
+    commentId: state.comments.pathData!.itemId,
+  };
 };
 
 export default connect(mapStateToProps)(createForm()(Component));

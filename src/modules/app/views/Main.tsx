@@ -16,7 +16,6 @@ import TopNav from "./TopNav";
 import Welcome from "./Welcome";
 
 const PhotosView = loadView(ModuleGetter, ModuleNames.photos, "Main");
-const PhotosDetails = loadView(ModuleGetter, ModuleNames.photos, "Details");
 const VideosView = loadView(ModuleGetter, ModuleNames.videos, "Main");
 
 interface Props extends DispatchProp {
@@ -34,8 +33,7 @@ class Component extends React.PureComponent<Props> {
           <div className="g-page">
             <TopNav />
             <Switch>
-              <Route exact={true} path={toUrl(ModuleNames.photos)} component={PhotosView} />
-              <Route exact={false} path={toUrl(ModuleNames.photos, "Details")} component={PhotosDetails} />
+              <Route exact={false} path={toUrl(ModuleNames.photos)} component={PhotosView} />
               <Route exact={true} path={toUrl(ModuleNames.videos)} component={VideosView} />
               <Route exact={true} path={toUrl(ModuleNames.app, "LoginForm")} component={LoginForm} />
             </Switch>

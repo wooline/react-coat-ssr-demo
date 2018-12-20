@@ -41,7 +41,7 @@ class Component extends React.PureComponent<Props> {
             key="photos"
             selected={isCur(views, ModuleNames.photos)}
             onPress={() => {
-              this.props.dispatch(routerActions.push(toUrl(ModuleNames.photos)));
+              this.props.dispatch(routerActions.push(toUrl(ModuleNames.photos, "List")));
             }}
           />
           <TabBar.Item

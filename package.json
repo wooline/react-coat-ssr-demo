@@ -73,12 +73,12 @@
     "not ie <= 11"
   ],
   "devServer": {
-    "url": "http://localhost:7445",
+    "url": "http://192.168.1.96:7445",
     "ssr": true,
     "mock": true,
     "proxy": {
       "/ajax/**": {
-        "target": "http://localhost:7446/",
+        "target": "http://192.168.1.96:7446/",
         "secure": false,
         "changeOrigin": true
       }

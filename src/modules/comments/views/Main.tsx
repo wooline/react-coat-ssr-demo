@@ -1,73 +1,33 @@
-import {mergeSearch, replaceQuery} from "common/routers";
-import Pagination from "components/Pagination";
-import {ListData} from "entity/comment";
-import {RootRouter, RootState} from "modules";
+import {toUrl} from "common/routers";
+import {RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
-import {connect, DispatchProp} from "react-redux";
-import {defaultSearch} from "../facade";
+import {connect} from "react-redux";
+import {Route, Switch} from "react-router-dom";
+import DetailsView from "./Details";
 import Editor from "./Editor";
+import ListView from "./List";
 import "./Main.less";
 
-interface Props extends DispatchProp {
-  rootRouter: RootRouter;
-  listData: ListData;
-}
-
-class Component extends React.PureComponent<Props> {
+class Component extends React.PureComponent {
   public render() {
-    const {
-      dispatch,
-      rootRouter,
-      listData: {items, summary, search},
-    } = this.props;
-
-    return items ? (
+    return (
       <div className={`${ModuleNames.comments}`}>
         <div className="wrap">
-          <div className="list-header">
-            <a href="" className="on">
-              最新
-            </a>
-            <a href="">最热</a>
-          </div>
-          <div className="list-items">
-            {items.map(item => (
-              <div className="g-border-top" key={item.id}>
-                <div className="avatar" style={{backgroundImage: `url(${item.avatarUrl})`}} />
-                <div className="user">
-                  {item.username}
-                  <span className="date">{item.createdTime}</span>
-                </div>
-                <div className="content">{item.content}</div>
-                <span className="reply">
-                  <span className="act">回复</span>({item.replies})
-                </span>
-              </div>
-            ))}
-          </div>
-          {summary && (
-            <div className="g-pagination">
-              <Pagination
-                dispatch={dispatch}
-                baseUrl={replaceQuery(rootRouter, ModuleNames.comments, {search: mergeSearch({...search, page: NaN}, defaultSearch)})}
-                page={summary.page}
-                totalPages={summary.totalPages}
-              />
-            </div>
-          )}
+          <Switch>
+            <Route exact={false} path={toUrl(ModuleNames.comments, "List")} component={ListView} />
+            <Route exact={false} path={toUrl(ModuleNames.comments, "Details")} component={DetailsView} />
+          </Switch>
         </div>
         <Editor />
       </div>
-    ) : null;
+    );
   }
 }
 
 const mapStateToProps = (state: RootState) => {
-  const model = state.comments;
   return {
-    rootRouter: state.router,
-    listData: model.listData,
+    pathname: state.router.location.pathname,
   };
 };
 

@@ -9,9 +9,9 @@ type MG = typeof ModuleGetter;
 
 const moduleToUrl: {[K in keyof MG]+?: string | {[V in keyof ReturnModule<MG[K]>["views"]]+?: string}} = {
   [ModuleNames.app]: {Main: "/", LoginForm: "/login"},
-  [ModuleNames.photos]: {Main: "/photos", Details: "/photos/:itemId"},
+  [ModuleNames.photos]: {Main: "/photos", List: "/photos/list", Details: "/photos/item/:itemId"},
   [ModuleNames.videos]: {Main: "/videos"},
-  [ModuleNames.comments]: {Main: "/:type/:itemId/comments"},
+  [ModuleNames.comments]: {Main: "/:type/item/:typeId/comments", List: "/:type/item/:typeId/comments/list", Details: "/:type/item/:typeId/comments/item/:itemId"},
 };
 
 const modulePaths = ((maps: {[mName: string]: string | {[vName: string]: string}}) => {
@@ -168,16 +168,16 @@ export function unserializeUrlQuery(query: string): any {
   }
   return args;
 }
-export function mergeSearch<S>(options: Partial<S>, base: S): Partial<S> {
-  const search = {...base, ...options};
+export function mergeSearch<S>(options: Partial<S>, def: S): Partial<S> {
+  const search = {...def, ...options};
   /* 过滤与默认值相等的参数 */
   return Object.keys(search).reduce((prev, cur) => {
     if (typeof search[cur] === "object") {
-      if (JSON.stringify(search[cur]) !== JSON.stringify(base[cur])) {
+      if (JSON.stringify(search[cur]) !== JSON.stringify(def[cur])) {
         prev[cur] = search[cur];
       }
     } else {
-      if (search[cur] !== base[cur]) {
+      if (search[cur] !== def[cur]) {
         prev[cur] = search[cur];
       }
     }
@@ -232,7 +232,7 @@ export function advanceRouter(url: string): RootRouter | string {
   const redirects = [
     {
       path: /^\/$/,
-      replace: "/photos",
+      replace: "/photos/list",
     },
     {
       path: /\/$/,
@@ -252,5 +252,8 @@ export function advanceRouter(url: string): RootRouter | string {
 }
 export function linkTo(e: React.MouseEvent<HTMLAnchorElement>, dispatch: Dispatch) {
   e.preventDefault();
-  dispatch(routerActions.push(e.currentTarget.getAttribute("href") as string));
+  const href = e.currentTarget.getAttribute("href") as string;
+  if (href !== "#") {
+    dispatch(routerActions.push(href));
+  }
 }

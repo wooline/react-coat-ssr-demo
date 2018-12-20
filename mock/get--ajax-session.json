@@ -2,7 +2,7 @@
   "statusCode": 200,
   "statusMessage": "OK",
   "headers": {
-    "x-delay": 2000,
+    "x-delay": 0,
     "x-powered-by": "Express",
     "content-type": "application/json; charset=utf-8",
     "connection": "close"

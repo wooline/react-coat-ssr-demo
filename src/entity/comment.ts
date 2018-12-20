@@ -9,10 +9,13 @@ interface Item {
   createdTime: string;
   replies: number;
 }
-
+interface Detail extends Item {
+  repliesList: Array<Item & {id: string}>;
+}
 export type CommentDefined = ResourceDefined & {
-  PathData: {type: ModuleNames.photos | ModuleNames.videos; itemId: string};
+  PathData: {type: ModuleNames.photos | ModuleNames.videos; typeId: string};
   ListItem: Item;
+  ItemDetail: Detail;
   ListSearch: {
     articleId: string;
     isNewest: boolean;
@@ -27,6 +30,7 @@ export type ListSummary = CommentResource["ListSummary"];
 export type ListOptional = CommentResource["ListOptional"];
 export type ItemDetail = CommentResource["ItemDetail"];
 export type ListData = CommentResource["ListData"];
+export type PathData = CommentResource["PathData"];
 export type State = CommentResource["State"];
 export type SearchData = State["searchData"];
 export type API = CommentResource["API"];

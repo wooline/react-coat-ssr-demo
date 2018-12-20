@@ -4,22 +4,15 @@
   display: flex;
   flex-direction: column;
   > .wrap {
-    padding: 10px;
+    padding: 10px 0;
     flex: 1 1 100%;
     overflow-x: hidden;
     overflow-y: auto;
   }
 
   .list-header {
-    padding: 10px 5px;
-
-    .on {
-      font-weight: bold;
-    }
-    > * {
-      display: inline-block;
-      margin-right: 10px;
-    }
+    color: #666;
+    padding: 10px 15px;
   }
   .list-items {
     .avatar {
@@ -33,6 +26,7 @@
       background-position: center center;
     }
     .content {
+      padding-top: 3px;
       max-height: 4.5em;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -40,6 +34,7 @@
     .user {
       font-size: 13px;
       color: rgb(160, 196, 0);
+
       .date {
         font-size: 12px;
         padding-right: 5px;
@@ -55,9 +50,11 @@
         text-decoration: underline;
       }
     }
-    > div {
+    > * {
+      display: block;
       line-height: 1.5;
-      padding: 15px 5px 14px 50px;
+      margin: 0 10px;
+      padding: 15px 0 14px 50px;
       position: relative;
     }
   }

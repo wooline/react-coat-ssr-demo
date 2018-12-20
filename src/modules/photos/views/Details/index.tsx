@@ -1,19 +1,20 @@
 import {Carousel, Icon as MIcon} from "antd-mobile";
-import {replaceQuery, toUrl} from "common/routers";
+import {mergeSearch, toUrl} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import LinkButton from "components/LinkButton";
-import {ItemDetail} from "entity/photo";
-import {RootRouter, RootState} from "modules";
+import {ItemDetail, SearchData} from "entity/photo";
+import {RootState} from "modules";
+import {defaultSearch as commentsDefaultSearch} from "modules/comments/facade";
 import {Main as Comments} from "modules/comments/views";
 import {ModuleNames} from "modules/names";
 import React from "react";
 import {findDOMNode} from "react-dom";
 import {connect, DispatchProp} from "react-redux";
+import {defaultSearch} from "../../facade";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  showComment: boolean;
-  rootRouter: RootRouter;
+  searchData: Exclude<SearchData, undefined>;
   dataSource: ItemDetail | undefined;
 }
 
@@ -37,8 +38,8 @@ class Component extends React.PureComponent<Props, State> {
   };
 
   public render() {
-    const {dataSource, showComment, rootRouter, dispatch} = this.props;
-    const searchData = rootRouter.searchData;
+    const {dataSource, searchData, dispatch} = this.props;
+
     const {moreDetail} = this.state;
     if (dataSource) {
       return (
@@ -47,7 +48,7 @@ class Component extends React.PureComponent<Props, State> {
             <h2>{dataSource.title}</h2>
             <LinkButton
               dispatch={dispatch}
-              href={toUrl(ModuleNames.photos, "Main", {itemId: undefined}, {...searchData, [ModuleNames.photos]: {...searchData[ModuleNames.photos], showComment: undefined}})}
+              href={toUrl(ModuleNames.photos, "List", {}, {[ModuleNames.photos]: {search: mergeSearch(searchData.search || {}, defaultSearch)}})}
               className="close-button"
             >
               <MIcon size="md" type="cross-circle" />
@@ -66,7 +67,19 @@ class Component extends React.PureComponent<Props, State> {
             </Carousel>
           </div>
 
-          <LinkButton dispatch={dispatch} href={replaceQuery(rootRouter, ModuleNames.photos, {showComment: true}, true)} className="comment-bar">
+          <LinkButton
+            dispatch={dispatch}
+            href={toUrl(
+              ModuleNames.comments,
+              "List",
+              {type: ModuleNames.photos, typeId: dataSource.id},
+              {
+                [ModuleNames.photos]: {search: mergeSearch(searchData.search || {}, defaultSearch), showComment: true},
+                [ModuleNames.comments]: {search: mergeSearch({articleId: dataSource.id}, commentsDefaultSearch)},
+              }
+            )}
+            className="comment-bar"
+          >
             <span>
               <Icon type={IconClass.HEART} />
               <br />
@@ -78,8 +91,20 @@ class Component extends React.PureComponent<Props, State> {
               {dataSource.comments}
             </span>
           </LinkButton>
-          <div className={"comments-panel" + (showComment ? " on" : "")}>
-            <LinkButton dispatch={dispatch} href={replaceQuery(rootRouter, ModuleNames.photos, {showComment: undefined}, true)} className="mask" />
+          <div className={"comments-panel" + (searchData.showComment ? " on" : "")}>
+            <LinkButton
+              dispatch={dispatch}
+              href={toUrl(
+                ModuleNames.comments,
+                "List",
+                {type: ModuleNames.photos, typeId: dataSource.id},
+                {
+                  [ModuleNames.photos]: {search: mergeSearch(searchData.search || {}, defaultSearch)},
+                  [ModuleNames.comments]: {search: mergeSearch({articleId: dataSource.id}, commentsDefaultSearch)},
+                }
+              )}
+              className="mask"
+            />
             <div className="dialog">
               <Comments />
             </div>
@@ -108,8 +133,7 @@ class Component extends React.PureComponent<Props, State> {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    rootRouter: state.router,
-    showComment: Boolean(state.photos.searchData && state.photos.searchData.showComment),
+    searchData: state.photos.searchData || {},
     dataSource: state.photos.itemDetail,
   };
 };

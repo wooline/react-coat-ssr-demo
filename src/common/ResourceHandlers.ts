@@ -37,7 +37,11 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
   }
   @effect()
   public async getItemDetail(id: string) {
-    const [itemDetail] = await Promise.all([this.config.api.getItemDetail!(id), this.config.api.hitItem!(id)]);
+    const arr: Array<Promise<any>> = [this.config.api.getItemDetail!(id)];
+    if (this.config.api.hitItem) {
+      arr.push(this.config.api.hitItem!(id));
+    }
+    const [itemDetail] = await Promise.all(arr);
     this.updateState({itemDetail} as Partial<S>);
   }
   @effect()

@@ -62,6 +62,7 @@ export interface Resource<D extends ResourceDefined = ResourceDefined> {
   ItemUpdateData: D["ItemUpdateData"];
   ItemCreateResult: D["ItemCreateResult"];
   ListData: ListData<D["ListItem"], D["ListSearch"], D["ListSummary"]>;
+  PathData: D["PathData"];
   State: D["State"] & {
     itemDetail?: D["ItemDetail"];
     itemEditor?: D["ItemEditor"];

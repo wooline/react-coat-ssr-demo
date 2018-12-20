@@ -116,7 +116,7 @@
         function setSize() {
           var cwidth = document.documentElement.clientWidth;
           var cheight = document.documentElement.clientHeight;
-          var maxWidth = Math.ceil((cheight * 320) / 454);
+          var maxWidth = 500;
           var width = Math.min(maxWidth, cwidth);
           var rem = width / 10;
           var styleArr = [];
@@ -126,7 +126,7 @@
         }
         setSize();
 
-        var timer;
+        /* var timer;
         window.addEventListener(
           "resize",
           function() {
@@ -138,7 +138,7 @@
             }
           },
           false
-        );
+        ); */
       })();
     </script>
     <!-- {react-coat-init-env} -->
