@@ -2,23 +2,27 @@ import {ArticleDefined, ArticleResource} from "./article";
 
 interface Item {
   title: string;
-  hits: number;
-  commentCount: number;
+  departure: string;
+  type: string;
+  hot: number;
+  price: number;
   coverUrl: string;
-  createTimeDesc: string;
-  videoUrl: string;
+  comments: number;
 }
+
 export type VideoDefined = ArticleDefined & {
   ListItem: Item;
-  ItemDetail: Item;
+  ItemDetail: Item & {remark: string; picList: string[]};
 };
-export type Resource = ArticleResource<VideoDefined>;
 
-export type ListItem = Resource["ListItem"];
-export type ListSearch = Resource["ListSearch"];
-export type ListSummary = Resource["ListSummary"];
-export type ListOptional = Resource["ListOptional"];
-export type ItemDetail = Resource["ItemDetail"];
-export type ListData = Resource["ListData"];
-export type State = Resource["State"];
-export type API = Resource["API"];
+export type VideoResource = ArticleResource<VideoDefined>;
+
+export type ListItem = VideoResource["ListItem"];
+export type ListSearch = VideoResource["ListSearch"];
+export type ListSummary = VideoResource["ListSummary"];
+export type ListOptional = VideoResource["ListOptional"];
+export type ItemDetail = VideoResource["ItemDetail"];
+export type PathData = VideoResource["PathData"];
+export type SearchData = VideoResource["SearchData"];
+export type API = VideoResource["API"];
+export type State = VideoResource["State"];

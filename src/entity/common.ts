@@ -9,6 +9,12 @@ export interface DefaultResult<Data = any, Error extends ErrorType = ErrorType> 
   data: Data;
   error: Error | null;
 }
+
+export interface ModuleRouterData<P, S, H> {
+  path: P;
+  search: Partial<S>;
+  hash: Partial<H>;
+}
 export type CarefulExtend<T, U> = T extends undefined ? undefined : T & U;
 
 export type PickOptional<T> = Pick<T, {[K in keyof T]-?: {} extends {[P in K]: T[K]} ? K : never}[keyof T]>;

@@ -1,8 +1,8 @@
 import request from "common/request";
-import {ItemDetail, ListData, ListSearch} from "entity/photo";
+import {ItemDetail, ListItem, ListSearch, ListSummary} from "entity/photo";
 
 export class API {
-  public searchList(listSearch: ListSearch): Promise<ListData> {
+  public searchList(listSearch: ListSearch): Promise<{listItems: ListItem[]; listSummary: ListSummary}> {
     return request("get", "/ajax/photos", listSearch);
   }
   public getItemDetail(id: string): Promise<ItemDetail> {

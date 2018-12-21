@@ -1,21 +1,21 @@
 import {Carousel, Icon as MIcon} from "antd-mobile";
-import {mergeSearch, toUrl} from "common/routers";
+import {replaceQuery, toUrl} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import LinkButton from "components/LinkButton";
-import {ItemDetail, SearchData} from "entity/photo";
-import {RootState} from "modules";
-import {defaultSearch as commentsDefaultSearch} from "modules/comments/facade";
+import {ItemDetail, ListSearch} from "entity/photo";
+import {RootState, RouterData} from "modules";
 import {Main as Comments} from "modules/comments/views";
 import {ModuleNames} from "modules/names";
 import React from "react";
 import {findDOMNode} from "react-dom";
 import {connect, DispatchProp} from "react-redux";
-import {defaultSearch} from "../../facade";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  searchData: Exclude<SearchData, undefined>;
-  dataSource: ItemDetail | undefined;
+  routerData: RouterData;
+  showComment: boolean;
+  listSearch: ListSearch;
+  itemDetail: ItemDetail | undefined;
 }
 
 interface State {
@@ -24,7 +24,7 @@ interface State {
 
 class Component extends React.PureComponent<Props, State> {
   public static getDerivedStateFromProps(nextProps: Props, prevState: State): State | null {
-    if (!nextProps.dataSource && prevState.moreDetail) {
+    if (!nextProps.itemDetail && prevState.moreDetail) {
       return {moreDetail: false};
     }
     return null;
@@ -38,28 +38,24 @@ class Component extends React.PureComponent<Props, State> {
   };
 
   public render() {
-    const {dataSource, searchData, dispatch} = this.props;
-
+    const {routerData, showComment, itemDetail, listSearch, dispatch} = this.props;
     const {moreDetail} = this.state;
-    if (dataSource) {
+    const searchData = routerData.searchData[ModuleNames.photos]!;
+    if (itemDetail) {
       return (
         <div className={`${ModuleNames.photos}-Details g-details g-doc-width g-modal g-enter-in`}>
           <div className="subject">
-            <h2>{dataSource.title}</h2>
-            <LinkButton
-              dispatch={dispatch}
-              href={toUrl(ModuleNames.photos, "List", {}, {[ModuleNames.photos]: {search: mergeSearch(searchData.search || {}, defaultSearch)}})}
-              className="close-button"
-            >
+            <h2>{itemDetail.title}</h2>
+            <LinkButton dispatch={dispatch} href={toUrl(routerData, ModuleNames.photos, "List", {}, {[ModuleNames.photos]: {search: listSearch, showComment: false}})} className="close-button">
               <MIcon size="md" type="cross-circle" />
             </LinkButton>
           </div>
           <div className={"remark" + (moreDetail ? " on" : "")} onClick={this.moreRemark}>
-            {dataSource.remark}
+            {itemDetail.remark}
           </div>
           <div className="content">
             <Carousel className="player" autoplay={false} infinite={true}>
-              {dataSource.picList.map(url => (
+              {itemDetail.picList.map(url => (
                 <div className="g-pre-img" key={url}>
                   <div className="pic" style={{backgroundImage: `url(${url})`}} />
                 </div>
@@ -69,39 +65,35 @@ class Component extends React.PureComponent<Props, State> {
 
           <LinkButton
             dispatch={dispatch}
-            href={toUrl(
-              ModuleNames.comments,
-              "List",
-              {type: ModuleNames.photos, typeId: dataSource.id},
+            href={replaceQuery(
+              routerData,
               {
-                [ModuleNames.photos]: {search: mergeSearch(searchData.search || {}, defaultSearch), showComment: true},
-                [ModuleNames.comments]: {search: mergeSearch({articleId: dataSource.id}, commentsDefaultSearch)},
-              }
+                [ModuleNames.photos]: {...searchData, showComment: true},
+              },
+              true
             )}
             className="comment-bar"
           >
             <span>
               <Icon type={IconClass.HEART} />
               <br />
-              {dataSource.hot}
+              {itemDetail.hot}
             </span>
             <span>
               <Icon type={IconClass.MESSAGE} />
               <br />
-              {dataSource.comments}
+              {itemDetail.comments}
             </span>
           </LinkButton>
-          <div className={"comments-panel" + (searchData.showComment ? " on" : "")}>
+          <div className={"comments-panel" + (showComment ? " on" : "")}>
             <LinkButton
               dispatch={dispatch}
-              href={toUrl(
-                ModuleNames.comments,
-                "List",
-                {type: ModuleNames.photos, typeId: dataSource.id},
+              href={replaceQuery(
+                routerData,
                 {
-                  [ModuleNames.photos]: {search: mergeSearch(searchData.search || {}, defaultSearch)},
-                  [ModuleNames.comments]: {search: mergeSearch({articleId: dataSource.id}, commentsDefaultSearch)},
-                }
+                  [ModuleNames.photos]: {...searchData, showComment: false},
+                },
+                true
               )}
               className="mask"
             />
@@ -132,9 +124,13 @@ class Component extends React.PureComponent<Props, State> {
 }
 
 const mapStateToProps = (state: RootState) => {
+  const model = state.photos;
+  const searchData = state.app.routerData.searchData[ModuleNames.photos] || {showComment: false};
   return {
-    searchData: state.photos.searchData || {},
-    dataSource: state.photos.itemDetail,
+    routerData: state.app.routerData,
+    showComment: searchData.showComment,
+    listSearch: model.listSearch,
+    itemDetail: model.itemDetail,
   };
 };
 

@@ -3,21 +3,16 @@ import {CommentResource, State} from "entity/comment";
 import {ModuleNames} from "modules/names";
 import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
-import {defaultSearch} from "./facade";
+import {defSearch} from "./facade";
 export {State} from "entity/comment";
 
 class ModuleHandlers extends ResourceHandlers<State, CommentResource> {
   constructor() {
     super(
       {
-        listData: {
-          search: {...defaultSearch},
-          items: null,
-          summary: null,
-        },
+        listSearch: defSearch.search,
       },
       {
-        defaultSearch,
         api,
       }
     );
@@ -25,6 +20,7 @@ class ModuleHandlers extends ResourceHandlers<State, CommentResource> {
   @effect()
   protected async [ModuleNames.comments + "/INIT"]() {
     await super.onInit();
+    this.inited();
   }
 }
 

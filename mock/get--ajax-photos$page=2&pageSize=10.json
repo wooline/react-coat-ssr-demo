@@ -8,17 +8,13 @@
     "connection": "close"
   },
   "response": {
-    "search": {
-      "page": 2,
-      "pageSize": 10
-    },
-    "summary": {
+    "listSummary": {
       "page": 2,
       "pageSize": 5,
       "totalItems": 10,
       "totalPages": 2
     },
-    "items": [
+    "listItems": [
       {
         "id": "6",
         "title": "桂林+阳朔+游轮百里大漓江+龙脊梯田+象鼻山+银子岩+古东瀑布+阳朔西街火车5日跟团游",

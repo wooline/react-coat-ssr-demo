@@ -1,5 +1,5 @@
 import {toUrl} from "common/routers";
-import {RootState} from "modules";
+import {RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {connect} from "react-redux";
@@ -8,14 +8,15 @@ import DetailsView from "./Details";
 import ListView from "./List";
 
 interface Props {
-  pathname: string;
+  routerData: RouterData;
 }
 class Component extends React.PureComponent<Props> {
   public render() {
+    const {routerData} = this.props;
     return (
       <Switch>
-        <Route exact={false} path={toUrl(ModuleNames.photos, "List")} component={ListView} />
-        <Route exact={false} path={toUrl(ModuleNames.photos, "Details")} component={DetailsView} />
+        <Route exact={false} path={toUrl(routerData, ModuleNames.photos, "List")} component={ListView} />
+        <Route exact={false} path={toUrl(routerData, ModuleNames.photos, "Details")} component={DetailsView} />
       </Switch>
     );
   }
@@ -23,7 +24,7 @@ class Component extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    pathname: state.router.location.pathname,
+    routerData: state.app.routerData,
   };
 };
 

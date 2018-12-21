@@ -57,14 +57,14 @@
     "yargs": "^12.0.0"
   },
   "devDependencies": {
-    "react-coat-dev-utils": "1.0.0-beta.6",
+    "react-coat-dev-utils": "1.0.0-beta.7",
     "react-coat-dev-pkg": "1.0.0-beta.3"
   },
   "dependencies": {
     "antd-mobile": "~2.2.6",
     "rc-form": "~2.2.7",
-    "react-coat": "4.0.0-beta.4",
-    "react-coat-pkg": "4.0.0-beta.1",
+    "react-coat": "4.0.0-beta.5",
+    "react-coat-pkg": "4.0.0-beta.2",
     "ts-import-plugin": "~1.5.5"
   },
   "browserslist": [
@@ -74,7 +74,7 @@
   ],
   "devServer": {
     "url": "http://192.168.1.96:7445",
-    "ssr": true,
+    "ssr": false,
     "mock": true,
     "proxy": {
       "/ajax/**": {

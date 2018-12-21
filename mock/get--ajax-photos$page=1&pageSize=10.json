@@ -8,17 +8,13 @@
     "connection": "close"
   },
   "response": {
-    "search": {
-      "page": 1,
-      "pageSize": 10
-    },
-    "summary": {
+    "listSummary": {
       "page": 1,
       "pageSize": 5,
       "totalItems": 10,
       "totalPages": 2
     },
-    "items": [
+    "listItems": [
       {
         "id": "1",
         "title": "新加坡+吉隆坡+马六甲6或7日跟团游",

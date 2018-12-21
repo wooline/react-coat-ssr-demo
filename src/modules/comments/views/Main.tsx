@@ -1,5 +1,5 @@
 import {toUrl} from "common/routers";
-import {RootState} from "modules";
+import {RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {connect} from "react-redux";
@@ -9,14 +9,19 @@ import Editor from "./Editor";
 import ListView from "./List";
 import "./Main.less";
 
-class Component extends React.PureComponent {
+interface Props {
+  routerData: RouterData;
+}
+
+class Component extends React.PureComponent<Props> {
   public render() {
+    const {routerData} = this.props;
     return (
       <div className={`${ModuleNames.comments}`}>
         <div className="wrap">
           <Switch>
-            <Route exact={false} path={toUrl(ModuleNames.comments, "List")} component={ListView} />
-            <Route exact={false} path={toUrl(ModuleNames.comments, "Details")} component={DetailsView} />
+            <Route exact={false} path={toUrl(routerData, ModuleNames.comments, "List")} component={ListView} />
+            <Route exact={false} path={toUrl(routerData, ModuleNames.comments, "Details")} component={DetailsView} />
           </Switch>
         </div>
         <Editor />
@@ -27,7 +32,7 @@ class Component extends React.PureComponent {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    pathname: state.router.location.pathname,
+    routerData: state.app.routerData,
   };
 };
 

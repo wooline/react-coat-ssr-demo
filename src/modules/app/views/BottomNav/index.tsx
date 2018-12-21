@@ -2,35 +2,35 @@ import {TabBar} from "antd-mobile";
 import {isCur, toUrl} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import {routerActions} from "connected-react-router";
-import {RootRouter, RootState} from "modules";
+import {RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import React from "react";
 import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  views: RootRouter["views"];
+  routerData: RouterData;
 }
 const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault();
 
-const PhotosLink = (
-  <a href={toUrl(ModuleNames.photos)} onClick={onClick}>
-    <Icon type={IconClass.PICTURE} />
-  </a>
-);
-const VideosLink = (
-  <a href={toUrl(ModuleNames.videos)} onClick={onClick}>
-    <Icon type={IconClass.LIVE} />
-  </a>
-);
-const MessageLink = (
-  <a href={toUrl(ModuleNames.videos)} onClick={onClick}>
-    <Icon type={IconClass.MESSAGE} />
-  </a>
-);
 class Component extends React.PureComponent<Props> {
   public render() {
-    const {views} = this.props;
+    const {routerData} = this.props;
+    const PhotosLink = (
+      <a href={toUrl(routerData, ModuleNames.photos)} onClick={onClick}>
+        <Icon type={IconClass.PICTURE} />
+      </a>
+    );
+    const VideosLink = (
+      <a href={toUrl(routerData, ModuleNames.videos)} onClick={onClick}>
+        <Icon type={IconClass.LIVE} />
+      </a>
+    );
+    const MessageLink = (
+      <a href={toUrl(routerData, ModuleNames.videos)} onClick={onClick}>
+        <Icon type={IconClass.MESSAGE} />
+      </a>
+    );
     return (
       <div className="app-BottomNav g-doc-width">
         <TabBar noRenderContent={true} barTintColor="#108ee9" tintColor="#ff0" unselectedTintColor="#fff">
@@ -39,9 +39,9 @@ class Component extends React.PureComponent<Props> {
             selectedIcon={PhotosLink}
             title="风景"
             key="photos"
-            selected={isCur(views, ModuleNames.photos)}
+            selected={isCur(routerData.views, ModuleNames.photos)}
             onPress={() => {
-              this.props.dispatch(routerActions.push(toUrl(ModuleNames.photos, "List")));
+              this.props.dispatch(routerActions.push(toUrl(routerData, ModuleNames.photos, "List")));
             }}
           />
           <TabBar.Item
@@ -49,9 +49,9 @@ class Component extends React.PureComponent<Props> {
             key="videos"
             icon={VideosLink}
             selectedIcon={VideosLink}
-            selected={isCur(views, ModuleNames.videos)}
+            selected={isCur(routerData.views, ModuleNames.videos)}
             onPress={() => {
-              this.props.dispatch(routerActions.push(toUrl(ModuleNames.videos)));
+              this.props.dispatch(routerActions.push(toUrl(routerData, ModuleNames.videos)));
             }}
           />
           <TabBar.Item
@@ -59,9 +59,9 @@ class Component extends React.PureComponent<Props> {
             selectedIcon={MessageLink}
             title="消息"
             key="messages"
-            selected={isCur(views, ModuleNames.videos)}
+            selected={isCur(routerData.views, ModuleNames.videos)}
             onPress={() => {
-              this.props.dispatch(routerActions.push(toUrl(ModuleNames.videos)));
+              this.props.dispatch(routerActions.push(toUrl(routerData, ModuleNames.videos)));
             }}
           />
         </TabBar>
@@ -72,7 +72,7 @@ class Component extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    views: state.router.views,
+    routerData: state.app.routerData,
   };
 };
 

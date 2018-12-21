@@ -1,20 +1,20 @@
-import {ListData} from "entity/video";
+import {ListItem} from "entity/video";
 import {RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {connect, DispatchProp} from "react-redux";
 
 interface Props extends DispatchProp {
-  listData: ListData;
+  listItems: ListItem[];
 }
 
 class Component extends React.PureComponent<Props> {
   public render() {
-    const {items} = this.props.listData;
-    return items ? (
+    const {listItems} = this.props;
+    return listItems ? (
       <div id={ModuleNames.videos}>
         <ul>
-          {items.map(item => (
+          {listItems.map(item => (
             <li key={item.title}>{item.title}</li>
           ))}
         </ul>
@@ -26,7 +26,7 @@ class Component extends React.PureComponent<Props> {
 const mapStateToProps = (state: RootState) => {
   const model = state.videos;
   return {
-    listData: model.listData,
+    listItems: model.listItems,
   };
 };
 

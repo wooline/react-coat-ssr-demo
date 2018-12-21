@@ -13,7 +13,7 @@ interface Item {
 export type PhotoDefined = ArticleDefined & {
   ListItem: Item;
   ItemDetail: Item & {remark: string; picList: string[]};
-  SearchData: {showComment?: boolean};
+  SearchData: {showComment: boolean};
 };
 
 export type PhotoResource = ArticleResource<PhotoDefined>;
@@ -23,7 +23,7 @@ export type ListSearch = PhotoResource["ListSearch"];
 export type ListSummary = PhotoResource["ListSummary"];
 export type ListOptional = PhotoResource["ListOptional"];
 export type ItemDetail = PhotoResource["ItemDetail"];
-export type ListData = PhotoResource["ListData"];
-export type State = PhotoResource["State"];
-export type SearchData = State["searchData"];
+export type PathData = PhotoResource["PathData"];
+export type SearchData = PhotoResource["SearchData"];
 export type API = PhotoResource["API"];
+export type State = PhotoResource["State"];

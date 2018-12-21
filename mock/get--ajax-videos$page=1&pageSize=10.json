@@ -7,11 +7,7 @@
     "connection": "close"
   },
   "response": {
-    "search": {
-      "page": 1,
-      "pageSize": 10
-    },
-    "items": [
+    "listItems": [
       {
         "title": "afdsfdasfasdfdasfasdfasd",
         "commentCount": 500,

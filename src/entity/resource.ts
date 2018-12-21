@@ -1,18 +1,13 @@
+import {BaseModuleState} from "react-coat";
 import {DefaultResult} from "./common";
-
-export interface ListData<Item, Search, Summary> {
-  search: Search;
-  items: Item[] | null;
-  summary: Summary | null;
-}
 
 export type EditorType = "create" | "update";
 
 export interface Defined {
-  State?: {};
-  SearchData?: {};
-  PathData?: {};
-  HashData?: {};
+  State: {};
+  SearchData: {};
+  PathData: {};
+  HashData: {};
   ListItem?: {};
   ListSearch?: {};
   ListSummary?: {};
@@ -25,13 +20,14 @@ export interface Defined {
 }
 
 export type ResourceDefined = Defined & {
+  State: BaseModuleState;
   PathData: {itemId?: string};
   ListItem: {
     id: string;
   };
   ListSearch: {
-    page: number | null;
-    pageSize: number | null;
+    page: number;
+    pageSize: number;
   };
   ListSummary: {
     page: number;
@@ -61,21 +57,20 @@ export interface Resource<D extends ResourceDefined = ResourceDefined> {
   ItemCreateData: D["ItemCreateData"];
   ItemUpdateData: D["ItemUpdateData"];
   ItemCreateResult: D["ItemCreateResult"];
-  ListData: ListData<D["ListItem"], D["ListSearch"], D["ListSummary"]>;
+  SearchData: D["SearchData"] & {search: D["ListSearch"]};
   PathData: D["PathData"];
   State: D["State"] & {
+    listSearch: D["ListSearch"];
+    listItems?: Array<D["ListItem"]>;
+    listSummary?: D["ListSummary"];
     itemDetail?: D["ItemDetail"];
     itemEditor?: D["ItemEditor"];
     selectedIds?: string[];
-    searchData?: D["SearchData"] & {search?: Partial<D["ListSearch"]>};
-    hashData?: D["HashData"];
-    pathData?: D["PathData"];
-    listData: ListData<D["ListItem"], D["ListSearch"], D["ListSummary"]>;
   };
   API: {
     hitItem?(id: string): Promise<void>;
     getItemDetail?(id: string): Promise<D["ItemDetail"]>;
-    searchList(request: D["ListSearch"]): Promise<ListData<D["ListItem"], D["ListSearch"], D["ListSummary"]>>;
+    searchList(request: D["ListSearch"]): Promise<{listItems: Array<D["ListItem"]>; listSummary: D["ListSummary"]}>;
     createItem?(request: D["ItemCreateData"]): Promise<D["ItemCreateResult"]>;
     updateItem?(request: D["ItemUpdateData"]): Promise<D["ItemUpdateResult"]>;
     deleteItems?(ids: string[]): Promise<void>;

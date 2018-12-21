@@ -1,36 +1,26 @@
 import ArticleHandlers from "common/ArticleHandlers";
-import {ListSearch, Resource, State} from "entity/video";
-export {State} from "entity/video";
+import {State, VideoResource} from "entity/video";
 import {ModuleNames} from "modules/names";
 import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
+import {defSearch} from "./facade";
+export {State} from "entity/video";
 
-const defaultSearch: ListSearch = {
-  title: null,
-  page: 1,
-  pageSize: 10,
-};
-
-class ModuleHandlers extends ArticleHandlers<State, Resource> {
+class ModuleHandlers extends ArticleHandlers<State, VideoResource> {
   constructor() {
     super(
       {
-        listData: {
-          search: {...defaultSearch},
-          items: null,
-          summary: null,
-        },
-        searchData: {},
+        listSearch: defSearch.search,
       },
       {
-        defaultSearch,
         api,
       }
     );
   }
   @effect()
   protected async [ModuleNames.videos + "/INIT"]() {
-    await this.dispatch(this.callThisAction(this.searchList));
+    await super.onInit();
+    this.inited();
   }
 }
 

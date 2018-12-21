@@ -9,17 +9,13 @@
     "connection": "close"
   },
   "response": {
-    "search": {
-      "page": 2,
-      "pageSize": 10
-    },
-    "summary": {
+    "listSummary": {
       "page": 2,
       "pageSize": 5,
       "totalItems": 10,
       "totalPages": 2
     },
-    "items": [
+    "listItems": [
       {
         "id": "16",
         "userId": "16",

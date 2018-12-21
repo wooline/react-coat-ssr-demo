@@ -1,19 +1,20 @@
-import {mergeSearch, toUrl} from "common/routers";
+import {replaceQuery, toUrl} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import LinkButton from "components/LinkButton";
 import Pagination from "components/Pagination";
-import {ListData, SearchData} from "entity/photo";
-import {RootState} from "modules";
-import {defaultSearch as commentsDefaultSearch} from "modules/comments/facade";
+import {ListItem, ListSearch, ListSummary} from "entity/photo";
+import {RootState, RouterData} from "modules";
+import {defSearch as commentsDefSearch} from "modules/comments/facade";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {connect, DispatchProp} from "react-redux";
-import {defaultSearch} from "../../facade";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  searchData: Exclude<SearchData, undefined>;
-  listData: ListData;
+  routerData: RouterData;
+  listSearch: ListSearch;
+  listItems: ListItem[] | undefined;
+  listSummary: ListSummary;
 }
 
 let scrollTop = 0;
@@ -26,26 +27,23 @@ class Component extends React.PureComponent<Props> {
     window.scrollTo(0, scrollTop);
   }
   public render() {
-    const {
-      dispatch,
-      searchData,
-      listData: {items, summary},
-    } = this.props;
+    const {dispatch, routerData, listSearch, listItems, listSummary} = this.props;
 
-    if (items) {
+    if (listItems) {
       const itemBaseUrl = toUrl(
+        routerData,
         ModuleNames.comments,
         "List",
         {type: ModuleNames.photos, typeId: "---"},
         {
-          [ModuleNames.photos]: {search: mergeSearch(searchData.search || {}, defaultSearch)},
-          [ModuleNames.comments]: {search: mergeSearch({articleId: "---"}, commentsDefaultSearch)},
+          [ModuleNames.photos]: {search: null as any, showComment: false},
+          [ModuleNames.comments]: {search: {...commentsDefSearch.search, articleId: "---"}},
         }
       );
       return (
         <div className={`${ModuleNames.photos}-List g-pic-list`}>
           <div className="list-items">
-            {items.map(item => (
+            {listItems.map(item => (
               <LinkButton dispatch={dispatch} href={itemBaseUrl.replace(/---/g, item.id)} key={item.id} className="g-pre-img">
                 <div style={{backgroundImage: `url(${item.coverUrl})`}}>
                   <h5 className="title">{item.title}</h5>
@@ -67,13 +65,13 @@ class Component extends React.PureComponent<Props> {
               </LinkButton>
             ))}
           </div>
-          {summary && (
+          {listSummary && (
             <div className="g-pagination">
               <Pagination
                 dispatch={dispatch}
-                baseUrl={toUrl(ModuleNames.photos, "List", {}, {[ModuleNames.photos]: {search: mergeSearch({...searchData.search, page: NaN}, defaultSearch)}})}
-                page={summary.page}
-                totalPages={summary.totalPages}
+                baseUrl={replaceQuery(routerData, {[ModuleNames.photos]: {showComment: false, search: {...listSearch, page: NaN}}})}
+                page={listSummary.page}
+                totalPages={listSummary.totalPages}
               />
             </div>
           )}
@@ -88,8 +86,10 @@ class Component extends React.PureComponent<Props> {
 const mapStateToProps = (state: RootState) => {
   const model = state.photos;
   return {
-    listData: model.listData,
-    searchData: model.searchData || {},
+    routerData: state.app.routerData,
+    listSearch: model.listSearch,
+    listItems: model.listItems,
+    listSummary: model.listSummary,
   };
 };
 

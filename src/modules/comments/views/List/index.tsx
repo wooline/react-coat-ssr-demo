@@ -1,19 +1,19 @@
-import {mergeSearch, replaceQuery, toUrl} from "common/routers";
+import {replaceQuery, toUrl} from "common/routers";
 import LinkButton from "components/LinkButton";
 import Pagination from "components/Pagination";
-import {ListData, PathData} from "entity/comment";
-import {RootRouter, RootState} from "modules";
+import {ListItem, ListSearch, ListSummary} from "entity/comment";
+import {RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {findDOMNode} from "react-dom";
 import {connect, DispatchProp} from "react-redux";
-import {defaultSearch} from "../../facade";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  rootRouter: RootRouter;
-  pathData: PathData;
-  listData: ListData;
+  routerData: RouterData;
+  listSearch: ListSearch;
+  listItems: ListItem[] | undefined;
+  listSummary: ListSummary;
 }
 let scrollTop = 0;
 class Component extends React.PureComponent<Props> {
@@ -28,35 +28,31 @@ class Component extends React.PureComponent<Props> {
     }
   }
   public render() {
-    const {
-      dispatch,
-      rootRouter,
-      listData: {items, summary, search},
-      pathData: {type, typeId},
-    } = this.props;
+    const {dispatch, routerData, listSearch, listItems, listSummary} = this.props;
+    const {type, typeId} = routerData.pathData[ModuleNames.comments]!;
 
-    if (items) {
-      const itemBaseUrl = toUrl(ModuleNames.comments, "Details", {type, typeId, itemId: "---"}, rootRouter.location.search);
+    if (listItems) {
+      const itemBaseUrl = toUrl(routerData, ModuleNames.comments, "Details", {type, typeId, itemId: "---"}, routerData.search);
       return (
         <div className={`${ModuleNames.comments}-List`}>
           <div className="list-header">
             <LinkButton
               dispatch={dispatch}
-              href={replaceQuery(rootRouter, ModuleNames.comments, {search: mergeSearch({...search, page: 1, isNewest: false}, defaultSearch)})}
-              className={search.isNewest ? "" : "on"}
+              href={replaceQuery(routerData, {[ModuleNames.comments]: {search: {...listSearch, page: 1, isNewest: false}}}, true)}
+              className={listSearch.isNewest ? "" : "on"}
             >
               最热
             </LinkButton>
             <LinkButton
               dispatch={dispatch}
-              href={replaceQuery(rootRouter, ModuleNames.comments, {search: mergeSearch({...search, page: 1, isNewest: true}, defaultSearch)})}
-              className={search.isNewest ? "on" : ""}
+              href={replaceQuery(routerData, {[ModuleNames.comments]: {search: {...listSearch, page: 1, isNewest: true}}}, true)}
+              className={listSearch.isNewest ? "on" : ""}
             >
               最新
             </LinkButton>
           </div>
           <div className="list-items">
-            {items.map(item => (
+            {listItems.map(item => (
               <LinkButton dispatch={dispatch} href={itemBaseUrl.replace(/---/g, item.id)} className="g-border-top" key={item.id}>
                 <div className="avatar" style={{backgroundImage: `url(${item.avatarUrl})`}} />
                 <div className="user">
@@ -70,13 +66,13 @@ class Component extends React.PureComponent<Props> {
               </LinkButton>
             ))}
           </div>
-          {summary && (
+          {listSummary && (
             <div className="g-pagination">
               <Pagination
                 dispatch={dispatch}
-                baseUrl={replaceQuery(rootRouter, ModuleNames.comments, {search: mergeSearch({...search, page: NaN}, defaultSearch)})}
-                page={summary.page}
-                totalPages={summary.totalPages}
+                baseUrl={replaceQuery(routerData, {[ModuleNames.comments]: {search: {...listSearch, page: NaN}}}, true)}
+                page={listSummary.page}
+                totalPages={listSummary.totalPages}
               />
             </div>
           )}
@@ -91,9 +87,10 @@ class Component extends React.PureComponent<Props> {
 const mapStateToProps = (state: RootState) => {
   const model = state.comments;
   return {
-    rootRouter: state.router,
-    listData: model.listData,
-    pathData: model.pathData,
+    routerData: state.app.routerData,
+    listSearch: model.listSearch,
+    listItems: model.listItems,
+    listSummary: model.listSummary,
   };
 };
 
