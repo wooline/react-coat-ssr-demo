@@ -1,5 +1,5 @@
 import {Carousel, Icon as MIcon} from "antd-mobile";
-import {replaceQuery, toUrl} from "common/routers";
+import {toPath, toUrl} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import LinkButton from "components/LinkButton";
 import {ItemDetail, ListSearch} from "entity/photo";
@@ -46,7 +46,7 @@ class Component extends React.PureComponent<Props, State> {
         <div className={`${ModuleNames.photos}-Details g-details g-doc-width g-modal g-enter-in`}>
           <div className="subject">
             <h2>{itemDetail.title}</h2>
-            <LinkButton dispatch={dispatch} href={toUrl(routerData, ModuleNames.photos, "List", {}, {[ModuleNames.photos]: {search: listSearch, showComment: false}})} className="close-button">
+            <LinkButton dispatch={dispatch} href={toUrl(toPath(ModuleNames.photos, "List", {}), {[ModuleNames.photos]: {search: listSearch, showComment: false}})} className="close-button">
               <MIcon size="md" type="cross-circle" />
             </LinkButton>
           </div>

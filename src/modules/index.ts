@@ -38,20 +38,18 @@ interface PathData {
   [ModuleNames.videos]?: VideosModuleRouter["path"];
   [ModuleNames.comments]?: CommentsModuleRouter["path"];
 }
-export type RootState = BaseState & States;
-
-export type RouterData = {
-  pathname: string;
-  search: string;
-  hash: string;
+export type RootState = BaseState<{
   views: {[viewName: string]: boolean};
   pathData: PathData;
   searchData: SearchData;
   hashData: {};
-};
-export const defSearch: SearchData = {
+}> &
+  States;
+
+export type RouterData = RootState["router"];
+/* export const defSearch: SearchData = {
   [ModuleNames.app]: appDefSearch,
   [ModuleNames.photos]: photosDefSearch,
   [ModuleNames.videos]: videosDefSearch,
   [ModuleNames.comments]: commentsDefSearch,
-};
+}; */

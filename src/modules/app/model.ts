@@ -1,18 +1,17 @@
 import {Toast} from "antd-mobile";
 import {CustomError, RedirectError} from "common/Errors";
-import {hashParser, isCur, pathParser, searchParser} from "common/routers";
+import {isCur} from "common/routers";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, LoadingState, loadModel, LOCATION_CHANGE, reducer, RouterState} from "react-coat";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, LoadingState, loadModel, reducer} from "react-coat";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 
 // 定义本模块的State类型
 
 export interface State extends BaseModuleState {
-  routerData: RouterData;
   projectConfig: ProjectConfig | null;
   curUser: CurUser | null;
   startupStep: StartupStep;
@@ -27,7 +26,6 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   constructor(presetData: {routerData: RouterData}) {
     // 定义本模块State的初始值
     const initState: State = {
-      routerData: presetData.routerData,
       projectConfig: null,
       curUser: null,
       startupStep: StartupStep.init,
@@ -58,7 +56,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
     return {...this.state, curUser};
   }
 
-  @reducer
+  /* @reducer
   protected [LOCATION_CHANGE](router: RouterState): State {
     const {pathname, search, hash} = router.location;
     const oLocation = this.rootState.router.location;
@@ -84,7 +82,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
     } else {
       return this.state;
     }
-  }
+  } */
 
   // 兼听全局错误的Action，并发送给后台
   // 兼听外部模块的Action，不需要手动触发，所以请使用protected或private
@@ -112,7 +110,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
       curUser,
       startupStep: StartupStep.configLoaded,
     });
-    const views = this.state.routerData.views;
+    const views = this.rootState.router.views;
     if (isCur(views, ModuleNames.app, "LoginForm") && curUser.hasLogin) {
       throw new RedirectError("301", "/");
     }

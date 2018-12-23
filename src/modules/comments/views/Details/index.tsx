@@ -1,8 +1,8 @@
 import {Icon as MIcon} from "antd-mobile";
-import {toUrl} from "common/routers";
+import {toPath, toUrl} from "common/routers";
 import LinkButton from "components/LinkButton";
 import {ItemDetail, PathData} from "entity/comment";
-import {RootState, RouterData} from "modules";
+import {RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import React from "react";
 import {findDOMNode} from "react-dom";
@@ -10,20 +10,24 @@ import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
 interface Props extends DispatchProp {
+  search: string;
   pathData: PathData;
-  routerData: RouterData;
   itemDetail: ItemDetail | undefined;
 }
 
 class Component extends React.PureComponent<Props> {
   public render() {
-    const {itemDetail, dispatch, routerData} = this.props;
-    const {type, typeId} = routerData.pathData[ModuleNames.comments]!;
+    const {
+      itemDetail,
+      dispatch,
+      search,
+      pathData: {type, typeId},
+    } = this.props;
     if (itemDetail) {
       return (
         <div className={`${ModuleNames.comments}-Details g-modal g-enter-in`}>
           <div className="list-header">
-            <LinkButton dispatch={dispatch} href={toUrl(routerData, ModuleNames.comments, "List", {type, typeId}, routerData.search)} className="close-button">
+            <LinkButton dispatch={dispatch} href={toUrl(toPath(ModuleNames.comments, "List", {type, typeId}), search)} className="close-button">
               <MIcon size="md" type="left" />
             </LinkButton>
           </div>
@@ -78,7 +82,8 @@ class Component extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    routerData: state.app.routerData,
+    search: state.router.location.search,
+    pathData: state.router.pathData[ModuleNames.comments],
     itemDetail: state.comments.itemDetail,
   };
 };

@@ -1,8 +1,7 @@
-import assignDeep from "assign-deep";
 import {routerActions} from "connected-react-router";
-import {defSearch, ModuleGetter, RouterData} from "modules";
+import {ModuleGetter, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
-import {Module} from "react-coat";
+import {Module, RouterParser} from "react-coat";
 import {matchPath} from "react-router";
 import {Dispatch} from "redux";
 
@@ -59,64 +58,11 @@ function serialize(data: {[key: string]: any}): string {
   }
 }
 
-export function toQuery<R extends RouterData["searchData"], H extends RouterData["hashData"]>(
-  pathname: string,
-  rootRouter: RouterData,
-  newSearchData?: R | string,
-  extendSearchData?: boolean,
-  newHashData?: H | string,
-  extendHashData?: boolean
-) {
-  const {searchData, hashData} = rootRouter;
-  let url = pathname;
-  if (newSearchData) {
-    let str = newSearchData as string;
-    if (typeof newSearchData !== "string") {
-      if (extendSearchData) {
-        str = serialize({...searchData, ...newSearchData});
-      } else {
-        str = serialize(newSearchData);
-      }
-    }
-    if (str) {
-      url += "?" + str;
-    }
-  }
-  if (newHashData) {
-    let str = newHashData as string;
-    if (typeof newHashData !== "string") {
-      if (extendHashData) {
-        str = serialize({...hashData, ...newHashData});
-      } else {
-        str = serialize(newHashData);
-      }
-    }
-    if (str) {
-      url += "#" + str;
-    }
-  }
-  return url;
-}
-
-export function replaceQuery<R extends RouterData["searchData"], H extends RouterData["hashData"]>(
-  rootRouter: RouterData,
-  newSearchData?: R | string,
-  extendSearchData?: boolean,
-  newHashData?: H | string,
-  extendHashData?: boolean
-) {
-  const {pathname} = rootRouter;
-  return toQuery(pathname, rootRouter, newSearchData, extendSearchData, newHashData, extendHashData);
-}
-
-export function toUrl<
-  N extends keyof RouterData["pathData"],
-  M extends ReturnModule<MG[N]>,
-  V extends keyof M["views"],
-  P extends RouterData["pathData"][N],
-  R extends RouterData["searchData"],
-  H extends RouterData["hashData"]
->(rootRouter: RouterData, moduleName: N, viewName?: V, params?: P, newSearchData?: R | string, extendSearchData?: boolean, newHashData?: H | string, extendHashData?: boolean): string {
+export function toPath<N extends keyof RouterData["pathData"], M extends ReturnModule<MG[N]>, V extends keyof M["views"], P extends RouterData["pathData"][N]>(
+  moduleName: N,
+  viewName?: V,
+  params?: P
+): string {
   viewName = viewName || ("Main" as any);
   let pathExp: string | {[viewName: string]: string} = moduleToUrl[moduleName] as string;
   if (typeof pathExp !== "string") {
@@ -133,7 +79,29 @@ export function toUrl<
       }
     });
   }
-  return toQuery(pathname, rootRouter, newSearchData, extendSearchData, newHashData, extendHashData);
+  return pathname;
+}
+export function toUrl<R extends RouterData["searchData"], H extends RouterData["hashData"]>(pathname: string, searchData?: R | string, hashData?: H | string): string {
+  let url = pathname;
+  if (searchData) {
+    let str = searchData as string;
+    if (typeof searchData !== "string") {
+      str = serialize(searchData);
+    }
+    if (str) {
+      url += "?" + str.replace("?", "");
+    }
+  }
+  if (hashData) {
+    let str = hashData as string;
+    if (typeof hashData !== "string") {
+      str = serialize(hashData);
+    }
+    if (str) {
+      url += "#" + str.replace("#", "");
+    }
+  }
+  return url;
 }
 
 export function isCur<N extends keyof MG, M extends ReturnModule<MG[N]>, V extends keyof M["views"]>(views: RouterData["views"], moduleName: N, viewName?: V): boolean {
@@ -175,6 +143,32 @@ export function unserializeUrlQuery(query: string): any {
   }, {});
 } */
 
+function parsePathname(
+  pathname: string
+): {
+  pathData: {
+    [moduleName: string]: {
+      [key: string]: any;
+    };
+  };
+  views: {
+    [viewName: string]: boolean;
+  };
+} {
+  const views: {[viewName: string]: boolean} = {};
+  const pathData: {[moduleName: string]: {[key: string]: any}} = {};
+  Object.keys(modulePaths).forEach(url => {
+    const match = matchPath(pathname, url);
+    if (match) {
+      const result = modulePaths[url];
+      views[result.join(".")] = true;
+      if (match.params) {
+        pathData[result[0]] = match.params;
+      }
+    }
+  });
+  return {views, pathData};
+}
 function parseRoute(pre: {}, cur: string) {
   const [key, val] = cur.split("=");
   if (key) {
@@ -191,71 +185,27 @@ function parseRoute(pre: {}, cur: string) {
   return pre;
 }
 
-export function searchParser(
-  search: string,
-  views: {[viewName: string]: boolean}
-): {
-  [moduleName: string]: {
-    [key: string]: any;
-  };
-} {
-  const data: {[moduleName: string]: {[key: string]: any}} = search.split(/[&?]/).reduce(parseRoute, {});
-  Object.keys(views).forEach(vName => {
-    const mName = vName.split(".")[0];
-    if (!data[mName]) {
-      data[mName] = {};
-    }
-  });
-  Object.keys(data).forEach(mName => {
-    data[mName] = assignDeep({}, defSearch[mName], data[mName]);
-  });
+export const routerParser: RouterParser<RouterData> = (nextRouter, prevRouter) => {
+  let nRouter: RouterData;
+  if (prevRouter) {
+    nRouter = {...prevRouter};
+  } else {
+    nRouter = {...nextRouter, views: {}, pathData: {}, searchData: {}, hashData: {}};
+  }
 
-  return data;
-}
-export function hashParser(
-  hash: string,
-  views: {[viewName: string]: boolean}
-): {
-  [moduleName: string]: {
-    [key: string]: any;
-  };
-} {
-  const data: {[moduleName: string]: {[key: string]: any}} = hash.split(/[&#]/).reduce(parseRoute, {});
-  Object.keys(views).forEach(vName => {
-    const mName = vName.split(".")[0];
-    if (!data[mName]) {
-      data[mName] = {};
-    }
-  });
-  return data;
-}
-export function pathParser(
-  pathname: string
-): {
-  data: {
-    [moduleName: string]: {
-      [key: string]: any;
-    };
-  };
-  views: {
-    [viewName: string]: boolean;
-  };
-} {
-  const views: {[viewName: string]: boolean} = {};
-  const data: {[moduleName: string]: {[key: string]: any}} = {};
-  Object.keys(modulePaths).forEach(url => {
-    const match = matchPath(pathname, url);
-    if (match) {
-      const result = modulePaths[url];
-      views[result.join(".")] = true;
-      if (match.params) {
-        data[result[0]] = match.params;
-      }
-    }
-  });
-  return {views, data};
-}
-
+  if (prevRouter && nextRouter.location.pathname !== prevRouter.location.pathname) {
+    const {views, pathData} = parsePathname(nextRouter.location.pathname);
+    nRouter.views = views;
+    nRouter.pathData = pathData;
+  }
+  if (prevRouter && nextRouter.location.search !== prevRouter.location.search) {
+    nRouter.searchData = nextRouter.location.search.split(/[&?]/).reduce(parseRoute, {});
+  }
+  if (prevRouter && nextRouter.location.hash !== prevRouter.location.hash) {
+    nRouter.searchData = nextRouter.location.hash.split(/[&#]/).reduce(parseRoute, {});
+  }
+  return nRouter;
+};
 export function advanceRouter(url: string): RouterData | string {
   let [pathname, search, hash] = url.split(/[?#]/);
   pathname = pathname.replace(/^.+:\/\/[^/]+/, "");
@@ -276,11 +226,13 @@ export function advanceRouter(url: string): RouterData | string {
       return pathname.replace(rule.path, rule.replace);
     }
   }
-  const {views, data} = pathParser(pathname);
+  const {views, pathData} = parsePathname(pathname);
   if (Object.keys(views).length < 2) {
     return `${InitEnv.clientPublicPath}404.html`;
   }
-  return {pathname, search, hash, views, pathData: data, searchData: searchParser(search, views), hashData: hashParser(hash, views)};
+  const searchData = search.split(/[&?]/).reduce(parseRoute, {});
+  const hashData = hash.split(/[&#]/).reduce(parseRoute, {});
+  return {location: {pathname, search, hash, state: null}, action: "POP", views, pathData, searchData, hashData};
 }
 export function linkTo(e: React.MouseEvent<HTMLAnchorElement>, dispatch: Dispatch) {
   e.preventDefault();

@@ -1,8 +1,8 @@
 import "asset/css/global.less";
-import {toUrl} from "common/routers";
+import {toPath} from "common/routers";
 import {StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
-import {ModuleGetter, RootState, RouterData} from "modules";
+import {ModuleGetter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {LoadingState, loadView} from "react-coat";
@@ -19,7 +19,6 @@ const PhotosView = loadView(ModuleGetter, ModuleNames.photos, "Main");
 const VideosView = loadView(ModuleGetter, ModuleNames.videos, "Main");
 
 interface Props extends DispatchProp {
-  routerData: RouterData;
   curUser: CurUser;
   startupStep: StartupStep;
   globalLoading: LoadingState;
@@ -27,16 +26,16 @@ interface Props extends DispatchProp {
 
 class Component extends React.PureComponent<Props> {
   public render() {
-    const {routerData, startupStep, globalLoading} = this.props;
+    const {startupStep, globalLoading} = this.props;
     return (
       <div className={ModuleNames.app}>
         {startupStep !== StartupStep.init && (
           <div className="g-page">
             <TopNav />
             <Switch>
-              <Route exact={false} path={toUrl(routerData, ModuleNames.photos)} component={PhotosView} />
-              <Route exact={true} path={toUrl(routerData, ModuleNames.videos)} component={VideosView} />
-              <Route exact={true} path={toUrl(routerData, ModuleNames.app, "LoginForm")} component={LoginForm} />
+              <Route exact={false} path={toPath(ModuleNames.photos)} component={PhotosView} />
+              <Route exact={true} path={toPath(ModuleNames.videos)} component={VideosView} />
+              <Route exact={true} path={toPath(ModuleNames.app, "LoginForm")} component={LoginForm} />
             </Switch>
             <BottomNav />
           </div>
@@ -51,7 +50,6 @@ class Component extends React.PureComponent<Props> {
 const mapStateToProps = (state: RootState) => {
   const app = state.app;
   return {
-    routerData: app.routerData,
     curUser: app.curUser,
     startupStep: app.startupStep,
     globalLoading: app.loading.global,

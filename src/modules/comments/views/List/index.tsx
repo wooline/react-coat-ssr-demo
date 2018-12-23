@@ -1,7 +1,7 @@
-import {replaceQuery, toUrl} from "common/routers";
+import {toPath, toUrl} from "common/routers";
 import LinkButton from "components/LinkButton";
 import Pagination from "components/Pagination";
-import {ListItem, ListSearch, ListSummary} from "entity/comment";
+import {ListItem, ListSearch, ListSummary, PathData} from "entity/comment";
 import {RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
@@ -28,24 +28,33 @@ class Component extends React.PureComponent<Props> {
     }
   }
   public render() {
-    const {dispatch, routerData, listSearch, listItems, listSummary} = this.props;
-    const {type, typeId} = routerData.pathData[ModuleNames.comments]!;
-
+    const {
+      dispatch,
+      routerData: {
+        location: {search, pathname},
+        pathData,
+        searchData,
+      },
+      listSearch,
+      listItems,
+      listSummary,
+    } = this.props;
+    const {type, typeId} = pathData[ModuleNames.comments]!;
     if (listItems) {
-      const itemBaseUrl = toUrl(routerData, ModuleNames.comments, "Details", {type, typeId, itemId: "---"}, routerData.search);
+      const itemBaseUrl = toUrl(toPath(ModuleNames.comments, "Details", {type, typeId, itemId: "---"}), search);
       return (
         <div className={`${ModuleNames.comments}-List`}>
           <div className="list-header">
             <LinkButton
               dispatch={dispatch}
-              href={replaceQuery(routerData, {[ModuleNames.comments]: {search: {...listSearch, page: 1, isNewest: false}}}, true)}
+              href={toUrl(pathname, {...searchData, [ModuleNames.comments]: {search: {...listSearch, page: 1, isNewest: false}}})}
               className={listSearch.isNewest ? "" : "on"}
             >
               最热
             </LinkButton>
             <LinkButton
               dispatch={dispatch}
-              href={replaceQuery(routerData, {[ModuleNames.comments]: {search: {...listSearch, page: 1, isNewest: true}}}, true)}
+              href={toUrl(pathname, {...searchData, [ModuleNames.comments]: {search: {...listSearch, page: 1, isNewest: true}}})}
               className={listSearch.isNewest ? "on" : ""}
             >
               最新
@@ -70,7 +79,7 @@ class Component extends React.PureComponent<Props> {
             <div className="g-pagination">
               <Pagination
                 dispatch={dispatch}
-                baseUrl={replaceQuery(routerData, {[ModuleNames.comments]: {search: {...listSearch, page: NaN}}}, true)}
+                baseUrl={toUrl(pathname, {...searchData, [ModuleNames.comments]: {search: {...listSearch, page: NaN}}})}
                 page={listSummary.page}
                 totalPages={listSummary.totalPages}
               />
@@ -87,7 +96,7 @@ class Component extends React.PureComponent<Props> {
 const mapStateToProps = (state: RootState) => {
   const model = state.comments;
   return {
-    routerData: state.app.routerData,
+    routerData: state.router,
     listSearch: model.listSearch,
     listItems: model.listItems,
     listSummary: model.listSummary,

@@ -12,8 +12,8 @@ export interface DefaultResult<Data = any, Error extends ErrorType = ErrorType> 
 
 export interface ModuleRouterData<P, S, H> {
   path: P;
-  search: Partial<S>;
-  hash: Partial<H>;
+  search: S;
+  hash: H;
 }
 export type CarefulExtend<T, U> = T extends undefined ? undefined : T & U;
 
