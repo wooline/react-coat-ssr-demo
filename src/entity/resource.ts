@@ -51,13 +51,14 @@ export interface Resource<D extends ResourceDefined = ResourceDefined> {
   ListItem: D["ListItem"];
   ListSearch: D["ListSearch"];
   ListSummary: D["ListSummary"];
-  ListOptional: Partial<D["ListSearch"]>;
+  ListOptions: Partial<D["ListSearch"]>;
   ItemDetail: D["ItemDetail"];
   ItemEditor: D["ItemEditor"];
   ItemCreateData: D["ItemCreateData"];
   ItemUpdateData: D["ItemUpdateData"];
   ItemCreateResult: D["ItemCreateResult"];
-  SearchData: D["SearchData"] & {search?: D["ListSearch"]};
+  SearchData: D["SearchData"] & {search: D["ListSearch"]};
+  SearchDataOptions: Partial<D["SearchData"] & {search: Partial<D["ListSearch"]>}>;
   PathData: D["PathData"];
   State: D["State"] & {
     listSearch: D["ListSearch"];
@@ -66,6 +67,7 @@ export interface Resource<D extends ResourceDefined = ResourceDefined> {
     itemDetail?: D["ItemDetail"];
     itemEditor?: D["ItemEditor"];
     selectedIds?: string[];
+    searchData: D["SearchData"] & {search: D["ListSearch"]};
   };
   API: {
     hitItem?(id: string): Promise<void>;

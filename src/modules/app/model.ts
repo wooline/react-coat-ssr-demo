@@ -12,6 +12,7 @@ import * as settingsService from "./api/settings";
 // 定义本模块的State类型
 
 export interface State extends BaseModuleState {
+  searchData: {};
   projectConfig: ProjectConfig | null;
   curUser: CurUser | null;
   startupStep: StartupStep;
@@ -26,6 +27,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   constructor(presetData: {routerData: RouterData}) {
     // 定义本模块State的初始值
     const initState: State = {
+      searchData: {},
       projectConfig: null,
       curUser: null,
       startupStep: StartupStep.init,
@@ -114,7 +116,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
     if (isCur(views, ModuleNames.app, "LoginForm") && curUser.hasLogin) {
       throw new RedirectError("301", "/");
     }
-    const subModules: ModuleNames[] = [ModuleNames.photos, ModuleNames.videos];
+    const subModules: ModuleNames[] = [ModuleNames.photos];
     for (const subModule of subModules) {
       if (isCur(views, subModule)) {
         await loadModel(ModuleGetter[subModule as any]).then(subModel => subModel(this.store));

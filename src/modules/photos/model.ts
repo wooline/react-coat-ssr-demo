@@ -3,14 +3,16 @@ import {PhotoResource, State} from "entity/photo";
 import {ModuleNames} from "modules/names";
 import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
-import {defSearch} from "./facade";
+import {defSearchData} from "./facade";
+
 export {State} from "entity/photo";
 
 class ModuleHandlers extends ArticleHandlers<State, PhotoResource> {
   constructor() {
     super(
       {
-        listSearch: defSearch.search,
+        listSearch: defSearchData.search,
+        searchData: defSearchData,
       },
       {
         api,

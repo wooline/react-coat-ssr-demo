@@ -9,4 +9,4 @@ export default exportModule<ModuleActions>(ModuleNames.app);
 
 export type ModuleRouter = ModuleRouterData<{}, {}, {}>;
 
-export const defSearch = {};
+export const defSearchData = {};

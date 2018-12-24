@@ -1,5 +1,6 @@
 import {routerActions} from "connected-react-router";
-import {ModuleGetter, RouterData} from "modules";
+import * as assignDeep from "deep-extend";
+import {defSearch, ModuleGetter, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import {Module, RouterParser} from "react-coat";
 import {matchPath} from "react-router";
@@ -10,7 +11,6 @@ type MG = typeof ModuleGetter;
 const moduleToUrl: {[K in keyof MG]+?: string | {[V in keyof ReturnModule<MG[K]>["views"]]+?: string}} = {
   [ModuleNames.app]: {Main: "/", LoginForm: "/login"},
   [ModuleNames.photos]: {Main: "/photos", List: "/photos/list", Details: "/photos/item/:itemId"},
-  [ModuleNames.videos]: {Main: "/videos"},
   [ModuleNames.comments]: {Main: "/:type/item/:typeId/comments", List: "/:type/item/:typeId/comments/list", Details: "/:type/item/:typeId/comments/item/:itemId"},
 };
 
@@ -86,7 +86,7 @@ export function toUrl<R extends RouterData["searchData"], H extends RouterData["
   if (searchData) {
     let str = searchData as string;
     if (typeof searchData !== "string") {
-      str = serialize(searchData);
+      str = serialize(excludeDefData(searchData, defSearch));
     }
     if (str) {
       url += "?" + str.replace("?", "");
@@ -105,7 +105,15 @@ export function toUrl<R extends RouterData["searchData"], H extends RouterData["
 }
 
 export function isCur<N extends keyof MG, M extends ReturnModule<MG[N]>, V extends keyof M["views"]>(views: RouterData["views"], moduleName: N, viewName?: V): boolean {
-  return views[[moduleName, viewName || "Main"].join(".")];
+  return views[moduleName] && views[moduleName][(viewName as string) || "Main"];
+}
+
+export function linkTo(e: React.MouseEvent<HTMLAnchorElement>, dispatch: Dispatch) {
+  e.preventDefault();
+  const href = e.currentTarget.getAttribute("href") as string;
+  if (href !== "#") {
+    dispatch(routerActions.push(href));
+  }
 }
 
 const ISO_DATE_FORMAT = /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(\.\d+)?(Z|[+-][01]\d:[0-5]\d)$/;
@@ -151,17 +159,18 @@ function parsePathname(
       [key: string]: any;
     };
   };
-  views: {
-    [viewName: string]: boolean;
-  };
+  views: {[moduleName: string]: {[viewName: string]: boolean}};
 } {
-  const views: {[viewName: string]: boolean} = {};
+  const views: {[moduleName: string]: {[viewName: string]: boolean}} = {};
   const pathData: {[moduleName: string]: {[key: string]: any}} = {};
   Object.keys(modulePaths).forEach(url => {
     const match = matchPath(pathname, url);
     if (match) {
       const result = modulePaths[url];
-      views[result.join(".")] = true;
+      if (!views[result[0]]) {
+        views[result[0]] = {};
+      }
+      views[result[0]][result[1]] = true;
       if (match.params) {
         pathData[result[0]] = match.params;
       }
@@ -186,12 +195,7 @@ function parseRoute(pre: {}, cur: string) {
 }
 
 export const routerParser: RouterParser<RouterData> = (nextRouter, prevRouter) => {
-  let nRouter: RouterData;
-  if (prevRouter) {
-    nRouter = {...prevRouter};
-  } else {
-    nRouter = {...nextRouter, views: {}, pathData: {}, searchData: {}, hashData: {}};
-  }
+  const nRouter: RouterData = {...(nextRouter as RouterData)};
 
   if (prevRouter && nextRouter.location.pathname !== prevRouter.location.pathname) {
     const {views, pathData} = parsePathname(nextRouter.location.pathname);
@@ -199,12 +203,44 @@ export const routerParser: RouterParser<RouterData> = (nextRouter, prevRouter) =
     nRouter.pathData = pathData;
   }
   if (prevRouter && nextRouter.location.search !== prevRouter.location.search) {
-    nRouter.searchData = nextRouter.location.search.split(/[&?]/).reduce(parseRoute, {});
+    const searchData = nextRouter.location.search.split(/[&?]/).reduce(parseRoute, {});
+    nRouter.searchData = searchData;
+    nRouter.fullSearchData = mergeDefData(nRouter.views, searchData);
   }
   if (prevRouter && nextRouter.location.hash !== prevRouter.location.hash) {
-    nRouter.searchData = nextRouter.location.hash.split(/[&#]/).reduce(parseRoute, {});
+    nRouter.hashData = nextRouter.location.hash.split(/[&#]/).reduce(parseRoute, {});
   }
   return nRouter;
+};
+function mergeDefData(views: {[moduleName: string]: {[viewName: string]: boolean}}, searchData: {[moduleName: string]: {[key: string]: any}}) {
+  const newSearchData = {...searchData};
+  Object.keys(views).forEach(mName => {
+    if (!newSearchData[mName]) {
+      newSearchData[mName] = {};
+    }
+  });
+  Object.keys(newSearchData).forEach(mName => {
+    if (defSearch[mName]) {
+      newSearchData[mName] = assignDeep({}, defSearch[mName], newSearchData[mName]);
+    }
+  });
+  return newSearchData;
+}
+const excludeDefData = (data: any, def: any) => {
+  const result: any = {};
+  for (const key in data) {
+    if (data.hasOwnProperty(key)) {
+      if (typeof data[key] === "object" && def[key] && !Array.isArray(def[key])) {
+        result[key] = excludeDefData(data[key], def[key]);
+      } else if (data[key] !== def[key]) {
+        result[key] = data[key];
+      }
+    }
+  }
+  if (Object.keys(result).length === 0) {
+    return undefined;
+  }
+  return result;
 };
 export function advanceRouter(url: string): RouterData | string {
   let [pathname, search, hash] = url.split(/[?#]/);
@@ -232,12 +268,5 @@ export function advanceRouter(url: string): RouterData | string {
   }
   const searchData = search.split(/[&?]/).reduce(parseRoute, {});
   const hashData = hash.split(/[&#]/).reduce(parseRoute, {});
-  return {location: {pathname, search, hash, state: null}, action: "POP", views, pathData, searchData, hashData};
-}
-export function linkTo(e: React.MouseEvent<HTMLAnchorElement>, dispatch: Dispatch) {
-  e.preventDefault();
-  const href = e.currentTarget.getAttribute("href") as string;
-  if (href !== "#") {
-    dispatch(routerActions.push(href));
-  }
+  return {location: {pathname, search, hash, state: null}, action: "POP", views, pathData, searchData, hashData, fullSearchData: mergeDefData(views, searchData)};
 }

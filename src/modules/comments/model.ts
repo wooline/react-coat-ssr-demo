@@ -3,14 +3,15 @@ import {CommentResource, State} from "entity/comment";
 import {ModuleNames} from "modules/names";
 import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
-import {defSearch} from "./facade";
 export {State} from "entity/comment";
+import {defSearchData} from "./facade";
 
 class ModuleHandlers extends ResourceHandlers<State, CommentResource> {
   constructor() {
     super(
       {
-        listSearch: defSearch.search,
+        listSearch: defSearchData.search,
+        searchData: defSearchData,
       },
       {
         api,

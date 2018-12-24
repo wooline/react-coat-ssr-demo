@@ -13,7 +13,7 @@ interface Detail extends Item {
   repliesList: Array<Item & {id: string}>;
 }
 export type CommentDefined = ResourceDefined & {
-  PathData: {type: ModuleNames.photos | ModuleNames.videos; typeId: string};
+  PathData: {type: ModuleNames.photos; typeId: string};
   ListItem: Item;
   ItemDetail: Detail;
   ListSearch: {
@@ -27,9 +27,10 @@ export type CommentResource = Resource<CommentDefined>;
 export type ListItem = CommentResource["ListItem"];
 export type ListSearch = CommentResource["ListSearch"];
 export type ListSummary = CommentResource["ListSummary"];
-export type ListOptional = CommentResource["ListOptional"];
+export type ListOptions = CommentResource["ListOptions"];
 export type ItemDetail = CommentResource["ItemDetail"];
 export type PathData = CommentResource["PathData"];
 export type SearchData = CommentResource["SearchData"];
+export type SearchDataOptions = CommentResource["SearchDataOptions"];
 export type API = CommentResource["API"];
 export type State = CommentResource["State"];

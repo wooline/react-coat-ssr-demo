@@ -10,6 +10,6 @@ export default function render(path: string): Promise<any> {
   if (typeof routerData === "string") {
     throw new RedirectError("301", routerData);
   } else {
-    return renderApp(ModuleGetter, ModuleNames.app, [path], {initData: {[ModuleNames.app]: {routerData}}});
+    return renderApp(ModuleGetter, ModuleNames.app, [path], {initData: {router: routerData}});
   }
 }

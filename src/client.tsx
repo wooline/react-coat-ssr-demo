@@ -1,4 +1,4 @@
-import {advanceRouter} from "common/routers";
+import {advanceRouter, routerParser} from "common/routers";
 import {ModuleGetter} from "modules";
 import {ModuleNames} from "modules/names";
 import {buildApp} from "react-coat";
@@ -8,5 +8,5 @@ const routerData = advanceRouter(window.location.href);
 if (typeof routerData === "string") {
   window.location.href = routerData;
 } else {
-  buildApp(ModuleGetter, ModuleNames.app, {initData: {[ModuleNames.app]: {routerData}}});
+  buildApp(ModuleGetter, ModuleNames.app, {routerParser, initData: {router: routerData}});
 }

@@ -17,9 +17,9 @@ export interface ModuleRouterData<P, S, H> {
 }
 export type CarefulExtend<T, U> = T extends undefined ? undefined : T & U;
 
-export type PickOptional<T> = Pick<T, {[K in keyof T]-?: {} extends {[P in K]: T[K]} ? K : never}[keyof T]>;
+export type PickOptions<T> = Pick<T, {[K in keyof T]-?: {} extends {[P in K]: T[K]} ? K : never}[keyof T]>;
 
-export type PickOptional2<T> = Pick<T, {[K in keyof T]-?: T[K] extends Exclude<T[K], undefined> ? never : K}[keyof T]>;
+export type PickOptions2<T> = Pick<T, {[K in keyof T]-?: T[K] extends Exclude<T[K], undefined> ? never : K}[keyof T]>;
 
 export declare interface ValidationRule {
   /** validation error message */

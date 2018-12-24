@@ -1,8 +1,8 @@
 import {Icon as MIcon} from "antd-mobile";
 import {toPath, toUrl} from "common/routers";
 import LinkButton from "components/LinkButton";
-import {ItemDetail, PathData} from "entity/comment";
-import {RootState} from "modules";
+import {ItemDetail, ListSearch, PathData} from "entity/comment";
+import {RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import React from "react";
 import {findDOMNode} from "react-dom";
@@ -10,25 +10,32 @@ import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  search: string;
+  searchData: RouterData["searchData"];
   pathData: PathData;
+  listSearch: ListSearch;
   itemDetail: ItemDetail | undefined;
 }
 
 class Component extends React.PureComponent<Props> {
   public render() {
     const {
-      itemDetail,
+      searchData,
       dispatch,
-      search,
       pathData: {type, typeId},
+      listSearch,
+      itemDetail,
     } = this.props;
     if (itemDetail) {
       return (
         <div className={`${ModuleNames.comments}-Details g-modal g-enter-in`}>
           <div className="list-header">
-            <LinkButton dispatch={dispatch} href={toUrl(toPath(ModuleNames.comments, "List", {type, typeId}), search)} className="close-button">
+            <LinkButton
+              dispatch={dispatch}
+              href={toUrl(toPath(ModuleNames.comments, "List", {type, typeId}), {...searchData, [ModuleNames.comments]: {search: {...listSearch, articleId: typeId}}})}
+              className="close-button"
+            >
               <MIcon size="md" type="left" />
+              <span>返回</span>
             </LinkButton>
           </div>
           <div className="list-items">
@@ -82,8 +89,9 @@ class Component extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    search: state.router.location.search,
+    searchData: state.router.searchData,
     pathData: state.router.pathData[ModuleNames.comments],
+    listSearch: state.comments.listSearch,
     itemDetail: state.comments.itemDetail,
   };
 };

@@ -10,38 +10,44 @@ import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  routerData: RouterData;
+  pathname: string;
+  pathData: PathData;
+  searchData: RouterData["searchData"];
   listSearch: ListSearch;
   listItems: ListItem[] | undefined;
   listSummary: ListSummary;
 }
-let scrollTop = 0;
+let scrollTop = NaN;
 class Component extends React.PureComponent<Props> {
-  public componentWillUnmount() {
-    const dom = findDOMNode(this) as HTMLElement;
-    scrollTop = dom ? (dom.parentNode as HTMLDivElement).scrollTop : 0;
-  }
-  public componentDidMount() {
+  private scroll = () => {
     const dom = findDOMNode(this) as HTMLElement;
     if (dom) {
       (dom.parentNode as HTMLDivElement).scrollTop = scrollTop;
+      scrollTop = 0;
     }
+  };
+  private onItemClick = () => {
+    const dom = findDOMNode(this) as HTMLElement;
+    scrollTop = (dom.parentNode as HTMLDivElement).scrollTop;
+  };
+  public componentDidUpdate() {
+    this.scroll();
+  }
+  public componentDidMount() {
+    this.scroll();
   }
   public render() {
     const {
       dispatch,
-      routerData: {
-        location: {search, pathname},
-        pathData,
-        searchData,
-      },
+      pathData: {type, typeId},
+      searchData,
+      pathname,
       listSearch,
       listItems,
       listSummary,
     } = this.props;
-    const {type, typeId} = pathData[ModuleNames.comments]!;
     if (listItems) {
-      const itemBaseUrl = toUrl(toPath(ModuleNames.comments, "Details", {type, typeId, itemId: "---"}), search);
+      const itemBaseUrl = toUrl(toPath(ModuleNames.comments, "Details", {type, typeId, itemId: "---"}), {...searchData, [ModuleNames.comments]: {}});
       return (
         <div className={`${ModuleNames.comments}-List`}>
           <div className="list-header">
@@ -62,7 +68,7 @@ class Component extends React.PureComponent<Props> {
           </div>
           <div className="list-items">
             {listItems.map(item => (
-              <LinkButton dispatch={dispatch} href={itemBaseUrl.replace(/---/g, item.id)} className="g-border-top" key={item.id}>
+              <LinkButton onClick={this.onItemClick} dispatch={dispatch} href={itemBaseUrl.replace(/---/g, item.id)} className="g-border-top" key={item.id}>
                 <div className="avatar" style={{backgroundImage: `url(${item.avatarUrl})`}} />
                 <div className="user">
                   {item.username}
@@ -95,8 +101,15 @@ class Component extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: RootState) => {
   const model = state.comments;
+  const {
+    pathData,
+    searchData,
+    location: {pathname},
+  } = state.router;
   return {
-    routerData: state.router,
+    pathname,
+    searchData,
+    pathData: pathData[ModuleNames.comments],
     listSearch: model.listSearch,
     listItems: model.listItems,
     listSummary: model.listSummary,

@@ -62,8 +62,9 @@
   },
   "dependencies": {
     "antd-mobile": "~2.2.6",
+    "deep-extend": "~0.6.0",
     "rc-form": "~2.2.7",
-    "react-coat": "4.0.0-beta.5",
+    "react-coat": "^4.0.0-beta.7",
     "react-coat-pkg": "4.0.0-beta.2",
     "ts-import-plugin": "~1.5.5"
   },
@@ -74,7 +75,7 @@
   ],
   "devServer": {
     "url": "http://192.168.1.96:7445",
-    "ssr": false,
+    "ssr": true,
     "mock": true,
     "proxy": {
       "/ajax/**": {

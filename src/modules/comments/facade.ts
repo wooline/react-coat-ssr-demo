@@ -1,4 +1,4 @@
-import {PathData, SearchData} from "entity/comment";
+import {PathData, SearchData, SearchDataOptions} from "entity/comment";
 import {ModuleRouterData} from "entity/common";
 import {ModuleNames} from "modules/names";
 import {exportModule} from "react-coat";
@@ -8,10 +8,6 @@ export type ModuleState = State;
 
 export default exportModule<ModuleActions>(ModuleNames.comments);
 
-export type ModuleSearchData = SearchData;
-export type ModulePathData = PathData;
+export type ModuleRouter = ModuleRouterData<PathData, SearchDataOptions, {}>;
 
-export const defSearch: SearchData = {
-  search: {articleId: "", isNewest: false, page: 1, pageSize: 10},
-};
-export type ModuleRouter = ModuleRouterData<PathData, SearchData, {}>;
+export const defSearchData: SearchData = {search: {articleId: "", isNewest: false, page: 1, pageSize: 10}};

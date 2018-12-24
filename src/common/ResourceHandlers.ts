@@ -28,7 +28,7 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
     return {...this.state, selectedIds};
   } */
   @effect()
-  public async searchList(options: R["ListOptional"] = {}) {
+  public async searchList(options: R["ListOptions"] = {}) {
     const listSearch: R["ListSearch"] = {...this.state.listSearch, ...options};
     const {listItems, listSummary} = await this.config.api.searchList(listSearch);
     this.updateState({listSearch, listItems, listSummary} as Partial<S>);
@@ -76,18 +76,23 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
   protected async [LOCATION_CHANGE](router: RouterState) {
     await this.parseRouter();
   }
+
   protected async parseRouter() {
-    const {views, pathData, searchData} = this.rootState.router;
+    if (this.rootState.router.views[this.namespace]) {
+      const searchData = this.rootState.router.fullSearchData[this.namespace];
+      this.updateState({searchData} as Partial<S>);
+    }
+    const {views, pathData} = this.rootState.router;
     const modulePathData = pathData[this.namespace as ModuleNames.photos];
-    const moduleSearchData = searchData[this.namespace as ModuleNames.photos];
+
     if (isCur(views, this.namespace, "Details" as any)) {
       const itemId = modulePathData!.itemId;
       if (!this.state.itemDetail || this.state.itemDetail!.id !== itemId) {
         await this.getItemDetail(itemId!);
       }
     } else if (isCur(views, this.namespace, "List" as any)) {
-      if (!this.state.listItems || !equal(moduleSearchData!.search, this.state.listSearch)) {
-        await this.searchList(moduleSearchData!.search);
+      if (!this.state.listItems || !equal(this.state.searchData.search, this.state.listSearch)) {
+        await this.searchList(this.state.searchData.search);
       }
     }
   }

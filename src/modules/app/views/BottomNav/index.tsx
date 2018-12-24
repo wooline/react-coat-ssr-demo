@@ -2,14 +2,14 @@ import {TabBar} from "antd-mobile";
 import {isCur, toPath} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import {routerActions} from "connected-react-router";
-import {RootState} from "modules";
+import {RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import React from "react";
 import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  views: {[viewName: string]: boolean};
+  views: RouterData["views"];
 }
 const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault();
 
@@ -21,16 +21,7 @@ class Component extends React.PureComponent<Props> {
         <Icon type={IconClass.PICTURE} />
       </a>
     );
-    const VideosLink = (
-      <a href={toPath(ModuleNames.videos, "Main")} onClick={onClick}>
-        <Icon type={IconClass.LIVE} />
-      </a>
-    );
-    const MessageLink = (
-      <a href={toPath(ModuleNames.videos)} onClick={onClick}>
-        <Icon type={IconClass.MESSAGE} />
-      </a>
-    );
+
     return (
       <div className="app-BottomNav g-doc-width">
         <TabBar noRenderContent={true} barTintColor="#108ee9" tintColor="#ff0" unselectedTintColor="#fff">
@@ -47,21 +38,21 @@ class Component extends React.PureComponent<Props> {
           <TabBar.Item
             title="视频"
             key="videos"
-            icon={VideosLink}
-            selectedIcon={VideosLink}
-            selected={isCur(views, ModuleNames.videos)}
+            icon={PhotosLink}
+            selectedIcon={PhotosLink}
+            selected={isCur(views, ModuleNames.photos)}
             onPress={() => {
-              dispatch(routerActions.push(toPath(ModuleNames.videos)));
+              dispatch(routerActions.push(toPath(ModuleNames.photos, "List")));
             }}
           />
           <TabBar.Item
-            icon={MessageLink}
-            selectedIcon={MessageLink}
+            icon={PhotosLink}
+            selectedIcon={PhotosLink}
             title="消息"
             key="messages"
-            selected={isCur(views, ModuleNames.videos)}
+            selected={isCur(views, ModuleNames.photos)}
             onPress={() => {
-              dispatch(routerActions.push(toPath(ModuleNames.videos)));
+              dispatch(routerActions.push(toPath(ModuleNames.photos, "List")));
             }}
           />
         </TabBar>

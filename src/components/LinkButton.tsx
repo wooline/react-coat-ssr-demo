@@ -10,9 +10,18 @@ reference(Button);
 interface Props extends AnchorHTMLAttributes<HTMLAnchorElement>, DispatchProp {}
 
 const Component = (props: Props) => {
-  const {dispatch, ...others} = props;
+  const {dispatch, onClick, ...others} = props;
   return (
-    <a {...others} onClick={e => linkTo(e, dispatch)} role="button">
+    <a
+      {...others}
+      onClick={e => {
+        if (onClick) {
+          onClick(e);
+        }
+        linkTo(e, dispatch);
+      }}
+      role="button"
+    >
       {props.children}
     </a>
   );

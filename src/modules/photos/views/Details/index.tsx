@@ -12,7 +12,8 @@ import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  routerData: RouterData;
+  pathname: string;
+  searchData: RouterData["searchData"];
   showComment: boolean;
   listSearch: ListSearch;
   itemDetail: ItemDetail | undefined;
@@ -38,9 +39,8 @@ class Component extends React.PureComponent<Props, State> {
   };
 
   public render() {
-    const {routerData, showComment, itemDetail, listSearch, dispatch} = this.props;
+    const {pathname, searchData, showComment, itemDetail, listSearch, dispatch} = this.props;
     const {moreDetail} = this.state;
-    const searchData = routerData.searchData[ModuleNames.photos]!;
     if (itemDetail) {
       return (
         <div className={`${ModuleNames.photos}-Details g-details g-doc-width g-modal g-enter-in`}>
@@ -65,13 +65,10 @@ class Component extends React.PureComponent<Props, State> {
 
           <LinkButton
             dispatch={dispatch}
-            href={replaceQuery(
-              routerData,
-              {
-                [ModuleNames.photos]: {...searchData, showComment: true},
-              },
-              true
-            )}
+            href={toUrl(pathname, {
+              ...searchData,
+              [ModuleNames.photos]: {showComment: true},
+            })}
             className="comment-bar"
           >
             <span>
@@ -88,10 +85,11 @@ class Component extends React.PureComponent<Props, State> {
           <div className={"comments-panel" + (showComment ? " on" : "")}>
             <LinkButton
               dispatch={dispatch}
-              href={replaceQuery(
-                routerData,
+              href={toUrl(
+                pathname,
                 {
-                  [ModuleNames.photos]: {...searchData, showComment: false},
+                  ...searchData,
+                  [ModuleNames.photos]: {showComment: false},
                 },
                 true
               )}
@@ -125,10 +123,10 @@ class Component extends React.PureComponent<Props, State> {
 
 const mapStateToProps = (state: RootState) => {
   const model = state.photos;
-  const searchData = state.app.routerData.searchData[ModuleNames.photos] || {showComment: false};
   return {
-    routerData: state.app.routerData,
-    showComment: searchData.showComment,
+    pathname: state.router.location.pathname,
+    searchData: state.router.searchData,
+    showComment: model.searchData.showComment,
     listSearch: model.listSearch,
     itemDetail: model.itemDetail,
   };

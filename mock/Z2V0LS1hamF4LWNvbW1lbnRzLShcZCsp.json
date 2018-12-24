@@ -1,5 +1,5 @@
 {
-  "url": "get--ajax-comments-(\\d)",
+  "url": "get--ajax-comments-(\\d+)",
   "statusCode": 200,
   "statusMessage": "OK",
   "headers": {
