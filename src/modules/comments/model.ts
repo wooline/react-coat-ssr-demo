@@ -4,14 +4,15 @@ import {ModuleNames} from "modules/names";
 import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
 export {State} from "entity/comment";
-import {defSearchData} from "./facade";
+import {defRouteData} from "./facade";
 
 class ModuleHandlers extends ResourceHandlers<State, CommentResource> {
   constructor() {
     super(
       {
-        listSearch: defSearchData.search,
-        searchData: defSearchData,
+        pathData: {type: ModuleNames.photos, typeId: ""},
+        searchData: defRouteData.searchData,
+        hashData: defRouteData.hashData,
       },
       {
         api,

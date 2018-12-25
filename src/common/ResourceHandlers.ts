@@ -8,7 +8,7 @@ import {BaseModuleHandlers, effect, LOCATION_CHANGE, RouterState} from "react-co
 //  mergeSearch, replaceQuery
 
 export default class Handlers<S extends R["State"] = R["State"], R extends Resource = Resource> extends BaseModuleHandlers<S, RootState, ModuleNames> {
-  constructor(initState: S, protected config: {api: R["API"]}) {
+  constructor(initState: S, protected config: {api: R["API"]; syncSearchKey?: Array<Extract<keyof R["SearchData"], string>>}) {
     super(initState);
   }
   /* @reducer
@@ -29,9 +29,10 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
   } */
   @effect()
   public async searchList(options: R["ListOptions"] = {}) {
-    const listSearch: R["ListSearch"] = {...this.state.listSearch, ...options};
+    const searchData = this.state.searchData;
+    const listSearch: R["ListSearch"] = {...searchData.search, ...options};
     const {listItems, listSummary} = await this.config.api.searchList(listSearch);
-    this.updateState({listSearch, listItems, listSummary} as Partial<S>);
+    this.updateState({searchData: {...searchData, search: listSearch}, listItems, listSummary} as Partial<S>);
   }
   @effect()
   public async getItemDetail(id: string) {
@@ -40,7 +41,7 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
       arr.push(this.config.api.hitItem!(id));
     }
     const [itemDetail] = await Promise.all(arr);
-    this.updateState({itemDetail} as Partial<S>);
+    this.updateState({itemDetail, pathData: {itemId: id}} as Partial<S>);
   }
   @effect()
   protected async createItem(data: R["ItemCreateData"]) {
@@ -78,21 +79,26 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
   }
 
   protected async parseRouter() {
-    if (this.rootState.router.views[this.namespace]) {
-      const searchData = this.rootState.router.fullSearchData[this.namespace];
-      this.updateState({searchData} as Partial<S>);
-    }
-    const {views, pathData} = this.rootState.router;
-    const modulePathData = pathData[this.namespace as ModuleNames.photos];
-
-    if (isCur(views, this.namespace, "Details" as any)) {
-      const itemId = modulePathData!.itemId;
-      if (!this.state.itemDetail || this.state.itemDetail!.id !== itemId) {
-        await this.getItemDetail(itemId!);
+    const {views, pathData, wholeSearchData} = this.rootState.router;
+    if (isCur(views, this.namespace)) {
+      const moduleSearchData = wholeSearchData[this.namespace as ModuleNames.photos]!;
+      const modulePathData = pathData[this.namespace as ModuleNames.photos]!;
+      const syncSearchKey: string[] | undefined = this.config.syncSearchKey;
+      if (syncSearchKey && syncSearchKey.length > 0) {
+        const syncSearchData = syncSearchKey.reduce((prev, cur) => {
+          prev[cur] = moduleSearchData[cur];
+          return prev;
+        }, {});
+        this.updateState({searchData: {...this.state.searchData, ...syncSearchData}} as Partial<S>);
       }
-    } else if (isCur(views, this.namespace, "List" as any)) {
-      if (!this.state.listItems || !equal(this.state.searchData.search, this.state.listSearch)) {
-        await this.searchList(this.state.searchData.search);
+      if (isCur(views, this.namespace, "Details" as any)) {
+        if (this.state.pathData.itemId !== modulePathData.itemId) {
+          await this.getItemDetail(modulePathData.itemId!);
+        }
+      } else if (isCur(views, this.namespace, "List" as any)) {
+        if (!this.state.listItems || !equal(this.state.searchData.search, moduleSearchData.search)) {
+          await this.searchList(moduleSearchData.search);
+        }
       }
     }
   }

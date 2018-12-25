@@ -1,3 +1,4 @@
+import {BaseModuleState} from "react-coat";
 export interface ErrorType<Code = any, Detail = null> {
   code: Code;
   message: string;
@@ -10,11 +11,23 @@ export interface DefaultResult<Data = any, Error extends ErrorType = ErrorType> 
   error: Error | null;
 }
 
-export interface ModuleRouterData<P, S, H> {
-  path: P;
-  search: S;
-  hash: H;
+export interface CommonModuleState extends BaseModuleState {
+  pathData: {};
+  searchData: {};
+  hashData: {};
 }
+export type DeepPartial<T> = {[P in keyof T]?: DeepPartial<T[P]>};
+
+/* type AA = {
+  bb: {
+    cc: {
+      dd: string;
+    };
+  };
+};
+
+type BB = DeepPartial<AA>; */
+
 export type CarefulExtend<T, U> = T extends undefined ? undefined : T & U;
 
 export type PickOptions<T> = Pick<T, {[K in keyof T]-?: {} extends {[P in K]: T[K]} ? K : never}[keyof T]>;

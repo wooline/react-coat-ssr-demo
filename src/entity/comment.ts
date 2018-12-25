@@ -31,6 +31,6 @@ export type ListOptions = CommentResource["ListOptions"];
 export type ItemDetail = CommentResource["ItemDetail"];
 export type PathData = CommentResource["PathData"];
 export type SearchData = CommentResource["SearchData"];
-export type SearchDataOptions = CommentResource["SearchDataOptions"];
+export type HashData = CommentResource["HashData"];
 export type API = CommentResource["API"];
 export type State = CommentResource["State"];

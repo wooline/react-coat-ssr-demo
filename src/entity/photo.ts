@@ -25,6 +25,6 @@ export type ListOptions = PhotoResource["ListOptions"];
 export type ItemDetail = PhotoResource["ItemDetail"];
 export type PathData = PhotoResource["PathData"];
 export type SearchData = PhotoResource["SearchData"];
-export type SearchDataOptions = PhotoResource["SearchDataOptions"];
+export type HashData = PhotoResource["HashData"];
 export type API = PhotoResource["API"];
 export type State = PhotoResource["State"];

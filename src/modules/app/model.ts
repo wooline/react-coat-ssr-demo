@@ -1,18 +1,20 @@
 import {Toast} from "antd-mobile";
 import {CustomError, RedirectError} from "common/Errors";
 import {isCur} from "common/routers";
+import {CommonModuleState} from "entity/common";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, LoadingState, loadModel, reducer} from "react-coat";
+import {Actions, BaseModuleHandlers, effect, ERROR, exportModel, LoadingState, loadModel, LOCATION_CHANGE, reducer} from "react-coat";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
+import {defRouteData} from "./facade";
 
 // 定义本模块的State类型
 
-export interface State extends BaseModuleState {
-  searchData: {};
+export interface State extends CommonModuleState {
+  hashData: {showSearch: boolean};
   projectConfig: ProjectConfig | null;
   curUser: CurUser | null;
   startupStep: StartupStep;
@@ -27,7 +29,9 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   constructor(presetData: {routerData: RouterData}) {
     // 定义本模块State的初始值
     const initState: State = {
-      searchData: {},
+      pathData: {},
+      searchData: defRouteData.searchData,
+      hashData: defRouteData.hashData,
       projectConfig: null,
       curUser: null,
       startupStep: StartupStep.init,
@@ -58,33 +62,14 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
     return {...this.state, curUser};
   }
 
-  /* @reducer
-  protected [LOCATION_CHANGE](router: RouterState): State {
-    const {pathname, search, hash} = router.location;
-    const oLocation = this.rootState.router.location;
-    const oRouterData = this.state.routerData;
-    let {pathData, searchData, hashData, views} = oRouterData;
-    let routerChanged: boolean = false;
-    if (pathname !== oLocation.pathname) {
-      const data = pathParser(pathname);
-      pathData = data.data;
-      views = data.views;
-      routerChanged = true;
-    }
-    if (search !== oLocation.search) {
-      searchData = searchParser(search, views);
-      routerChanged = true;
-    }
-    if (hash !== oLocation.hash) {
-      hashData = hashParser(hash, views);
-      routerChanged = true;
-    }
-    if (routerChanged) {
-      return {...this.state, routerData: {pathname, search, hash, pathData, searchData, hashData, views}};
-    } else {
-      return this.state;
-    }
-  } */
+  protected parseRouter() {
+    this.updateState({hashData: this.rootState.router.wholeHashData[ModuleNames.app]});
+  }
+
+  @effect()
+  protected async [LOCATION_CHANGE]() {
+    this.parseRouter();
+  }
 
   // 兼听全局错误的Action，并发送给后台
   // 兼听外部模块的Action，不需要手动触发，所以请使用protected或private
@@ -106,6 +91,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   // 兼听自已的INIT Action，做一些异步数据请求，不需要手动触发，所以请使用protected或private
   @effect()
   protected async [ModuleNames.app + "/INIT"]() {
+    this.parseRouter();
     const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);
     this.updateState({
       projectConfig,

@@ -1,12 +1,14 @@
 import {routerActions} from "connected-react-router";
 import * as assignDeep from "deep-extend";
-import {defSearch, ModuleGetter, RouterData} from "modules";
+import {defHash, defSearch, ModuleGetter, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import {Module, RouterParser} from "react-coat";
 import {matchPath} from "react-router";
 import {Dispatch} from "redux";
 
 type MG = typeof ModuleGetter;
+type MData = {[moduleName: string]: {[key: string]: any}};
+type Views = {[moduleName: string]: {[viewName: string]: boolean}};
 
 const moduleToUrl: {[K in keyof MG]+?: string | {[V in keyof ReturnModule<MG[K]>["views"]]+?: string}} = {
   [ModuleNames.app]: {Main: "/", LoginForm: "/login"},
@@ -95,7 +97,7 @@ export function toUrl<R extends RouterData["searchData"], H extends RouterData["
   if (hashData) {
     let str = hashData as string;
     if (typeof hashData !== "string") {
-      str = serialize(hashData);
+      str = serialize(excludeDefData(hashData, defHash));
     }
     if (str) {
       url += "#" + str.replace("#", "");
@@ -154,15 +156,11 @@ export function unserializeUrlQuery(query: string): any {
 function parsePathname(
   pathname: string
 ): {
-  pathData: {
-    [moduleName: string]: {
-      [key: string]: any;
-    };
-  };
-  views: {[moduleName: string]: {[viewName: string]: boolean}};
+  pathData: MData;
+  views: Views;
 } {
-  const views: {[moduleName: string]: {[viewName: string]: boolean}} = {};
-  const pathData: {[moduleName: string]: {[key: string]: any}} = {};
+  const views: Views = {};
+  const pathData: MData = {};
   Object.keys(modulePaths).forEach(url => {
     const match = matchPath(pathname, url);
     if (match) {
@@ -205,26 +203,28 @@ export const routerParser: RouterParser<RouterData> = (nextRouter, prevRouter) =
   if (prevRouter && nextRouter.location.search !== prevRouter.location.search) {
     const searchData = nextRouter.location.search.split(/[&?]/).reduce(parseRoute, {});
     nRouter.searchData = searchData;
-    nRouter.fullSearchData = mergeDefData(nRouter.views, searchData);
+    nRouter.wholeSearchData = mergeDefData(nRouter.views, searchData, defSearch);
   }
   if (prevRouter && nextRouter.location.hash !== prevRouter.location.hash) {
-    nRouter.hashData = nextRouter.location.hash.split(/[&#]/).reduce(parseRoute, {});
+    const hashData = nextRouter.location.hash.split(/[&#]/).reduce(parseRoute, {});
+    nRouter.hashData = hashData;
+    nRouter.wholeHashData = mergeDefData(nRouter.views, hashData, defHash);
   }
   return nRouter;
 };
-function mergeDefData(views: {[moduleName: string]: {[viewName: string]: boolean}}, searchData: {[moduleName: string]: {[key: string]: any}}) {
-  const newSearchData = {...searchData};
+function mergeDefData(views: Views, data: any, def: any) {
+  const newData = {...data};
   Object.keys(views).forEach(mName => {
-    if (!newSearchData[mName]) {
-      newSearchData[mName] = {};
+    if (!newData[mName]) {
+      newData[mName] = {};
     }
   });
-  Object.keys(newSearchData).forEach(mName => {
-    if (defSearch[mName]) {
-      newSearchData[mName] = assignDeep({}, defSearch[mName], newSearchData[mName]);
+  Object.keys(newData).forEach(mName => {
+    if (def[mName]) {
+      newData[mName] = assignDeep({}, def[mName], newData[mName]);
     }
   });
-  return newSearchData;
+  return newData;
 }
 const excludeDefData = (data: any, def: any) => {
   const result: any = {};
@@ -268,5 +268,14 @@ export function advanceRouter(url: string): RouterData | string {
   }
   const searchData = search.split(/[&?]/).reduce(parseRoute, {});
   const hashData = hash.split(/[&#]/).reduce(parseRoute, {});
-  return {location: {pathname, search, hash, state: null}, action: "POP", views, pathData, searchData, hashData, fullSearchData: mergeDefData(views, searchData)};
+  return {
+    location: {pathname, search, hash, state: null},
+    action: "POP",
+    views,
+    pathData,
+    searchData,
+    hashData,
+    wholeSearchData: mergeDefData(views, searchData, defSearch),
+    wholeHashData: mergeDefData(views, hashData, defHash),
+  };
 }

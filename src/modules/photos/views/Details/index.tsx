@@ -85,14 +85,10 @@ class Component extends React.PureComponent<Props, State> {
           <div className={"comments-panel" + (showComment ? " on" : "")}>
             <LinkButton
               dispatch={dispatch}
-              href={toUrl(
-                pathname,
-                {
-                  ...searchData,
-                  [ModuleNames.photos]: {showComment: false},
-                },
-                true
-              )}
+              href={toUrl(pathname, {
+                ...searchData,
+                [ModuleNames.photos]: {showComment: false},
+              })}
               className="mask"
             />
             <div className="dialog">
@@ -127,7 +123,7 @@ const mapStateToProps = (state: RootState) => {
     pathname: state.router.location.pathname,
     searchData: state.router.searchData,
     showComment: model.searchData.showComment,
-    listSearch: model.listSearch,
+    listSearch: model.searchData.search,
     itemDetail: model.itemDetail,
   };
 };

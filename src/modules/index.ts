@@ -1,6 +1,7 @@
-import {defSearchData as appDefSearch, ModuleRouter as AppModuleRouter, ModuleState as AppState} from "modules/app/facade";
-import {defSearchData as commentsDefSearch, ModuleRouter as CommentsModuleRouter, ModuleState as CommentsState} from "modules/comments/facade";
-import {defSearchData as photosDefSearch, ModuleRouter as PhotosModuleRouter, ModuleState as PhotosState} from "modules/photos/facade";
+import {DeepPartial} from "entity/common";
+import {defRouteData as appDefRoute, ModuleState as AppState} from "modules/app/facade";
+import {defRouteData as commentsDefRoute, ModuleState as CommentsState} from "modules/comments/facade";
+import {defRouteData as photosDefRoute, ModuleState as PhotosState} from "modules/photos/facade";
 import {RootState as BaseState, RouterState} from "react-coat";
 import {ModuleNames} from "./names";
 
@@ -21,31 +22,27 @@ interface States {
   [ModuleNames.photos]: PhotosState;
   [ModuleNames.comments]: CommentsState;
 }
-interface SearchData {
-  [ModuleNames.app]?: AppModuleRouter["search"];
-  [ModuleNames.photos]?: PhotosModuleRouter["search"];
-  [ModuleNames.comments]?: CommentsModuleRouter["search"];
-}
-interface PathData {
-  [ModuleNames.app]?: AppModuleRouter["path"];
-  [ModuleNames.photos]?: PhotosModuleRouter["path"];
-  [ModuleNames.comments]?: CommentsModuleRouter["path"];
-}
+
 export type RootState = BaseState<
   RouterState & {
     views: {[moduleName: string]: {[viewName: string]: boolean}};
-    pathData: PathData;
-    searchData: SearchData;
-    fullSearchData: SearchData;
-    hashData: {};
+    pathData: {[M in keyof States]?: States[M]["pathData"]};
+    searchData: {[M in keyof States]?: DeepPartial<States[M]["searchData"]>};
+    hashData: {[M in keyof States]?: DeepPartial<States[M]["hashData"]>};
+    wholeSearchData: {[M in keyof States]?: States[M]["searchData"]};
+    wholeHashData: {[M in keyof States]?: States[M]["hashData"]};
   }
 > &
   States;
 
 export type RouterData = RootState["router"];
 
-export const defSearch: SearchData = {
-  [ModuleNames.app]: appDefSearch,
-  [ModuleNames.photos]: photosDefSearch,
-  [ModuleNames.comments]: commentsDefSearch,
+export const defSearch = {
+  [ModuleNames.photos]: photosDefRoute.searchData,
+  [ModuleNames.comments]: commentsDefRoute.searchData,
+};
+export const defHash = {
+  [ModuleNames.app]: appDefRoute.hashData,
+  [ModuleNames.photos]: photosDefRoute.hashData,
+  [ModuleNames.comments]: commentsDefRoute.hashData,
 };

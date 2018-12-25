@@ -110,7 +110,7 @@ const mapStateToProps = (state: RootState) => {
     pathname,
     searchData,
     pathData: pathData[ModuleNames.comments],
-    listSearch: model.listSearch,
+    listSearch: model.searchData.search,
     listItems: model.listItems,
     listSummary: model.listSummary,
   };

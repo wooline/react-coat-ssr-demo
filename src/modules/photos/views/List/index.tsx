@@ -2,6 +2,8 @@ import {toPath, toUrl} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import LinkButton from "components/LinkButton";
 import Pagination from "components/Pagination";
+import Search from "components/Search";
+import {routerActions} from "connected-react-router";
 import {ListItem, ListSearch, ListSummary} from "entity/photo";
 import {RootState} from "modules";
 import {ModuleNames} from "modules/names";
@@ -10,7 +12,9 @@ import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
 interface Props extends DispatchProp {
+  showSearch: boolean;
   pathname: string;
+  search: string;
   listSearch: ListSearch;
   listItems: ListItem[] | undefined;
   listSummary: ListSummary;
@@ -26,6 +30,10 @@ class Component extends React.PureComponent<Props> {
   private onItemClick = () => {
     scrollTop = window.pageYOffset;
   };
+  private onSearch = (title: string) => {
+    const {dispatch, pathname} = this.props;
+    dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.photos]: {search: {title}}})));
+  };
   public componentDidMount() {
     this.scroll();
   }
@@ -34,7 +42,7 @@ class Component extends React.PureComponent<Props> {
   }
 
   public render() {
-    const {dispatch, pathname, listSearch, listItems, listSummary} = this.props;
+    const {dispatch, showSearch, pathname, search, listSearch, listItems, listSummary} = this.props;
 
     if (listItems) {
       const itemBaseUrl = toUrl(toPath(ModuleNames.comments, "List", {type: ModuleNames.photos, typeId: "---"}), {
@@ -42,6 +50,7 @@ class Component extends React.PureComponent<Props> {
       });
       return (
         <div className={`${ModuleNames.photos}-List g-pic-list`}>
+          <Search onSearch={this.onSearch} pathname={pathname} search={search} visible={showSearch || listSearch.title !== null} dispatch={dispatch} />
           <div className="list-items">
             {listItems.map(item => (
               <LinkButton onClick={this.onItemClick} dispatch={dispatch} href={itemBaseUrl.replace(/---/g, item.id)} key={item.id} className="g-pre-img">
@@ -67,12 +76,7 @@ class Component extends React.PureComponent<Props> {
           </div>
           {listSummary && (
             <div className="g-pagination">
-              <Pagination
-                dispatch={dispatch}
-                baseUrl={toUrl(pathname, {[ModuleNames.photos]: {showComment: false, search: {...listSearch, page: NaN}}})}
-                page={listSummary.page}
-                totalPages={listSummary.totalPages}
-              />
+              <Pagination dispatch={dispatch} baseUrl={toUrl(pathname, {[ModuleNames.photos]: {search: {...listSearch, page: NaN}}})} page={listSummary.page} totalPages={listSummary.totalPages} />
             </div>
           )}
         </div>
@@ -86,8 +90,10 @@ class Component extends React.PureComponent<Props> {
 const mapStateToProps = (state: RootState) => {
   const model = state.photos;
   return {
+    showSearch: state.app.hashData.showSearch,
     pathname: state.router.location.pathname,
-    listSearch: model.listSearch,
+    search: state.router.location.search,
+    listSearch: model.searchData.search,
     listItems: model.listItems,
     listSummary: model.listSummary,
   };
