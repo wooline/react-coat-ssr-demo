@@ -1,4 +1,5 @@
-import {CommonModuleState, DefaultResult} from "./common";
+import {BaseModuleState} from "react-coat";
+import {DefaultResult} from "./common";
 
 export type EditorType = "create" | "update";
 
@@ -7,19 +8,19 @@ export interface Defined {
   SearchData: {};
   PathData: {};
   HashData: {};
-  ListItem?: {};
-  ListSearch?: {};
-  ListSummary?: {};
-  ItemDetail?: {};
-  ItemEditor?: {};
-  ItemCreateData?: {};
-  ItemUpdateData?: {};
-  ItemCreateResult?: {};
-  ItemUpdateResult?: {};
+  ListItem: {};
+  ListSearch: {};
+  ListSummary: {};
+  ItemDetail: {};
+  ItemEditor: {};
+  ItemCreateData: {};
+  ItemUpdateData: {};
+  ItemCreateResult: {};
+  ItemUpdateResult: {};
 }
 
 export type ResourceDefined = Defined & {
-  State: CommonModuleState;
+  State: BaseModuleState;
   PathData: {itemId?: string};
   ListItem: {
     id: string;
@@ -61,13 +62,11 @@ export interface Resource<D extends ResourceDefined = ResourceDefined> {
   PathData: D["PathData"];
   State: D["State"] & {
     listItems?: Array<D["ListItem"]>;
+    listSearch: D["ListSearch"];
     listSummary?: D["ListSummary"];
     itemDetail?: D["ItemDetail"];
     itemEditor?: D["ItemEditor"];
     selectedIds?: string[];
-    pathData: D["PathData"];
-    searchData: D["SearchData"] & {search: D["ListSearch"]};
-    hashData: D["HashData"];
   };
   API: {
     hitItem?(id: string): Promise<void>;

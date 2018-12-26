@@ -43,7 +43,7 @@ const mapStateToProps = (state: RootState) => {
   return {
     pathname,
     search,
-    showSearch: state.app.hashData.showSearch,
+    showSearch: state.app.showSearch,
     logoUrl: state.app.projectConfig!.logoUrl,
     avatarUrl: state.app.curUser!.avatarUrl,
   };

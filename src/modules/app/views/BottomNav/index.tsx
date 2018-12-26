@@ -21,14 +21,18 @@ class Component extends React.PureComponent<Props> {
         <Icon type={IconClass.PICTURE} />
       </a>
     );
-
+    const VideosLink = (
+      <a href={toPath(ModuleNames.videos, "List")} onClick={onClick}>
+        <Icon type={IconClass.LIVE} />
+      </a>
+    );
     return (
       <div className="app-BottomNav g-doc-width">
         <TabBar noRenderContent={true} barTintColor="#108ee9" tintColor="#ff0" unselectedTintColor="#fff">
           <TabBar.Item
             icon={PhotosLink}
             selectedIcon={PhotosLink}
-            title="风景"
+            title="组团"
             key="photos"
             selected={isCur(views, ModuleNames.photos)}
             onPress={() => {
@@ -36,13 +40,13 @@ class Component extends React.PureComponent<Props> {
             }}
           />
           <TabBar.Item
-            title="视频"
+            title="分享"
             key="videos"
-            icon={PhotosLink}
-            selectedIcon={PhotosLink}
-            selected={isCur(views, ModuleNames.photos)}
+            icon={VideosLink}
+            selectedIcon={VideosLink}
+            selected={isCur(views, ModuleNames.videos)}
             onPress={() => {
-              dispatch(routerActions.push(toPath(ModuleNames.photos, "List")));
+              dispatch(routerActions.push(toPath(ModuleNames.videos, "List")));
             }}
           />
           <TabBar.Item

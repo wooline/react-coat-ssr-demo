@@ -6,9 +6,10 @@ import ResourceHandlers from "./ResourceHandlers";
 
 export default class Handlers<S extends R["State"], R extends ArticleResource> extends ResourceHandlers<S, R> {
   protected async onInit() {
-    await this.parseRouter();
-    if (isCur(this.rootState.router.views, this.namespace, "Details" as any)) {
+    const result = await super.onInit();
+    if (isCur(result.views, this.namespace, "Details" as any)) {
       await loadModel(ModuleGetter.comments).then(subModel => subModel(this.store));
     }
+    return result;
   }
 }

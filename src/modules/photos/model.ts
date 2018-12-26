@@ -11,15 +11,19 @@ class ModuleHandlers extends ArticleHandlers<State, PhotoResource> {
   constructor() {
     super(
       {
-        pathData: {},
-        searchData: defRouteData.searchData,
-        hashData: defRouteData.hashData,
+        listSearch: defRouteData.searchData.search,
+        showComment: false,
       },
       {
         api,
-        syncSearchKey: ["showComment"],
       }
     );
+  }
+  @effect()
+  protected async parseRouter() {
+    const result = await super.parseRouter();
+    this.dispatch(this.callThisAction(this.putRouteData, {showComment: result.moduleSearchData.showComment}));
+    return result;
   }
   @effect()
   protected async [ModuleNames.photos + "/INIT"]() {

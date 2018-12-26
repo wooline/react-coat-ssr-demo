@@ -1,0 +1,66 @@
+{
+  "url": "get--ajax-photos\\$page=2&pageSize=10&title=.+",
+  "statusCode": 200,
+  "statusMessage": "OK",
+  "headers": {
+    "x-delay": 1000,
+    "x-powered-by": "Express",
+    "content-type": "application/json; charset=utf-8",
+    "connection": "close"
+  },
+  "response": {
+    "listSummary": {
+      "page": 2,
+      "pageSize": 5,
+      "totalItems": 10,
+      "totalPages": 2
+    },
+    "listItems": [
+      {
+        "id": "7",
+        "title": "厚道北京火车/双高/双动5日跟团游",
+        "departure": "北京",
+        "type": "个人游",
+        "price": 256,
+        "hot": 658,
+        "coverUrl": "/client/imgs/7/1.jpg"
+      },
+      {
+        "id": "2",
+        "title": "芽庄4晚5日跟团游",
+        "departure": "常州",
+        "type": "跟团游",
+        "price": 1582,
+        "hot": 36,
+        "coverUrl": "/client/imgs/2/1.jpg"
+      },
+      {
+        "id": "6",
+        "title": "桂林+阳朔+游轮百里大漓江+龙脊梯田+象鼻山+银子岩+古东瀑布+阳朔西街火车5日跟团游",
+        "departure": "桂林",
+        "type": "跟团游",
+        "price": 3456,
+        "hot": 67,
+        "coverUrl": "/client/imgs/6/1.jpg"
+      },
+      {
+        "id": "1",
+        "title": "新加坡+吉隆坡+马六甲6或7日跟团游",
+        "departure": "无锡",
+        "type": "跟团游",
+        "price": 2499,
+        "hot": 265,
+        "coverUrl": "/client/imgs/1/1.jpg"
+      },
+      {
+        "id": "8",
+        "title": "自驾出行更便捷【冬日暖泉季】",
+        "departure": "苏州",
+        "type": "自驾游",
+        "price": 399,
+        "hot": 3562,
+        "coverUrl": "/client/imgs/8/1.jpg"
+      }
+    ]
+  }
+}

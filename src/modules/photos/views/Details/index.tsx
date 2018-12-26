@@ -122,8 +122,8 @@ const mapStateToProps = (state: RootState) => {
   return {
     pathname: state.router.location.pathname,
     searchData: state.router.searchData,
-    showComment: model.searchData.showComment,
-    listSearch: model.searchData.search,
+    showComment: model.showComment,
+    listSearch: model.listSearch,
     itemDetail: model.itemDetail,
   };
 };

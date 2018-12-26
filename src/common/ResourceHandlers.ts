@@ -4,11 +4,11 @@ import {equal} from "common/utils";
 import {Resource} from "entity/resource";
 import {RootState} from "modules";
 import {ModuleNames} from "modules/names";
-import {BaseModuleHandlers, effect, LOCATION_CHANGE, RouterState} from "react-coat";
+import {BaseModuleHandlers, effect, LOCATION_CHANGE, reducer, RouterState} from "react-coat";
 //  mergeSearch, replaceQuery
 
 export default class Handlers<S extends R["State"] = R["State"], R extends Resource = Resource> extends BaseModuleHandlers<S, RootState, ModuleNames> {
-  constructor(initState: S, protected config: {api: R["API"]; syncSearchKey?: Array<Extract<keyof R["SearchData"], string>>}) {
+  constructor(initState: S, protected config: {api: R["API"]}) {
     super(initState);
   }
   /* @reducer
@@ -27,12 +27,15 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
   protected putSelectedIds(selectedIds: string[]): S {
     return {...this.state, selectedIds};
   } */
+  @reducer
+  public putRouteData(routeData: Partial<S>): S {
+    return {...this.state, ...routeData};
+  }
   @effect()
   public async searchList(options: R["ListOptions"] = {}) {
-    const searchData = this.state.searchData;
-    const listSearch: R["ListSearch"] = {...searchData.search, ...options};
+    const listSearch: R["ListSearch"] = {...this.state.listSearch, ...options};
     const {listItems, listSummary} = await this.config.api.searchList(listSearch);
-    this.updateState({searchData: {...searchData, search: listSearch}, listItems, listSummary} as Partial<S>);
+    this.updateState({listSearch, listItems, listSummary} as Partial<S>);
   }
   @effect()
   public async getItemDetail(id: string) {
@@ -41,7 +44,7 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
       arr.push(this.config.api.hitItem!(id));
     }
     const [itemDetail] = await Promise.all(arr);
-    this.updateState({itemDetail, pathData: {itemId: id}} as Partial<S>);
+    this.updateState({itemDetail} as Partial<S>);
   }
   @effect()
   protected async createItem(data: R["ItemCreateData"]) {
@@ -73,36 +76,34 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
     this.updateState({selectedIds: []} as any); // 清空当前选中项
     this.searchList(); // 刷新当前页
   }
-  @effect()
+  @effect(null)
   protected async [LOCATION_CHANGE](router: RouterState) {
-    await this.parseRouter();
-  }
-
-  protected async parseRouter() {
-    const {views, pathData, wholeSearchData} = this.rootState.router;
+    const {views} = this.rootState.router;
     if (isCur(views, this.namespace)) {
-      const moduleSearchData = wholeSearchData[this.namespace as ModuleNames.photos]!;
-      const modulePathData = pathData[this.namespace as ModuleNames.photos]!;
-      const syncSearchKey: string[] | undefined = this.config.syncSearchKey;
-      if (syncSearchKey && syncSearchKey.length > 0) {
-        const syncSearchData = syncSearchKey.reduce((prev, cur) => {
-          prev[cur] = moduleSearchData[cur];
-          return prev;
-        }, {});
-        this.updateState({searchData: {...this.state.searchData, ...syncSearchData}} as Partial<S>);
-      }
-      if (isCur(views, this.namespace, "Details" as any)) {
-        if (this.state.pathData.itemId !== modulePathData.itemId) {
-          await this.getItemDetail(modulePathData.itemId!);
-        }
-      } else if (isCur(views, this.namespace, "List" as any)) {
-        if (!this.state.listItems || !equal(this.state.searchData.search, moduleSearchData.search)) {
-          await this.searchList(moduleSearchData.search);
-        }
-      }
+      // 因为LOCATION_CHANGE被多个模块监听，但是只有当前模块才需要处理，所以为了性能，不需要监控loading状态，改为parseRouter时监控loading
+      // 直接调用this.parseRouter()，将不会触发action，也不会监控loading状态
+      this.dispatch(this.callThisAction(this.parseRouter));
     }
   }
+  @effect()
+  protected async parseRouter() {
+    const {views, pathData, wholeSearchData, wholeHashData} = this.rootState.router;
+    const modulePathData = pathData[this.namespace as ModuleNames.photos]!;
+    const moduleSearchData = wholeSearchData[this.namespace as ModuleNames.photos]!;
+    const moduleHashData = wholeHashData[this.namespace as ModuleNames.photos]!;
+
+    if (isCur(views, this.namespace, "Details" as any)) {
+      if (!this.state.itemDetail || this.state.itemDetail.id !== modulePathData.itemId) {
+        await this.getItemDetail(modulePathData.itemId!);
+      }
+    } else if (isCur(views, this.namespace, "List" as any)) {
+      if (!this.state.listItems || !equal(this.state.listSearch, moduleSearchData.search)) {
+        await this.searchList(moduleSearchData.search);
+      }
+    }
+    return {views, modulePathData, moduleSearchData, moduleHashData};
+  }
   protected async onInit() {
-    await this.parseRouter();
+    return this.parseRouter();
   }
 }

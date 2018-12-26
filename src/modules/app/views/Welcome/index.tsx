@@ -15,8 +15,8 @@ interface Props extends DispatchProp {
 let nid: NodeJS.Timeout;
 
 class Component extends React.PureComponent<Props> {
-  private timer: HTMLSpanElement;
-  private img: HTMLImageElement;
+  private timer?: HTMLSpanElement;
+  private img?: HTMLImageElement;
 
   public onCountEnd = () => {
     if (nid) {
@@ -66,19 +66,19 @@ class Component extends React.PureComponent<Props> {
   public componentDidMount() {
     const initLoading = document.getElementById("g-init-loading");
     if (initLoading) {
-      if (this.img.naturalWidth) {
+      if (this.img!.naturalWidth) {
         this.props.dispatch(thisModule.actions.putStartup(StartupStep.startupImageLoaded));
       } else {
-        this.img.onload = () => {
+        this.img!.onload = () => {
           this.props.dispatch(thisModule.actions.putStartup(StartupStep.startupImageLoaded));
         };
-        this.img.onerror = () => {
+        this.img!.onerror = () => {
           this.onCountEnd();
         };
       }
       initLoading.parentNode!.removeChild(initLoading);
       let {times} = this.props.config;
-      const el = this.timer;
+      const el = this.timer!;
       nid = setInterval(() => {
         // 防止图片还未载入，倒计时就已经开始
         if (this.props.startupStep !== StartupStep.configLoaded) {

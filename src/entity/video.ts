@@ -12,7 +12,7 @@ interface Item {
 
 export type VideoDefined = ArticleDefined & {
   ListItem: Item;
-  ItemDetail: Item & {remark: string; picList: string[]};
+  ItemDetail: Item;
 };
 
 export type VideoResource = ArticleResource<VideoDefined>;
@@ -24,5 +24,6 @@ export type ListOptions = VideoResource["ListOptions"];
 export type ItemDetail = VideoResource["ItemDetail"];
 export type PathData = VideoResource["PathData"];
 export type SearchData = VideoResource["SearchData"];
+export type HashData = VideoResource["HashData"];
 export type API = VideoResource["API"];
 export type State = VideoResource["State"];

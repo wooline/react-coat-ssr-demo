@@ -16,9 +16,10 @@ import TopNav from "./TopNav";
 import Welcome from "./Welcome";
 
 const PhotosView = loadView(ModuleGetter, ModuleNames.photos, "Main");
+const VideosView = loadView(ModuleGetter, ModuleNames.videos, "Main");
 
 interface Props extends DispatchProp {
-  curUser: CurUser;
+  curUser: CurUser | null;
   startupStep: StartupStep;
   globalLoading: LoadingState;
 }
@@ -33,6 +34,7 @@ class Component extends React.PureComponent<Props> {
             <TopNav />
             <Switch>
               <Route exact={false} path={toPath(ModuleNames.photos)} component={PhotosView} />
+              <Route exact={false} path={toPath(ModuleNames.videos)} component={VideosView} />
               <Route exact={true} path={toPath(ModuleNames.app, "LoginForm")} component={LoginForm} />
             </Switch>
             <BottomNav />

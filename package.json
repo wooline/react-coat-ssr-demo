@@ -75,7 +75,7 @@
   ],
   "devServer": {
     "url": "http://192.168.1.96:7445",
-    "ssr": false,
+    "ssr": true,
     "mock": true,
     "proxy": {
       "/ajax/**": {

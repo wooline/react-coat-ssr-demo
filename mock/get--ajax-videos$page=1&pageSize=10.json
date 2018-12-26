@@ -2,27 +2,63 @@
   "statusCode": 200,
   "statusMessage": "OK",
   "headers": {
+    "x-delay": 0,
     "x-powered-by": "Express",
     "content-type": "application/json; charset=utf-8",
     "connection": "close"
   },
   "response": {
+    "listSummary": {
+      "page": 1,
+      "pageSize": 5,
+      "totalItems": 10,
+      "totalPages": 2
+    },
     "listItems": [
       {
-        "title": "afdsfdasfasdfdasfasdfasd",
-        "commentCount": 500,
-        "imageCount": 10,
-        "coverUrl": "http://103.90.137.51:8020/images/20180914203359610.PNG",
-        "createTimeDesc": "1天前",
-        "clickCount": 500
+        "id": "1",
+        "title": "新加坡+吉隆坡+马六甲6或7日跟团游",
+        "departure": "无锡",
+        "type": "跟团游",
+        "price": 2499,
+        "hot": 265,
+        "coverUrl": "/client/imgs/1/2.jpg"
       },
       {
-        "title": "gfhgfhfh",
-        "commentCount": 120,
-        "imageCount": 5,
-        "coverUrl": "http://103.90.137.51:8020/images/20180914203359610.PNG",
-        "createTimeDesc": "1个月前",
-        "clickCount": 256
+        "id": "2",
+        "title": "芽庄4晚5日跟团游",
+        "departure": "常州",
+        "type": "跟团游",
+        "price": 1582,
+        "hot": 36,
+        "coverUrl": "/client/imgs/2/2.jpg"
+      },
+      {
+        "id": "3",
+        "title": "厦门+鼓浪屿自驾4日游",
+        "departure": "苏州",
+        "type": "自驾游",
+        "price": 800,
+        "hot": 6895,
+        "coverUrl": "/client/imgs/3/2.jpg"
+      },
+      {
+        "id": "4",
+        "title": "住无锡318文化大院，游灵山小镇拈花湾",
+        "departure": "无锡",
+        "type": "自助游",
+        "price": 6581,
+        "hot": 562,
+        "coverUrl": "/client/imgs/4/2.jpg"
+      },
+      {
+        "id": "5",
+        "title": "长沙+张家界森林公园+天门山+玻璃栈道+黄龙洞+凤凰古城双高6日跟团游",
+        "departure": "长沙",
+        "type": "跟团游",
+        "price": 3075,
+        "hot": 882,
+        "coverUrl": "/client/imgs/5/2.jpg"
       }
     ]
   }

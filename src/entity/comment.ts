@@ -13,7 +13,7 @@ interface Detail extends Item {
   repliesList: Array<Item & {id: string}>;
 }
 export type CommentDefined = ResourceDefined & {
-  PathData: {type: ModuleNames.photos; typeId: string};
+  PathData: {type: ModuleNames; typeId: string};
   ListItem: Item;
   ItemDetail: Detail;
   ListSearch: {

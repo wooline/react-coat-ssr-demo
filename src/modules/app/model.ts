@@ -1,20 +1,19 @@
 import {Toast} from "antd-mobile";
 import {CustomError, RedirectError} from "common/Errors";
 import {isCur} from "common/routers";
-import {CommonModuleState} from "entity/common";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
-import {Actions, BaseModuleHandlers, effect, ERROR, exportModel, LoadingState, loadModel, LOCATION_CHANGE, reducer} from "react-coat";
+import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, LoadingState, loadModel, LOCATION_CHANGE, reducer} from "react-coat";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 import {defRouteData} from "./facade";
 
 // 定义本模块的State类型
 
-export interface State extends CommonModuleState {
-  hashData: {showSearch: boolean};
+export interface State extends BaseModuleState {
+  showSearch: boolean;
   projectConfig: ProjectConfig | null;
   curUser: CurUser | null;
   startupStep: StartupStep;
@@ -29,9 +28,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   constructor(presetData: {routerData: RouterData}) {
     // 定义本模块State的初始值
     const initState: State = {
-      pathData: {},
-      searchData: defRouteData.searchData,
-      hashData: defRouteData.hashData,
+      showSearch: defRouteData.hashData.showSearch,
       projectConfig: null,
       curUser: null,
       startupStep: StartupStep.init,
@@ -46,6 +43,10 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   @reducer
   public putStartup(startupStep: StartupStep): State {
     return {...this.state, startupStep};
+  }
+  @reducer
+  protected putRouteData(routeData: Partial<State>): State {
+    return {...this.state, ...routeData};
   }
   @effect("login") // 使用自定义loading状态
   public async login(payload: {username: string; password: string}) {
@@ -62,13 +63,14 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
     return {...this.state, curUser};
   }
 
-  protected parseRouter() {
-    this.updateState({hashData: this.rootState.router.wholeHashData[ModuleNames.app]});
+  @effect()
+  protected async parseRouter() {
+    this.dispatch(this.callThisAction(this.putRouteData, {showSearch: this.rootState.router.wholeHashData[ModuleNames.app]!.showSearch}));
   }
 
-  @effect()
+  @effect(null)
   protected async [LOCATION_CHANGE]() {
-    this.parseRouter();
+    this.dispatch(this.callThisAction(this.parseRouter));
   }
 
   // 兼听全局错误的Action，并发送给后台
@@ -92,6 +94,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   @effect()
   protected async [ModuleNames.app + "/INIT"]() {
     this.parseRouter();
+
     const [projectConfig, curUser] = await Promise.all([settingsService.api.getSettings(), sessionService.api.getCurUser()]);
     this.updateState({
       projectConfig,
@@ -102,6 +105,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
     if (isCur(views, ModuleNames.app, "LoginForm") && curUser.hasLogin) {
       throw new RedirectError("301", "/");
     }
+
     const subModules: ModuleNames[] = [ModuleNames.photos];
     for (const subModule of subModules) {
       if (isCur(views, subModule)) {

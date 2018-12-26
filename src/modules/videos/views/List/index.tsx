@@ -4,7 +4,7 @@ import LinkButton from "components/LinkButton";
 import Pagination from "components/Pagination";
 import Search from "components/Search";
 import {routerActions} from "connected-react-router";
-import {ListItem, ListSearch, ListSummary} from "entity/photo";
+import {ListItem, ListSearch, ListSummary} from "entity/video";
 import {RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
@@ -32,12 +32,12 @@ class Component extends React.PureComponent<Props> {
   };
   private onSearch = (title: string) => {
     const {dispatch, pathname} = this.props;
-    dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.photos]: {search: {title}}})));
+    dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.videos]: {search: {title}}})));
   };
   private onSearchClose = () => {
     const {dispatch, search, pathname} = this.props;
     if (this.props.listSearch.title) {
-      dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.photos]: {search: {title: null}}}, {[ModuleNames.app]: {showSearch: false}})));
+      dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.videos]: {search: {title: null}}}, {[ModuleNames.app]: {showSearch: false}})));
     } else {
       dispatch(routerActions.push(toUrl(pathname, search, {[ModuleNames.app]: {showSearch: false}})));
     }
@@ -54,11 +54,11 @@ class Component extends React.PureComponent<Props> {
     const {dispatch, showSearch, pathname, listSearch, listItems, listSummary} = this.props;
 
     if (listItems) {
-      const itemBaseUrl = toUrl(toPath(ModuleNames.comments, "List", {type: ModuleNames.photos, typeId: "---"}), {
+      const itemBaseUrl = toUrl(toPath(ModuleNames.comments, "List", {type: ModuleNames.videos, typeId: "---"}), {
         [ModuleNames.comments]: {search: {articleId: "---"}},
       });
       return (
-        <div className={`${ModuleNames.photos}-List g-pic-list`}>
+        <div className={`${ModuleNames.videos}-List g-pic-list`}>
           <Search value={listSearch.title || ""} onClose={this.onSearchClose} onSearch={this.onSearch} visible={showSearch || listSearch.title !== null} />
           <div className="list-items">
             {listItems.map(item => (
@@ -85,7 +85,7 @@ class Component extends React.PureComponent<Props> {
           </div>
           {listSummary && (
             <div className="g-pagination">
-              <Pagination dispatch={dispatch} baseUrl={toUrl(pathname, {[ModuleNames.photos]: {search: {...listSearch, page: NaN}}})} page={listSummary.page} totalPages={listSummary.totalPages} />
+              <Pagination dispatch={dispatch} baseUrl={toUrl(pathname, {[ModuleNames.videos]: {search: {...listSearch, page: NaN}}})} page={listSummary.page} totalPages={listSummary.totalPages} />
             </div>
           )}
         </div>
@@ -97,7 +97,7 @@ class Component extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: RootState) => {
-  const model = state.photos;
+  const model = state.videos;
   return {
     showSearch: state.app.showSearch,
     search: state.router.location.search,

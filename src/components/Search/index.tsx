@@ -1,41 +1,50 @@
 import {Button, InputItem, Toast} from "antd-mobile";
-import {toUrl} from "common/routers";
-import LinkButton from "components/LinkButton";
-import {ModuleNames} from "modules/names";
-import React, {RefObject} from "react";
-import {DispatchProp} from "react-redux";
+import React from "react";
 import "./index.less";
 
-interface Props extends DispatchProp {
+interface Props {
+  onClose: () => void;
   onSearch: (keyword: string) => void;
+  value: string;
   visible: boolean;
-  pathname: string;
-  search: string;
 }
-
-class Component extends React.PureComponent<Props> {
-  private input: RefObject<InputItem> = React.createRef();
+interface State {
+  props?: Props;
+  value: string;
+}
+class Component extends React.PureComponent<Props, State> {
+  public static getDerivedStateFromProps(nextProps: Props, prevState: State): State | null {
+    if (nextProps !== prevState.props) {
+      return {props: nextProps, value: nextProps.value};
+    }
+    return null;
+  }
+  public state: State = {
+    value: "",
+  };
   private onSubmit = () => {
-    const keyword: string = this.input.current!.state.value;
+    const keyword: string = this.state.value;
     if (!keyword) {
       Toast.info("请输入搜索关键字");
     } else {
       this.props.onSearch(keyword);
     }
   };
-  private onClose = () => {};
+  private onChange = (value: string) => {
+    this.setState({value});
+  };
   public render() {
-    const {pathname, search, visible, dispatch} = this.props;
+    const {visible} = this.props;
     return (
       <div className={`${visible ? "on " : ""}comp-Search`}>
         <div className="wrap">
-          <InputItem clear={true} placeholder="关键字..." ref={this.input as any} />
+          <InputItem clear={true} onChange={this.onChange} placeholder="关键字..." value={this.state.value} />
           <Button size="small" type="primary" onClick={this.onSubmit}>
             搜索
           </Button>
-          <LinkButton onClick={this.onClose} className="am-button am-button-small" href={toUrl(pathname, search, {[ModuleNames.app]: {showSearch: false}})} key="0" dispatch={dispatch}>
+          <Button onClick={this.props.onClose} size="small">
             取消
-          </LinkButton>
+          </Button>
         </div>
       </div>
     );

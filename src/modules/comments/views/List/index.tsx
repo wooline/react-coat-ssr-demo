@@ -15,7 +15,7 @@ interface Props extends DispatchProp {
   searchData: RouterData["searchData"];
   listSearch: ListSearch;
   listItems: ListItem[] | undefined;
-  listSummary: ListSummary;
+  listSummary: ListSummary | undefined;
 }
 let scrollTop = NaN;
 class Component extends React.PureComponent<Props> {
@@ -109,8 +109,8 @@ const mapStateToProps = (state: RootState) => {
   return {
     pathname,
     searchData,
-    pathData: pathData[ModuleNames.comments],
-    listSearch: model.searchData.search,
+    pathData: pathData[ModuleNames.comments]!,
+    listSearch: model.listSearch,
     listItems: model.listItems,
     listSummary: model.listSummary,
   };

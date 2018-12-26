@@ -1,6 +1,6 @@
 import {routerActions} from "connected-react-router";
 import * as assignDeep from "deep-extend";
-import {defHash, defSearch, ModuleGetter, RouterData} from "modules";
+import {defRouteData, ModuleGetter, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import {Module, RouterParser} from "react-coat";
 import {matchPath} from "react-router";
@@ -13,6 +13,7 @@ type Views = {[moduleName: string]: {[viewName: string]: boolean}};
 const moduleToUrl: {[K in keyof MG]+?: string | {[V in keyof ReturnModule<MG[K]>["views"]]+?: string}} = {
   [ModuleNames.app]: {Main: "/", LoginForm: "/login"},
   [ModuleNames.photos]: {Main: "/photos", List: "/photos/list", Details: "/photos/item/:itemId"},
+  [ModuleNames.videos]: {Main: "/videos", List: "/videos/list", Details: "/videos/item/:itemId"},
   [ModuleNames.comments]: {Main: "/:type/item/:typeId/comments", List: "/:type/item/:typeId/comments/list", Details: "/:type/item/:typeId/comments/item/:itemId"},
 };
 
@@ -34,6 +35,18 @@ const modulePaths = ((maps: {[mName: string]: string | {[vName: string]: string}
   }
   return urls;
 })(moduleToUrl as any);
+
+const {defSearch, defHash}: {defSearch: RouterData["wholeSearchData"]; defHash: RouterData["wholeHashData"]} = (routeData => {
+  const search = {};
+  const hash = {};
+  for (const moduleName in routeData) {
+    if (routeData.hasOwnProperty(moduleName)) {
+      search[moduleName] = routeData[moduleName].searchData;
+      hash[moduleName] = routeData[moduleName].hashData;
+    }
+  }
+  return {defSearch: search, defHash: hash};
+})(defRouteData);
 
 type ReturnModule<T extends () => any> = T extends () => Promise<infer R> ? R : T extends () => infer R ? R : Module;
 
@@ -194,23 +207,28 @@ function parseRoute(pre: {}, cur: string) {
 
 export const routerParser: RouterParser<RouterData> = (nextRouter, prevRouter) => {
   const nRouter: RouterData = {...(nextRouter as RouterData)};
-
+  const changed = {pathname: false, search: false, hash: false};
   if (prevRouter && nextRouter.location.pathname !== prevRouter.location.pathname) {
     const {views, pathData} = parsePathname(nextRouter.location.pathname);
     nRouter.views = views;
     nRouter.pathData = pathData;
+    changed.pathname = true;
   }
   if (prevRouter && nextRouter.location.search !== prevRouter.location.search) {
-    const searchData = nextRouter.location.search.split(/[&?]/).reduce(parseRoute, {});
-    nRouter.searchData = searchData;
-    nRouter.wholeSearchData = mergeDefData(nRouter.views, searchData, defSearch);
+    nRouter.searchData = nextRouter.location.search.split(/[&?]/).reduce(parseRoute, {});
+    changed.search = true;
   }
   if (prevRouter && nextRouter.location.hash !== prevRouter.location.hash) {
-    const hashData = nextRouter.location.hash.split(/[&#]/).reduce(parseRoute, {});
-    nRouter.hashData = hashData;
-    nRouter.wholeHashData = mergeDefData(nRouter.views, hashData, defHash);
+    nRouter.hashData = nextRouter.location.hash.split(/[&#]/).reduce(parseRoute, {});
+    changed.hash = true;
   }
-  return nRouter;
+  if (changed.pathname || changed.search) {
+    nRouter.wholeSearchData = mergeDefData(nRouter.views, nRouter.searchData, defSearch);
+  }
+  if (changed.pathname || changed.hash) {
+    nRouter.wholeHashData = mergeDefData(nRouter.views, nRouter.hashData, defHash);
+  }
+  return nRouter as RouterData;
 };
 function mergeDefData(views: Views, data: any, def: any) {
   const newData = {...data};

@@ -14,6 +14,7 @@ export type PhotoDefined = ArticleDefined & {
   ListItem: Item;
   ItemDetail: Item & {remark: string; picList: string[]};
   SearchData: {showComment: boolean};
+  State: {showComment: boolean};
 };
 
 export type PhotoResource = ArticleResource<PhotoDefined>;
