@@ -1,0 +1,11 @@
+{
+  "url": "post--ajax-photos-\\w+-hit",
+  "statusCode": 200,
+  "statusMessage": "OK",
+  "headers": {
+    "x-powered-by": "Express",
+    "content-type": "application/json; charset=utf-8",
+    "connection": "close"
+  },
+  "response": ""
+}

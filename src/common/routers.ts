@@ -1,7 +1,6 @@
 import {routerActions} from "connected-react-router";
 import * as assignDeep from "deep-extend";
 import {defRouteData, ModuleGetter, RouterData} from "modules";
-import {ModuleNames} from "modules/names";
 import {Module, RouterParser} from "react-coat";
 import {matchPath} from "react-router";
 import {Dispatch} from "redux";
@@ -11,10 +10,10 @@ type MData = {[moduleName: string]: {[key: string]: any}};
 type Views = {[moduleName: string]: {[viewName: string]: boolean}};
 
 const moduleToUrl: {[K in keyof MG]+?: string | {[V in keyof ReturnModule<MG[K]>["views"]]+?: string}} = {
-  [ModuleNames.app]: {Main: "/", LoginForm: "/login"},
-  [ModuleNames.photos]: {Main: "/photos", List: "/photos/list", Details: "/photos/item/:itemId"},
-  [ModuleNames.videos]: {Main: "/videos", List: "/videos/list", Details: "/videos/item/:itemId"},
-  [ModuleNames.comments]: {Main: "/:type/item/:typeId/comments", List: "/:type/item/:typeId/comments/list", Details: "/:type/item/:typeId/comments/item/:itemId"},
+  app: {Main: "/", LoginForm: "/login"},
+  photos: {Main: "/photos", List: "/photos/list", Details: "/photos/item/:itemId"},
+  videos: {Main: "/videos", List: "/videos/list", Details: "/videos/item/:itemId"},
+  comments: {Main: "/:type/item/:typeId/comments", List: "/:type/item/:typeId/comments/list", Details: "/:type/item/:typeId/comments/item/:itemId"},
 };
 
 const modulePaths = ((maps: {[mName: string]: string | {[vName: string]: string}}) => {
@@ -126,7 +125,7 @@ export function isCur<N extends keyof MG, M extends ReturnModule<MG[N]>, V exten
 export function linkTo(e: React.MouseEvent<HTMLAnchorElement>, dispatch: Dispatch) {
   e.preventDefault();
   const href = e.currentTarget.getAttribute("href") as string;
-  if (href !== "#") {
+  if (href && href !== "#") {
     dispatch(routerActions.push(href));
   }
 }

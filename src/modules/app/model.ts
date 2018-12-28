@@ -1,6 +1,6 @@
 import {Toast} from "antd-mobile";
 import {CustomError, RedirectError} from "common/Errors";
-import {isCur} from "common/routers";
+import {isCur, toUrl} from "common/routers";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {ModuleGetter, RootState, RouterData} from "modules";
@@ -13,6 +13,8 @@ import {defRouteData} from "./facade";
 // 定义本模块的State类型
 
 export interface State extends BaseModuleState {
+  showLoginPop: boolean;
+  showRegisterPop: boolean;
   showSearch: boolean;
   projectConfig: ProjectConfig | null;
   curUser: CurUser | null;
@@ -28,6 +30,8 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   constructor(presetData: {routerData: RouterData}) {
     // 定义本模块State的初始值
     const initState: State = {
+      showLoginPop: defRouteData.hashData.showLoginPop,
+      showRegisterPop: defRouteData.hashData.showRegisterPop,
       showSearch: defRouteData.hashData.showSearch,
       projectConfig: null,
       curUser: null,
@@ -65,7 +69,8 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
 
   @effect()
   protected async parseRouter() {
-    this.dispatch(this.callThisAction(this.putRouteData, {showSearch: this.rootState.router.wholeHashData[ModuleNames.app]!.showSearch}));
+    const hashData = this.rootState.router.wholeHashData.app! || {};
+    this.dispatch(this.callThisAction(this.putRouteData, {showSearch: hashData.showSearch, showLoginPop: hashData.showLoginPop, showRegisterPop: hashData.showRegisterPop}));
   }
 
   @effect(null)
@@ -84,6 +89,13 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
       } else {
         this.dispatch(this.routerActions.replace(url));
       }
+    } else if (error.code === "401") {
+      const {
+        hashData,
+        location: {pathname, search},
+      } = this.rootState.router;
+      const url = toUrl(pathname, search, {...hashData, [ModuleNames.app]: {showLoginPop: true}});
+      this.dispatch(this.routerActions.push(url));
     } else {
       Toast.fail(error.message);
       await settingsService.api.reportError(error);
@@ -106,7 +118,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
       throw new RedirectError("301", "/");
     }
 
-    const subModules: ModuleNames[] = [ModuleNames.photos];
+    const subModules: ModuleNames[] = [ModuleNames.photos, ModuleNames.videos];
     for (const subModule of subModules) {
       if (isCur(views, subModule)) {
         await loadModel(ModuleGetter[subModule as any]).then(subModel => subModel(this.store));

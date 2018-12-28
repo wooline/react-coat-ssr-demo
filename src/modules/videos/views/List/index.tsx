@@ -67,18 +67,9 @@ class Component extends React.PureComponent<Props> {
                   <h5 className="title">{item.title}</h5>
                   <div className="listImg" />
                   <div className="props">
-                    <Icon type={IconClass.LOCATION} /> {item.departure}
-                    <Icon type={IconClass.HEART} /> {item.type}
+                    <Icon type={IconClass.HEART} /> {item.hot}
                   </div>
-                  <div className="desc">
-                    <span className="hot">
-                      人气(<strong>{item.hot}</strong>)
-                    </span>
-                    <em className="price">
-                      <span className="unit">￥</span>
-                      {item.price}
-                    </em>
-                  </div>
+                  <Icon className="icon-palyer" type={IconClass.PLAY_CIRCLE} />
                 </div>
               </LinkButton>
             ))}

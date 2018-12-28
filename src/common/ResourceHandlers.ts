@@ -88,9 +88,9 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
   @effect()
   protected async parseRouter() {
     const {views, pathData, wholeSearchData, wholeHashData} = this.rootState.router;
-    const modulePathData = pathData[this.namespace as ModuleNames.photos]!;
-    const moduleSearchData = wholeSearchData[this.namespace as ModuleNames.photos]!;
-    const moduleHashData = wholeHashData[this.namespace as ModuleNames.photos]!;
+    const modulePathData = pathData[this.namespace as "photos"]!;
+    const moduleSearchData = wholeSearchData[this.namespace as "photos"]!;
+    const moduleHashData = wholeHashData[this.namespace as "photos"]!;
 
     if (isCur(views, this.namespace, "Details" as any)) {
       if (!this.state.itemDetail || this.state.itemDetail.id !== modulePathData.itemId) {

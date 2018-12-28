@@ -64,7 +64,7 @@
     "antd-mobile": "~2.2.6",
     "deep-extend": "~0.6.0",
     "rc-form": "~2.2.7",
-    "react-coat": "^4.0.0-beta.7",
+    "react-coat": "^4.0.0-beta.9",
     "react-coat-pkg": "4.0.0-beta.2",
     "ts-import-plugin": "~1.5.5"
   },

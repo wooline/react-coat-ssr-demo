@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <link rel="shortcut icon" href="@@CLIENT_PUBLICfavicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <title>React App</title>
@@ -126,7 +127,7 @@
         }
         setSize();
 
-        /* var timer;
+        var timer;
         window.addEventListener(
           "resize",
           function() {
@@ -138,7 +139,7 @@
             }
           },
           false
-        ); */
+        );
       })();
     </script>
     <!-- {react-coat-init-env} -->
@@ -147,14 +148,14 @@
         if (!global.InitEnv) {
           global.InitEnv = isDev
             ? {
-                clientPublicPath: "/client/",
+                clientPublicPath: "@@CLIENT_PUBLIC",
                 apiServer: {
                   "^/ajax/": "@@LOCALHOST" + "/ajax/",
                   "^/captcha/": "@@LOCALHOST" + "/captcha/",
                 },
               }
             : {
-                clientPublicPath: "/client/",
+                clientPublicPath: "@@CLIENT_PUBLIC",
                 apiServer: {
                   "^/ajax/": "@@LOCALHOST" + "/ajax/",
                   "^/captcha/": "@@LOCALHOST" + "/captcha/",

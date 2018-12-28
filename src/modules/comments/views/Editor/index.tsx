@@ -62,7 +62,7 @@ class Component extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: RootState) => {
-  const pathData = state.router.pathData[ModuleNames.comments];
+  const pathData = state.router.pathData.comments;
   return {
     hasLogin: state.app.curUser!.hasLogin,
     articleId: pathData!.typeId,

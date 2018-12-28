@@ -23,13 +23,27 @@ class Component extends React.PureComponent<Props> {
       return (
         <div className={`${ModuleNames.videos}-Details g-details g-doc-width g-modal g-enter-in`}>
           <div className="subject">
-            <h2>{itemDetail.title}</h2>
+            <h2 />
             <LinkButton dispatch={dispatch} href={toUrl(toPath(ModuleNames.videos, "List", {}), {[ModuleNames.videos]: {search: listSearch, showComment: false}})} className="close-button">
               <MIcon size="md" type="cross-circle" />
             </LinkButton>
           </div>
-          <div className="content">sdfsdf</div>
-          <div>
+          <div className="content">
+            <video
+              width="100%"
+              height="100%"
+              autoPlay={true}
+              controls={true}
+              preload="auto"
+              muted={false}
+              playsInline={true}
+              poster={itemDetail.coverUrl}
+              onError={() => this.setState({message: "暂无视频！"})}
+            >
+              <source src={itemDetail.coverUrl} type="video/mp4" />
+            </video>
+          </div>
+          <div className="comments-panel">
             <Comments />
           </div>
         </div>

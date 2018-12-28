@@ -7,11 +7,10 @@ import {HTMLAttributes} from "react";
 export enum IconClass {LIVE = "icon-live",
 MESSAGE = "icon-message",
 PICTURE = "icon-picture",
+PLAY_CIRCLE = "icon-play-circle",
 RELOAD = "icon-reload",
 LOCATION = "icon-location",
-HEART = "icon-heart",
-HEART_FILL = "icon-heart-fill",
-LOCATION_FILL = "icon-location-fill",}
+HEART = "icon-heart",}
 
 interface Props extends HTMLAttributes<HTMLSpanElement> {
   type: IconClass;

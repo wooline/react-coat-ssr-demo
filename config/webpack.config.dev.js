@@ -12,14 +12,20 @@ const TSImportPlugin = require("ts-import-plugin");
 const paths = require("./paths");
 
 const appPackage = require(path.join(paths.rootPath, "./package.json"));
-// const EnvDefine = {"process.env.DEV_URL": JSON.stringify(appPackage.devServer.url)};
+const conPath = path.join(paths.configPath, "./dev");
+const conEnv = require(path.join(conPath, "./env"));
+
 const htmlReplace = [
   {
     pattern: "@@LOCALHOST",
     replacement: appPackage.devServer.url,
   },
+  {
+    pattern: "@@CLIENT_PUBLIC",
+    replacement: conEnv.clientPublicPath,
+  },
 ];
-const conPath = path.join(paths.configPath, "./dev");
+
 const tsCompilerOptions = require(path.join(paths.rootPath, "./tsconfig.json")).compilerOptions;
 tsCompilerOptions.target = "es2017";
 

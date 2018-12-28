@@ -90,7 +90,7 @@ class Component extends React.PureComponent<Props> {
 const mapStateToProps = (state: RootState) => {
   return {
     searchData: state.router.searchData,
-    pathData: state.router.pathData[ModuleNames.comments]!,
+    pathData: state.router.pathData.comments!,
     listSearch: state.comments.listSearch,
     itemDetail: state.comments.itemDetail,
   };
