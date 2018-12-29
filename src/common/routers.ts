@@ -1,20 +1,12 @@
 import {routerActions} from "connected-react-router";
 import * as assignDeep from "deep-extend";
-import {defRouteData, ModuleGetter, RouterData} from "modules";
-import {Module, RouterParser} from "react-coat";
+import {defRouteData, ModuleGetter, moduleToUrl, ReturnModule, RootRouter, RouterData} from "modules";
+import {RouterParser} from "react-coat";
 import {matchPath} from "react-router";
 import {Dispatch} from "redux";
 
-type MG = typeof ModuleGetter;
 type MData = {[moduleName: string]: {[key: string]: any}};
 type Views = {[moduleName: string]: {[viewName: string]: boolean}};
-
-const moduleToUrl: {[K in keyof MG]+?: string | {[V in keyof ReturnModule<MG[K]>["views"]]+?: string}} = {
-  app: {Main: "/", LoginForm: "/login"},
-  photos: {Main: "/photos", List: "/photos/list", Details: "/photos/item/:itemId"},
-  videos: {Main: "/videos", List: "/videos/list", Details: "/videos/item/:itemId"},
-  comments: {Main: "/:type/item/:typeId/comments", List: "/:type/item/:typeId/comments/list", Details: "/:type/item/:typeId/comments/item/:itemId"},
-};
 
 const modulePaths = ((maps: {[mName: string]: string | {[vName: string]: string}}) => {
   const urls: {[pathname: string]: [string, string]} = {};
@@ -47,8 +39,6 @@ const {defSearch, defHash}: {defSearch: RouterData["wholeSearchData"]; defHash: 
   return {defSearch: search, defHash: hash};
 })(defRouteData);
 
-type ReturnModule<T extends () => any> = T extends () => Promise<infer R> ? R : T extends () => infer R ? R : Module;
-
 function serialize(data: {[key: string]: any}): string {
   const flatArr: string[] = [];
   for (const mName in data) {
@@ -72,7 +62,7 @@ function serialize(data: {[key: string]: any}): string {
   }
 }
 
-export function toPath<N extends keyof RouterData["pathData"], M extends ReturnModule<MG[N]>, V extends keyof M["views"], P extends RouterData["pathData"][N]>(
+export function toPath<N extends keyof RouterData["pathData"], M extends ReturnModule<ModuleGetter[N]>, V extends keyof M["views"], P extends RouterData["pathData"][N]>(
   moduleName: N,
   viewName?: V,
   params?: P
@@ -118,7 +108,7 @@ export function toUrl<R extends RouterData["searchData"], H extends RouterData["
   return url;
 }
 
-export function isCur<N extends keyof MG, M extends ReturnModule<MG[N]>, V extends keyof M["views"]>(views: RouterData["views"], moduleName: N, viewName?: V): boolean {
+export function isCur<N extends keyof ModuleGetter, M extends ReturnModule<ModuleGetter[N]>, V extends keyof M["views"]>(views: RouterData["views"], moduleName: N, viewName?: V): boolean {
   return views[moduleName] && views[moduleName][(viewName as string) || "Main"];
 }
 
@@ -204,8 +194,8 @@ function parseRoute(pre: {}, cur: string) {
   return pre;
 }
 
-export const routerParser: RouterParser<RouterData> = (nextRouter, prevRouter) => {
-  const nRouter: RouterData = {...(nextRouter as RouterData)};
+export const routerParser: RouterParser<RootRouter> = (nextRouter, prevRouter) => {
+  const nRouter: RootRouter = {...nextRouter};
   const changed = {pathname: false, search: false, hash: false};
   if (prevRouter && nextRouter.location.pathname !== prevRouter.location.pathname) {
     const {views, pathData} = parsePathname(nextRouter.location.pathname);
@@ -227,7 +217,7 @@ export const routerParser: RouterParser<RouterData> = (nextRouter, prevRouter) =
   if (changed.pathname || changed.hash) {
     nRouter.wholeHashData = mergeDefData(nRouter.views, nRouter.hashData, defHash);
   }
-  return nRouter as RouterData;
+  return nRouter;
 };
 function mergeDefData(views: Views, data: any, def: any) {
   const newData = {...data};
@@ -259,8 +249,12 @@ const excludeDefData = (data: any, def: any) => {
   }
   return result;
 };
-export function advanceRouter(url: string): RouterData | string {
+export function advanceRouter(url: string): RootRouter | string {
   let [pathname, search, hash] = url.split(/[?#]/);
+  if (url.indexOf("?") === -1) {
+    hash = search;
+    search = "";
+  }
   pathname = pathname.replace(/^.+:\/\/[^/]+/, "");
   search = search ? "?" + search : "";
   hash = hash ? "#" + hash : "";

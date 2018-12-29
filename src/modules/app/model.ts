@@ -3,19 +3,18 @@ import {CustomError, RedirectError} from "common/Errors";
 import {isCur, toUrl} from "common/routers";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
-import {ModuleGetter, RootState, RouterData} from "modules";
+import {moduleGetter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, LoadingState, loadModel, LOCATION_CHANGE, reducer} from "react-coat";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
-import {defRouteData} from "./facade";
 
 // 定义本模块的State类型
 
 export interface State extends BaseModuleState {
-  showLoginPop: boolean;
-  showRegisterPop: boolean;
-  showSearch: boolean;
+  showLoginPop?: boolean;
+  showRegisterPop?: boolean;
+  showSearch?: boolean;
   projectConfig: ProjectConfig | null;
   curUser: CurUser | null;
   startupStep: StartupStep;
@@ -27,12 +26,9 @@ export interface State extends BaseModuleState {
 
 // 定义本模块的Handlers
 class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
-  constructor(presetData: {routerData: RouterData}) {
+  constructor() {
     // 定义本模块State的初始值
     const initState: State = {
-      showLoginPop: defRouteData.hashData.showLoginPop,
-      showRegisterPop: defRouteData.hashData.showRegisterPop,
-      showSearch: defRouteData.hashData.showSearch,
       projectConfig: null,
       curUser: null,
       startupStep: StartupStep.init,
@@ -69,8 +65,9 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
 
   @effect()
   protected async parseRouter() {
-    const hashData = this.rootState.router.wholeHashData.app! || {};
-    this.dispatch(this.callThisAction(this.putRouteData, {showSearch: hashData.showSearch, showLoginPop: hashData.showLoginPop, showRegisterPop: hashData.showRegisterPop}));
+    const searchData = this.rootState.router.wholeSearchData.app! || {};
+    // const hashData = this.rootState.router.wholeHashData.app! || {};
+    this.dispatch(this.callThisAction(this.putRouteData, {showSearch: searchData.showSearch, showLoginPop: searchData.showLoginPop, showRegisterPop: searchData.showRegisterPop}));
   }
 
   @effect(null)
@@ -91,10 +88,10 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
       }
     } else if (error.code === "401") {
       const {
-        hashData,
-        location: {pathname, search},
+        searchData,
+        location: {pathname},
       } = this.rootState.router;
-      const url = toUrl(pathname, search, {...hashData, [ModuleNames.app]: {showLoginPop: true}});
+      const url = toUrl(pathname, {...searchData, [ModuleNames.app]: {...searchData.app, showLoginPop: true}});
       this.dispatch(this.routerActions.push(url));
     } else {
       Toast.fail(error.message);
@@ -118,10 +115,10 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
       throw new RedirectError("301", "/");
     }
 
-    const subModules: ModuleNames[] = [ModuleNames.photos, ModuleNames.videos];
+    const subModules: ModuleNames[] = [ModuleNames.photos, ModuleNames.videos, ModuleNames.messages];
     for (const subModule of subModules) {
       if (isCur(views, subModule)) {
-        await loadModel(ModuleGetter[subModule as any]).then(subModel => subModel(this.store));
+        await loadModel(moduleGetter[subModule as any]).then(subModel => subModel(this.store));
         break;
       }
     }

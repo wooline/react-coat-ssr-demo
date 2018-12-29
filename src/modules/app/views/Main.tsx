@@ -3,7 +3,7 @@ import "asset/css/global.less";
 import {toPath, toUrl} from "common/routers";
 import {routerActions} from "connected-react-router";
 import {StartupStep} from "entity/global";
-import {ModuleGetter, RootState, RouterData} from "modules";
+import {moduleGetter, RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {LoadingState, loadView} from "react-coat";
@@ -17,13 +17,13 @@ import LoginPop from "./LoginPop";
 import TopNav from "./TopNav";
 import Welcome from "./Welcome";
 
-const PhotosView = loadView(ModuleGetter, ModuleNames.photos, "Main");
-const VideosView = loadView(ModuleGetter, ModuleNames.videos, "Main");
+const PhotosView = loadView(moduleGetter, ModuleNames.photos, "Main");
+const VideosView = loadView(moduleGetter, ModuleNames.videos, "Main");
+const MessagesView = loadView(moduleGetter, ModuleNames.messages, "Main");
 
 interface Props extends DispatchProp {
   pathname: string;
-  search: string;
-  hashData: RouterData["hashData"];
+  searchData: RouterData["searchData"];
   showLoginPop: boolean;
   startupStep: StartupStep;
   globalLoading: LoadingState;
@@ -31,8 +31,8 @@ interface Props extends DispatchProp {
 
 class Component extends React.PureComponent<Props> {
   private onCloseLoginPop = () => {
-    const {pathname, search, hashData, dispatch} = this.props;
-    const url = toUrl(pathname, search, {...hashData, [ModuleNames.app]: {showLoginPop: false}});
+    const {pathname, searchData, dispatch} = this.props;
+    const url = toUrl(pathname, {...searchData, [ModuleNames.app]: {...searchData.app, showLoginPop: false}});
     dispatch(routerActions.push(url));
   };
 
@@ -46,6 +46,7 @@ class Component extends React.PureComponent<Props> {
             <Switch>
               <Route exact={false} path={toPath(ModuleNames.photos)} component={PhotosView} />
               <Route exact={false} path={toPath(ModuleNames.videos)} component={VideosView} />
+              <Route exact={false} path={toPath(ModuleNames.messages)} component={MessagesView} />
               <Route exact={true} path={toPath(ModuleNames.app, "LoginForm")} component={LoginForm} />
             </Switch>
             <BottomNav />
@@ -63,12 +64,10 @@ class Component extends React.PureComponent<Props> {
 // todo document title处理
 const mapStateToProps = (state: RootState) => {
   const app = state.app;
-  const {pathname, search} = state.router.location;
   return {
-    pathname,
-    search,
-    hashData: state.router.hashData,
-    showLoginPop: app.showLoginPop && app.curUser !== null && !app.curUser.hasLogin,
+    pathname: state.router.location.pathname,
+    searchData: state.router.searchData,
+    showLoginPop: Boolean(app.showLoginPop && app.curUser !== null && !app.curUser.hasLogin),
     startupStep: app.startupStep,
     globalLoading: app.loading.global,
   };

@@ -7,12 +7,10 @@ export type ModuleState = State;
 
 export default exportModule<ModuleActions>(ModuleNames.app);
 
-export const defRouteData: ModuleRoute<{}, {}, {showSearch: boolean; showLoginPop: boolean; showRegisterPop: boolean}> = {
+export const defRouteData: ModuleRoute<{}, {showSearch: boolean; showLoginPop: boolean; showRegisterPop: boolean}, {refresh: boolean | null}> = {
   pathData: {},
-  searchData: {},
+  searchData: {showSearch: false, showLoginPop: false, showRegisterPop: false},
   hashData: {
-    showSearch: false,
-    showLoginPop: false,
-    showRegisterPop: false,
+    refresh: null,
   },
 };

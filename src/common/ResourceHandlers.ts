@@ -33,15 +33,17 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
   }
   @effect()
   public async searchList(options: R["ListOptions"] = {}) {
-    const listSearch: R["ListSearch"] = {...this.state.listSearch, ...options};
+    const listSearch: R["ListSearch"] = {...this.state.listSearch!, ...options};
+    this.updateState({listSearch} as Partial<S>);
     const {listItems, listSummary} = await this.config.api.searchList(listSearch);
-    this.updateState({listSearch, listItems, listSummary} as Partial<S>);
+    this.updateState({listItems, listSummary} as Partial<S>);
   }
   @effect()
-  public async getItemDetail(id: string) {
-    const arr: Array<Promise<any>> = [this.config.api.getItemDetail!(id)];
+  public async getItemDetail(itemDetailId: string) {
+    this.updateState({itemDetailId} as Partial<S>);
+    const arr: Array<Promise<any>> = [this.config.api.getItemDetail!(itemDetailId)];
     if (this.config.api.hitItem) {
-      arr.push(this.config.api.hitItem!(id));
+      arr.push(this.config.api.hitItem!(itemDetailId));
     }
     const [itemDetail] = await Promise.all(arr);
     this.updateState({itemDetail} as Partial<S>);
@@ -91,13 +93,14 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
     const modulePathData = pathData[this.namespace as "photos"]!;
     const moduleSearchData = wholeSearchData[this.namespace as "photos"]!;
     const moduleHashData = wholeHashData[this.namespace as "photos"]!;
+    const appHashData = wholeHashData[ModuleNames.app]! || {};
 
     if (isCur(views, this.namespace, "Details" as any)) {
-      if (!this.state.itemDetail || this.state.itemDetail.id !== modulePathData.itemId) {
+      if (this.state.itemDetailId !== modulePathData.itemId) {
         await this.getItemDetail(modulePathData.itemId!);
       }
     } else if (isCur(views, this.namespace, "List" as any)) {
-      if (!this.state.listItems || !equal(this.state.listSearch, moduleSearchData.search)) {
+      if (appHashData.refresh || (appHashData.refresh === null && !equal(this.state.listSearch, moduleSearchData.search))) {
         await this.searchList(moduleSearchData.search);
       }
     }

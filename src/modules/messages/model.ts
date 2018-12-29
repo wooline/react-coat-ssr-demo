@@ -1,17 +1,17 @@
 import ArticleHandlers from "common/ArticleHandlers";
-import {State, VideoResource} from "entity/video";
+import {MessageResource, State} from "entity/message";
 import {ModuleNames} from "modules/names";
 import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
 
-export {State} from "entity/video";
+export {State} from "entity/message";
 
-class ModuleHandlers extends ArticleHandlers<State, VideoResource> {
+class ModuleHandlers extends ArticleHandlers<State, MessageResource> {
   constructor() {
     super({}, {api});
   }
   @effect()
-  protected async [ModuleNames.videos + "/INIT"]() {
+  protected async [ModuleNames.messages + "/INIT"]() {
     await super.onInit();
     this.inited();
   }
@@ -20,4 +20,4 @@ class ModuleHandlers extends ArticleHandlers<State, VideoResource> {
 // 导出本模块的Actions
 export type ModuleActions = Actions<ModuleHandlers>;
 
-export default exportModel(ModuleNames.videos, ModuleHandlers);
+export default exportModel(ModuleNames.messages, ModuleHandlers);

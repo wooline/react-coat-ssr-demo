@@ -14,8 +14,7 @@ import "./index.less";
 interface Props extends DispatchProp {
   showSearch: boolean;
   pathname: string;
-  search: string;
-  listSearch: ListSearch;
+  listSearch: ListSearch | undefined;
   listItems: ListItem[] | undefined;
   listSummary: ListSummary | undefined;
 }
@@ -35,12 +34,13 @@ class Component extends React.PureComponent<Props> {
     dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.photos]: {search: {title}}})));
   };
   private onSearchClose = () => {
-    const {dispatch, search, pathname} = this.props;
-    if (this.props.listSearch.title) {
-      dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.photos]: {search: {title: null}}}, {[ModuleNames.app]: {showSearch: false}})));
+    const {dispatch, pathname} = this.props;
+    dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.app]: {showSearch: false}, [ModuleNames.photos]: {search: {title: null}}})));
+    /* if (this.props.listSearch!.title) {
+      dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.photos]: {[ModuleNames.app]: {showSearch: false}, search: {title: null}}})));
     } else {
       dispatch(routerActions.push(toUrl(pathname, search, {[ModuleNames.app]: {showSearch: false}})));
-    }
+    } */
   };
 
   public componentDidMount() {
@@ -53,7 +53,7 @@ class Component extends React.PureComponent<Props> {
   public render() {
     const {dispatch, showSearch, pathname, listSearch, listItems, listSummary} = this.props;
 
-    if (listItems) {
+    if (listItems && listSearch) {
       const itemBaseUrl = toUrl(toPath(ModuleNames.comments, "List", {type: ModuleNames.photos, typeId: "---"}), {
         [ModuleNames.comments]: {search: {articleId: "---"}},
       });
@@ -99,8 +99,7 @@ class Component extends React.PureComponent<Props> {
 const mapStateToProps = (state: RootState) => {
   const model = state.photos;
   return {
-    showSearch: state.app.showSearch,
-    search: state.router.location.search,
+    showSearch: Boolean(state.app.showSearch),
     pathname: state.router.location.pathname,
     listSearch: model.listSearch,
     listItems: model.listItems,

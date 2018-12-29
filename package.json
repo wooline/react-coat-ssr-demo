@@ -1,7 +1,7 @@
 {
   "name": "ssr",
   "version": "1.0.0",
-  "description": "",
+  "description": "a demo of the react-coat with ssr",
   "main": "index.js",
   "scripts": {
     "build": "cross-env NODE_ENV=production node scripts/build.js",
@@ -10,8 +10,12 @@
     "gen-icon": "node scripts/gen-icon.js",
     "test": "cross-env NODE_ENV=development node scripts/test.js"
   },
-  "author": "",
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wooline/react-coat-ssr-demo.git"
+  },
+  "author": "wooline <wooline@qq.com>",
+  "license": "MIT",
   "peerDependencies": {
     "asset-require-hook": "^1.2.0",
     "axios": "^0.15.0",
@@ -57,14 +61,14 @@
     "yargs": "^12.0.0"
   },
   "devDependencies": {
-    "react-coat-dev-utils": "1.0.0-beta.7",
+    "react-coat-dev-utils": "1.0.0-beta.8",
     "react-coat-dev-pkg": "1.0.0-beta.3"
   },
   "dependencies": {
     "antd-mobile": "~2.2.6",
     "deep-extend": "~0.6.0",
     "rc-form": "~2.2.7",
-    "react-coat": "^4.0.0-beta.9",
+    "react-coat": "^4.0.0-beta.10",
     "react-coat-pkg": "4.0.0-beta.2",
     "ts-import-plugin": "~1.5.5"
   },
@@ -75,7 +79,7 @@
   ],
   "devServer": {
     "url": "http://192.168.1.96:7445",
-    "ssr": true,
+    "ssr": false,
     "mock": true,
     "proxy": {
       "/ajax/**": {

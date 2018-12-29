@@ -7,7 +7,7 @@ export class API {
   }
 
   public reportError(error: any): Promise<boolean> {
-    console.log("report", error);
+    console.log("report", error.message);
     return Promise.resolve(true);
   }
 }

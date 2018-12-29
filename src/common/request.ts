@@ -1,4 +1,12 @@
-import axios, {AxiosRequestConfig} from "axios";
+import axios, {AxiosError, AxiosRequestConfig} from "axios";
+import {CustomError} from "common/Errors";
+
+axios.interceptors.response.use(
+  response => response,
+  error => {
+    handleError(error);
+  }
+);
 
 export default function ajax<T>(method: string, url: string, params: {[key: string]: any} = {}, data: {[key: string]: any} = {}, headers: {[key: string]: string} = {}): Promise<T> {
   method = method.toLocaleLowerCase();
@@ -26,7 +34,13 @@ export default function ajax<T>(method: string, url: string, params: {[key: stri
 
   return axios.request(config).then(response => response.data);
 }
+function handleError(error: AxiosError) {
+  const httpErrorCode = error.response ? error.response.status : 0;
+  const responseData = error.response ? error.response.data : "";
 
+  const errorMessage = responseData && responseData.message ? responseData.message : `failed to call ${error.config.url}`;
+  throw new CustomError(errorMessage, httpErrorCode.toString(), responseData);
+}
 /* export function stringifyQuery<A>(key: string, args: A, defArgs: A, locationSearch: string): string {
   const parms = Object.keys(args).reduce((prev, cur) => {
     if (typeof args[cur] === "object") {

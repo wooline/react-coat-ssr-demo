@@ -1,15 +1,15 @@
 import {RedirectError} from "common/Errors";
 import {advanceRouter} from "common/routers";
-import {ModuleGetter} from "modules";
+import {moduleGetter} from "modules";
 import {ModuleNames} from "modules/names";
 import {renderApp} from "react-coat";
 
 export default function render(path: string): Promise<any> {
   getInitEnv(global, process.env.NODE_ENV !== "production");
-  const routerData = advanceRouter(path);
-  if (typeof routerData === "string") {
-    throw new RedirectError("301", routerData);
+  const rootRouter = advanceRouter(path);
+  if (typeof rootRouter === "string") {
+    throw new RedirectError("301", rootRouter);
   } else {
-    return renderApp(ModuleGetter, ModuleNames.app, [path], {initData: {router: routerData}});
+    return renderApp(moduleGetter, ModuleNames.app, [path], {initData: {router: rootRouter}});
   }
 }

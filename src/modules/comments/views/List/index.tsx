@@ -13,7 +13,7 @@ interface Props extends DispatchProp {
   pathname: string;
   pathData: PathData;
   searchData: RouterData["searchData"];
-  listSearch: ListSearch;
+  listSearch: ListSearch | undefined;
   listItems: ListItem[] | undefined;
   listSummary: ListSummary | undefined;
 }
@@ -46,7 +46,7 @@ class Component extends React.PureComponent<Props> {
       listItems,
       listSummary,
     } = this.props;
-    if (listItems) {
+    if (listItems && listSearch) {
       const itemBaseUrl = toUrl(toPath(ModuleNames.comments, "Details", {type, typeId, itemId: "---"}), {...searchData, [ModuleNames.comments]: {}});
       return (
         <div className={`${ModuleNames.comments}-List`}>

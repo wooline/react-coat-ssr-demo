@@ -1,12 +1,12 @@
 import {advanceRouter, routerParser} from "common/routers";
-import {ModuleGetter} from "modules";
+import {moduleGetter} from "modules";
 import {ModuleNames} from "modules/names";
 import {buildApp} from "react-coat";
 
 getInitEnv(window, process.env.NODE_ENV !== "production");
-const routerData = advanceRouter(window.location.href);
-if (typeof routerData === "string") {
-  window.location.href = routerData;
+const rootRouter = advanceRouter(window.location.href);
+if (typeof rootRouter === "string") {
+  window.location.href = rootRouter;
 } else {
-  buildApp(ModuleGetter, ModuleNames.app, {routerParser, initData: {router: routerData}});
+  buildApp(moduleGetter, ModuleNames.app, {routerParser, initData: {router: rootRouter}});
 }

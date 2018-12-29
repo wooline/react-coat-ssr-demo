@@ -12,7 +12,7 @@ import "./index.less";
 interface Props extends DispatchProp {
   searchData: RouterData["searchData"];
   pathData: PathData;
-  listSearch: ListSearch;
+  listSearch: ListSearch | undefined;
   itemDetail: ItemDetail | undefined;
 }
 

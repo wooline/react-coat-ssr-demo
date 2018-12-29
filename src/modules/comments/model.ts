@@ -4,18 +4,10 @@ import {ModuleNames} from "modules/names";
 import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
 export {State} from "entity/comment";
-import {defRouteData} from "./facade";
 
 class ModuleHandlers extends ResourceHandlers<State, CommentResource> {
   constructor() {
-    super(
-      {
-        listSearch: defRouteData.searchData.search,
-      },
-      {
-        api,
-      }
-    );
+    super({}, {api});
   }
   @effect()
   protected async [ModuleNames.comments + "/INIT"]() {

@@ -17,16 +17,6 @@ export type ModuleRoute<P extends {} = {}, S extends {} = {}, H extends {} = {}>
 };
 export type DeepPartial<T> = {[P in keyof T]?: DeepPartial<T[P]>};
 
-/* type AA = {
-  bb: {
-    cc: {
-      dd: string;
-    };
-  };
-};
-
-type BB = DeepPartial<AA>; */
-
 export type CarefulExtend<T, U> = T extends undefined ? undefined : T & U;
 
 export type PickOptions<T> = Pick<T, {[K in keyof T]-?: {} extends {[P in K]: T[K]} ? K : never}[keyof T]>;

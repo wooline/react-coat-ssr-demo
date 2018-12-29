@@ -11,8 +11,7 @@ import "./index.less";
 
 interface Props extends RCForm, DispatchProp {
   pathname: string;
-  search: string;
-  hashData: RouterData["hashData"];
+  searchData: RouterData["searchData"];
 }
 
 class Component extends React.PureComponent<Props> {
@@ -32,8 +31,7 @@ class Component extends React.PureComponent<Props> {
   public render() {
     const {
       pathname,
-      search,
-      hashData,
+      searchData,
       dispatch,
       form: {getFieldProps},
     } = this.props;
@@ -56,7 +54,7 @@ class Component extends React.PureComponent<Props> {
         },
       ],
     });
-    const regUrl = toUrl(pathname, search, {...hashData, [ModuleNames.app]: {showRegisterPop: true}});
+    const regUrl = toUrl(pathname, {...searchData, [ModuleNames.app]: {...searchData.app, showRegisterPop: true}});
     return (
       <div className="app-LoginPop">
         <List className="bd">
@@ -79,11 +77,10 @@ class Component extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: RootState) => {
-  const {pathname, search} = state.router.location;
+  const {pathname} = state.router.location;
   return {
     pathname,
-    search,
-    hashData: state.router.hashData,
+    searchData: state.router.searchData,
   };
 };
 

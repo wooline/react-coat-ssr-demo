@@ -3,21 +3,12 @@ import {PhotoResource, State} from "entity/photo";
 import {ModuleNames} from "modules/names";
 import {Actions, effect, exportModel} from "react-coat";
 import api from "./api";
-import {defRouteData} from "./facade";
 
 export {State} from "entity/photo";
 
 class ModuleHandlers extends ArticleHandlers<State, PhotoResource> {
   constructor() {
-    super(
-      {
-        listSearch: defRouteData.searchData.search,
-        showComment: false,
-      },
-      {
-        api,
-      }
-    );
+    super({}, {api});
   }
   @effect()
   protected async parseRouter() {

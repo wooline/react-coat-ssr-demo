@@ -15,7 +15,7 @@ interface Props extends DispatchProp {
   pathname: string;
   searchData: RouterData["searchData"];
   showComment: boolean;
-  listSearch: ListSearch;
+  listSearch: ListSearch | undefined;
   itemDetail: ItemDetail | undefined;
 }
 
@@ -122,7 +122,7 @@ const mapStateToProps = (state: RootState) => {
   return {
     pathname: state.router.location.pathname,
     searchData: state.router.searchData,
-    showComment: model.showComment,
+    showComment: Boolean(model.showComment),
     listSearch: model.listSearch,
     itemDetail: model.itemDetail,
   };
