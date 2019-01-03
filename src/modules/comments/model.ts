@@ -12,7 +12,6 @@ class ModuleHandlers extends ResourceHandlers<State, CommentResource> {
   @effect()
   protected async [ModuleNames.comments + "/INIT"]() {
     await super.onInit();
-    this.inited();
   }
 }
 

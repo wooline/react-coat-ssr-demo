@@ -75,24 +75,25 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
     this.dispatch(this.callThisAction(this.parseRouter));
   }
 
-  // 兼听全局错误的Action，并发送给后台
+  // uncatched错误会触发@@framework/ERROR，兼听并发送给后台
   // 兼听外部模块的Action，不需要手动触发，所以请使用protected或private
   @effect(null) // 不需要loading，设置为null
   protected async [ERROR](error: CustomError) {
-    if (error.code === "301" || error.code === "302") {
+    if (error.code === "401") {
+      const {
+        searchData,
+        location: {pathname},
+      } = this.rootState.router;
+      const url = toUrl(pathname, {...searchData, [ModuleNames.app]: {...searchData.app, showLoginPop: true}});
+      this.updateState({showLoginPop: true});
+      this.dispatch(this.routerActions.replace(url));
+    } else if (error.code === "301" || error.code === "302") {
       const url = error.detail as string;
       if (url.endsWith("404.html")) {
         window.location.href = error.detail;
       } else {
         this.dispatch(this.routerActions.replace(url));
       }
-    } else if (error.code === "401") {
-      const {
-        searchData,
-        location: {pathname},
-      } = this.rootState.router;
-      const url = toUrl(pathname, {...searchData, [ModuleNames.app]: {...searchData.app, showLoginPop: true}});
-      this.dispatch(this.routerActions.push(url));
     } else {
       Toast.fail(error.message);
       await settingsService.api.reportError(error);
@@ -122,7 +123,6 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
         break;
       }
     }
-    this.inited();
   }
 }
 

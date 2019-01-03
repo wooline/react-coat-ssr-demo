@@ -11,7 +11,7 @@ const mainModule = require(path.join(paths.distServerPath, "main"));
 const htmlTpl = fs.readFileSync(path.join(paths.distClientPath, "index.html"), "utf8");
 const [, , port] = appPackage.devServer.url.split(/:\/*/);
 const app = express();
-app.use("/client", express.static(paths.distClientPath));
+app.use("/client", express.static(paths.distClientPath, {fallthrough: false}));
 app.use(devServer(htmlTpl, mainModule, appPackage.devServer.proxy));
 app.use(devMock(appPackage.devServer.mock, appPackage.devServer.proxy, true));
 

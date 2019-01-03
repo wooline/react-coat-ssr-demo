@@ -13,15 +13,19 @@ const StylelintPlugin = require("stylelint-webpack-plugin");
 const paths = require("./paths");
 
 const appPackage = require(path.join(paths.rootPath, "./package.json"));
+const conPath = path.join(paths.configPath, "./prod");
+const conEnv = require(path.join(conPath, "./env"));
 // const EnvDefine = {BBBB: JSON.stringify(appPackage.devServer.url), IS_DEV: JSON.stringify(true)};
 const htmlReplace = [
   {
     pattern: "@@LOCALHOST",
     replacement: appPackage.devServer.url,
   },
+  {
+    pattern: "@@CLIENT_PUBLIC",
+    replacement: conEnv.clientPublicPath,
+  },
 ];
-const conPath = path.join(paths.configPath, "./prod");
-const conEnv = require(path.join(conPath, "./env"));
 
 const tsCompilerOptions = require(path.join(paths.rootPath, "./tsconfig.json")).compilerOptions;
 tsCompilerOptions.target = "es2017";
@@ -214,6 +218,7 @@ const serverConfig = {
     modules: [paths.srcPath, "node_modules"],
     alias: {
       conf: conPath,
+      "react-coat": "react-coat/build/es6",
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).

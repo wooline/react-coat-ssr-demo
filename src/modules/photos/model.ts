@@ -19,7 +19,6 @@ class ModuleHandlers extends ArticleHandlers<State, PhotoResource> {
   @effect()
   protected async [ModuleNames.photos + "/INIT"]() {
     await super.onInit();
-    this.inited();
   }
 }
 

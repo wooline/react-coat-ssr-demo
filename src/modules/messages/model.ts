@@ -13,7 +13,6 @@ class ModuleHandlers extends ArticleHandlers<State, MessageResource> {
   @effect()
   protected async [ModuleNames.messages + "/INIT"]() {
     await super.onInit();
-    this.inited();
   }
 }
 

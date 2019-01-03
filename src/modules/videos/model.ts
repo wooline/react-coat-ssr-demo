@@ -13,7 +13,6 @@ class ModuleHandlers extends ArticleHandlers<State, VideoResource> {
   @effect()
   protected async [ModuleNames.videos + "/INIT"]() {
     await super.onInit();
-    this.inited();
   }
 }
 

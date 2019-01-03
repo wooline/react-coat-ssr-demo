@@ -52,10 +52,10 @@ class Component extends React.PureComponent<Props> {
             <BottomNav />
           </div>
         )}
+        {(startupStep === StartupStep.configLoaded || startupStep === StartupStep.startupImageLoaded || startupStep === StartupStep.startupCountEnd) && <Welcome className={startupStep} />}
         <Modal visible={showLoginPop} transparent={true} onClose={this.onCloseLoginPop} title="请登录" closable={true}>
           <LoginPop />
         </Modal>
-        {(startupStep === StartupStep.configLoaded || startupStep === StartupStep.startupImageLoaded || startupStep === StartupStep.startupCountEnd) && <Welcome className={startupStep} />}
         <Loading loading={globalLoading} />
       </div>
     );

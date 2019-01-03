@@ -191,6 +191,7 @@ const serverConfig = {
     modules: [paths.srcPath, "node_modules"],
     alias: {
       conf: conPath,
+      "react-coat": "react-coat/build/es6",
     },
     plugins: [
       // Prevents users from importing files from outside of src/ (or node_modules/).
