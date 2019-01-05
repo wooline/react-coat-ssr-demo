@@ -2,7 +2,9 @@ import {Button, InputItem, List, Toast} from "antd-mobile";
 import {toUrl} from "common/routers";
 import LinkButton from "components/LinkButton";
 import {RCForm} from "entity/common";
+import {LoginRequest} from "entity/session";
 import {RootState, RouterData} from "modules";
+import thisModule from "modules/app/facade";
 import {ModuleNames} from "modules/names";
 import {createForm} from "rc-form";
 import * as React from "react";
@@ -17,9 +19,9 @@ interface Props extends RCForm, DispatchProp {
 class Component extends React.PureComponent<Props> {
   private onSubmit = () => {
     const {validateFields, getFieldError} = this.props.form;
-    validateFields((errors, values) => {
+    validateFields((errors, values: LoginRequest) => {
       if (!errors) {
-        // this.props.dispatch(thisModule.actions.login(values));
+        this.props.dispatch(thisModule.actions.login(values));
       } else {
         const errorField = Object.keys(errors)[0];
         const message = getFieldError(errorField).join(", ");

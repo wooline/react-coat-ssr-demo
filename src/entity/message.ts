@@ -1,7 +1,7 @@
 import {ArticleDefined, ArticleResource} from "./article";
 
 interface Item {
-  title: string;
+  author: string;
   content: string;
   date: Date;
 }

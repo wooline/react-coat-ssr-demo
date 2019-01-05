@@ -25,7 +25,7 @@ class Component extends React.PureComponent<Props> {
       validateFields<{content: string}>((errors, values) => {
         if (!errors) {
           const {content} = values;
-          this.props.dispatch(thisModule.actions.getItemDetail(content)); // df
+          this.props.dispatch(thisModule.actions.createItem(content));
         } else {
           const errorField = Object.keys(errors)[0];
           const message = getFieldError(errorField).join(", ");

@@ -1,14 +1,17 @@
 import {TabBar} from "antd-mobile";
+import {UnauthorizedError} from "common/Errors";
 import {isCur, toPath, toUrl} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import {routerActions} from "connected-react-router";
 import {RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
 import React from "react";
+import {errorAction} from "react-coat";
 import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
 interface Props extends DispatchProp {
+  hasLogin: boolean;
   views: RouterData["views"];
 }
 const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault();
@@ -64,7 +67,11 @@ class Component extends React.PureComponent<Props> {
             key="messages"
             selected={isCur(views, ModuleNames.messages)}
             onPress={() => {
-              dispatch(routerActions.push(messagesUrl));
+              if (!this.props.hasLogin) {
+                this.props.dispatch(errorAction(new UnauthorizedError()));
+              } else {
+                dispatch(routerActions.push(messagesUrl));
+              }
             }}
           />
         </TabBar>
@@ -75,6 +82,7 @@ class Component extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: RootState) => {
   return {
+    hasLogin: state.app.curUser!.hasLogin,
     views: state.router.views,
   };
 };

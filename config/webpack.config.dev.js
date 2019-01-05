@@ -205,18 +205,13 @@ const serverConfig = {
   },
   optimization: {
     minimize: false,
+    runtimeChunk: false,
     splitChunks: {
       cacheGroups: {
         default: false,
-        vendors: {
-          minChunks: 1,
-          minSize: 0,
-          name: "vendors",
-        },
+        vendors: false,
       },
     },
-    runtimeChunk: false,
-    // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
   },
   module: {
     strictExportPresence: true,

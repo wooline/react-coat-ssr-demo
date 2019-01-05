@@ -1,0 +1,19 @@
+{
+  "statusCode": 200,
+  "statusMessage": "OK",
+  "headers": {
+    "x-delay": 0,
+    "x-powered-by": "Express",
+    "content-type": "application/json; charset=utf-8",
+    "connection": "close"
+  },
+  "response": {
+    "data": {
+      "uid": "1",
+      "username": "Jimmy",
+      "hasLogin": true,
+      "avatarUrl": "/client/imgs/u1.jpg"
+    },
+    "error": null
+  }
+}

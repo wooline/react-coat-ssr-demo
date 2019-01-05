@@ -49,7 +49,7 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
     this.updateState({itemDetail} as Partial<S>);
   }
   @effect()
-  protected async createItem(data: R["ItemCreateData"]) {
+  public async createItem(data: R["ItemCreateData"]) {
     const response = await this.config.api.createItem!(data);
     if (!response.error) {
       Toast.info("操作成功");

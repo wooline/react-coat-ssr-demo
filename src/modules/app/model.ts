@@ -53,6 +53,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
     const loginResult = await sessionService.api.login(payload);
     if (!loginResult.error) {
       this.updateState({curUser: loginResult.data});
+      Toast.success("欢迎您回来！");
     } else {
       alert(loginResult.error.message);
     }
@@ -116,7 +117,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
       throw new RedirectError("301", "/");
     }
 
-    const subModules: ModuleNames[] = [ModuleNames.photos, ModuleNames.videos, ModuleNames.messages];
+    const subModules: ModuleNames[] = [ModuleNames.photos, ModuleNames.videos];
     for (const subModule of subModules) {
       if (isCur(views, subModule)) {
         await loadModel(moduleGetter[subModule as any]).then(subModel => subModel(this.store));

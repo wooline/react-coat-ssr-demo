@@ -44,8 +44,8 @@ export type ResourceDefined = Defined & {
   ItemUpdateData: {
     id: string;
   };
-  ItemCreateResult: DefaultResult;
-  ItemUpdateResult: DefaultResult;
+  ItemCreateResult: DefaultResult<{id: string}>;
+  ItemUpdateResult: DefaultResult<void>;
 };
 export interface Resource<D extends ResourceDefined = ResourceDefined> {
   ListItem: D["ListItem"];

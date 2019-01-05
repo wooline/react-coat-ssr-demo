@@ -6,8 +6,7 @@ export class API {
     return request("get", "/ajax/session");
   }
   public login(req: LoginRequest): Promise<LoginResponse> {
-    // return request("put", "/ajax/session", {}, req);
-    return Promise.resolve({data: {uid: "1", username: "jimmy", hasLogin: true, avatarUrl: ""}, error: null});
+    return request("put", "/ajax/session", {}, req);
   }
 }
 

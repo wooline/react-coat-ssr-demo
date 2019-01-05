@@ -41,7 +41,11 @@ class Component extends React.PureComponent<Props> {
           <Search value={listSearch.title || ""} onClose={this.onSearchClose} onSearch={this.onSearch} visible={showSearch || listSearch.title !== null} />
           <div className="list-items">
             {listItems.map(item => (
-              <div key={item.id}>{item.content} </div>
+              <div key={item.id}>
+                <div className="author">{item.author}</div>
+                <div className="date">{item.date.toUTCString()}</div>
+                <div className="content">{item.content}</div>
+              </div>
             ))}
           </div>
           {listSummary && (

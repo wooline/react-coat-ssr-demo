@@ -104,11 +104,7 @@ const clientConfig = {
     ],
   },
   optimization: {
-    minimize: false,
-    splitChunks: {
-      chunks: "async",
-    },
-    // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
+    minimize: true,
     runtimeChunk: "single",
   },
   stats: {chunkModules: false},
@@ -232,18 +228,13 @@ const serverConfig = {
   },
   optimization: {
     minimize: false,
+    runtimeChunk: false,
     splitChunks: {
       cacheGroups: {
         default: false,
-        vendors: {
-          minChunks: 1,
-          minSize: 0,
-          name: "vendors",
-        },
+        vendors: false,
       },
     },
-    // namedModules,namedChunks: false,, //在编译后的代码中用自增的数字代替module路径
-    runtimeChunk: false,
   },
   performance: false,
   module: {

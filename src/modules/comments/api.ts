@@ -1,5 +1,5 @@
 import request from "common/request";
-import {ItemDetail, ListItem, ListSearch, ListSummary} from "entity/comment";
+import {ItemCreateData, ItemCreateResult, ItemDetail, ListItem, ListSearch, ListSummary} from "entity/comment";
 
 export class API {
   public searchList(listSearch: ListSearch): Promise<{listItems: ListItem[]; listSummary: ListSummary}> {
@@ -7,6 +7,9 @@ export class API {
   }
   public getItemDetail(id: string): Promise<ItemDetail> {
     return request("get", "/ajax/comments/:id", {id});
+  }
+  public createItem(item: ItemCreateData): Promise<ItemCreateResult> {
+    return request("post", "/ajax/comments", {}, item);
   }
 }
 
