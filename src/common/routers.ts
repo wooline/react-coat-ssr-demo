@@ -85,7 +85,7 @@ export function toPath<N extends keyof RouterData["pathData"], M extends ReturnM
   }
   return pathname;
 }
-export function toUrl<R extends RouterData["searchData"], H extends RouterData["hashData"]>(pathname: string, searchData?: R | string, hashData?: H | string): string {
+export function toUrl(pathname: string, searchData?: RouterData["searchData"], hashData?: RouterData["hashData"]): string {
   let url = pathname;
   if (searchData) {
     let str = searchData as string;

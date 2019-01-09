@@ -17,6 +17,7 @@ const conPath = path.join(paths.configPath, "./prod");
 const conEnv = require(path.join(conPath, "./env"));
 // const EnvDefine = {BBBB: JSON.stringify(appPackage.devServer.url), IS_DEV: JSON.stringify(true)};
 const htmlReplace = [
+  // 服务器取ajax数据，无法使用相对路径，必须指明
   {
     pattern: "@@LOCALHOST",
     replacement: appPackage.devServer.url,

@@ -24,7 +24,7 @@ class Component extends React.PureComponent<Props> {
         <div className={`${ModuleNames.videos}-Details g-details g-doc-width g-modal g-enter-in`}>
           <div className="subject">
             <h2 />
-            <LinkButton dispatch={dispatch} href={toUrl(toPath(ModuleNames.videos, "List", {}), {[ModuleNames.videos]: {search: listSearch, showComment: false}})} className="close-button">
+            <LinkButton dispatch={dispatch} href={toUrl(toPath(ModuleNames.videos, "List", {}), {[ModuleNames.videos]: {search: listSearch}})} className="close-button">
               <MIcon size="md" type="cross-circle" />
             </LinkButton>
           </div>
@@ -40,7 +40,7 @@ class Component extends React.PureComponent<Props> {
               poster={itemDetail.coverUrl}
               onError={() => this.setState({message: "暂无视频！"})}
             >
-              <source src={itemDetail.coverUrl} type="video/mp4" />
+              <source src={itemDetail.videoUrl} type="video/mp4" />
             </video>
           </div>
           <div className="comments-panel">

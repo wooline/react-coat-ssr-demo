@@ -6,6 +6,7 @@ import {CurUser} from "entity/session";
 import {moduleGetter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, LoadingState, loadModel, LOCATION_CHANGE, reducer} from "react-coat";
+import {MetaData} from "react-coat/build/es6/global";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 
@@ -87,7 +88,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
       } = this.rootState.router;
       const url = toUrl(pathname, {...searchData, [ModuleNames.app]: {...searchData.app, showLoginPop: true}});
       this.updateState({showLoginPop: true});
-      this.dispatch(this.routerActions.replace(url));
+      this.dispatch(this.routerActions.push(url));
     } else if (error.code === "301" || error.code === "302") {
       const url = error.detail as string;
       if (url.endsWith("404.html")) {
@@ -95,9 +96,11 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
       } else {
         this.dispatch(this.routerActions.replace(url));
       }
-    } else {
+    } else if (MetaData.isBrowser) {
       Toast.fail(error.message);
       await settingsService.api.reportError(error);
+    } else {
+      console.log(error);
     }
   }
 

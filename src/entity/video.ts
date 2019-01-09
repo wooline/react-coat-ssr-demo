@@ -2,12 +2,9 @@ import {ArticleDefined, ArticleResource} from "./article";
 
 interface Item {
   title: string;
-  departure: string;
-  type: string;
   hot: number;
-  price: number;
   coverUrl: string;
-  comments: number;
+  videoUrl: string;
 }
 
 export type VideoDefined = ArticleDefined & {

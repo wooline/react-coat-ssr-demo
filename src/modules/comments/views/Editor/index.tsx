@@ -21,11 +21,15 @@ class Component extends React.PureComponent<Props> {
     if (!this.props.hasLogin) {
       this.props.dispatch(errorAction(new UnauthorizedError()));
     } else {
-      const {validateFields, getFieldError} = this.props.form;
+      const {
+        articleId,
+        commentId,
+        form: {validateFields, getFieldError},
+      } = this.props;
       validateFields<{content: string}>((errors, values) => {
         if (!errors) {
           const {content} = values;
-          this.props.dispatch(thisModule.actions.createItem(content));
+          this.props.dispatch(thisModule.actions.createItem({content, articleId, commentId}));
         } else {
           const errorField = Object.keys(errors)[0];
           const message = getFieldError(errorField).join(", ");

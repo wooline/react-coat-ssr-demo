@@ -20,6 +20,11 @@ export type CommentDefined = ResourceDefined & {
     articleId: string;
     isNewest: boolean;
   };
+  ItemCreateData: {
+    articleId: string;
+    content: string;
+    commentId?: string;
+  };
 };
 
 export type CommentResource = Resource<CommentDefined>;

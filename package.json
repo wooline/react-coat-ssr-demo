@@ -4,8 +4,8 @@
   "description": "a demo of the react-coat with ssr",
   "main": "index.js",
   "scripts": {
-    "build": "cross-env NODE_ENV=production node scripts/build.js",
     "start": "cross-env NODE_ENV=development node scripts/start.js",
+    "build": "cross-env NODE_ENV=production node scripts/build.js",
     "prod-express-demo": "node scripts/ssr-demo.js && npm run build && node prod-express-demo",
     "gen-icon": "node scripts/gen-icon.js",
     "test": "cross-env NODE_ENV=development node scripts/test.js"
@@ -78,12 +78,12 @@
     "not ie <= 11"
   ],
   "devServer": {
-    "url": "http://192.168.1.96:7445",
+    "url": "http://localhost:7445",
     "ssr": true,
     "mock": true,
     "proxy": {
       "/ajax/**": {
-        "target": "http://192.168.1.96:7446/",
+        "target": "http://localhost:7446/",
         "secure": false,
         "changeOrigin": true
       }

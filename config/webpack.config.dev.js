@@ -16,6 +16,7 @@ const conPath = path.join(paths.configPath, "./dev");
 const conEnv = require(path.join(conPath, "./env"));
 
 const htmlReplace = [
+  // 服务器取ajax数据，无法使用相对路径，必须指明
   {
     pattern: "@@LOCALHOST",
     replacement: appPackage.devServer.url,
