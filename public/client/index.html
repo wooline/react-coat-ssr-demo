@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="shortcut icon" href="@@CLIENT_PUBLICfavicon.ico" />
+    <link rel="shortcut icon" href="$$CLIENT_PUBLIC_PATH$$favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <title>React App</title>
@@ -144,22 +144,8 @@
     </script>
     <!-- {react-coat-init-env} -->
     <script>
-      function getInitEnv(global, isDev) {
-        if (!global.InitEnv) {
-          global.InitEnv = isDev
-            ? {
-                clientPublicPath: "@@CLIENT_PUBLIC",
-                apiServer: {
-                  "^/ajax/": "@@LOCALHOST" + "/ajax/",
-                },
-              }
-            : {
-                clientPublicPath: "@@CLIENT_PUBLIC",
-                apiServer: {
-                  "^/ajax/": "@@LOCALHOST" + "/ajax/",
-                },
-              };
-        }
+      function getInitEnv(env) {
+        return $$ENV$$;
       }
     </script>
   </head>

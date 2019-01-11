@@ -1,12 +1,12 @@
 import {Toast} from "antd-mobile";
-import {CustomError, RedirectError} from "common/Errors";
-import {isCur, toUrl} from "common/routers";
+import {CustomError} from "common/Errors";
+import {isCur} from "common/routers";
+import {isBrowser} from "common/utils";
 import {ProjectConfig, StartupStep} from "entity/global";
 import {CurUser} from "entity/session";
 import {moduleGetter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import {Actions, BaseModuleHandlers, BaseModuleState, effect, ERROR, exportModel, LoadingState, loadModel, LOCATION_CHANGE, reducer} from "react-coat";
-import {MetaData} from "react-coat/build/es6/global";
 import * as sessionService from "./api/session";
 import * as settingsService from "./api/settings";
 
@@ -14,6 +14,7 @@ import * as settingsService from "./api/settings";
 
 export interface State extends BaseModuleState {
   showLoginPop?: boolean;
+  showNotFoundPop?: boolean;
   showRegisterPop?: boolean;
   showSearch?: boolean;
   projectConfig: ProjectConfig | null;
@@ -46,8 +47,16 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
     return {...this.state, startupStep};
   }
   @reducer
-  protected putRouteData(routeData: Partial<State>): State {
-    return {...this.state, ...routeData};
+  protected putCurUser(curUser: CurUser): State {
+    return {...this.state, curUser};
+  }
+  @reducer
+  public putCloseLoginPop(): State {
+    return {...this.state, showLoginPop: false};
+  }
+  @reducer
+  public putCloseNotFoundPop(): State {
+    return {...this.state, showNotFoundPop: false};
   }
   @effect("login") // 使用自定义loading状态
   public async login(payload: {username: string; password: string}) {
@@ -60,16 +69,13 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
     }
   }
 
-  @reducer
-  protected putCurUser(curUser: CurUser): State {
-    return {...this.state, curUser};
-  }
-
   @effect()
   protected async parseRouter() {
     const searchData = this.rootState.router.wholeSearchData.app! || {};
-    // const hashData = this.rootState.router.wholeHashData.app! || {};
-    this.dispatch(this.callThisAction(this.putRouteData, {showSearch: searchData.showSearch, showLoginPop: searchData.showLoginPop, showRegisterPop: searchData.showRegisterPop}));
+    this.updateState({
+      showSearch: searchData.showSearch,
+      showRegisterPop: searchData.showRegisterPop,
+    });
   }
 
   @effect(null)
@@ -78,25 +84,16 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
   }
 
   // uncatched错误会触发@@framework/ERROR，兼听并发送给后台
-  // 兼听外部模块的Action，不需要手动触发，所以请使用protected或private
-  @effect(null) // 不需要loading，设置为null
+  // 在服务器渲染时，仅能兼听到model执行时的错误，其它错误请用nodejs兼听
+  @effect(null)
   protected async [ERROR](error: CustomError) {
     if (error.code === "401") {
-      const {
-        searchData,
-        location: {pathname},
-      } = this.rootState.router;
-      const url = toUrl(pathname, {...searchData, [ModuleNames.app]: {...searchData.app, showLoginPop: true}});
       this.updateState({showLoginPop: true});
-      this.dispatch(this.routerActions.push(url));
+    } else if (error.code === "404") {
+      this.updateState({showNotFoundPop: true});
     } else if (error.code === "301" || error.code === "302") {
-      const url = error.detail as string;
-      if (url.endsWith("404.html")) {
-        window.location.href = error.detail;
-      } else {
-        this.dispatch(this.routerActions.replace(url));
-      }
-    } else if (MetaData.isBrowser) {
+      this.dispatch(this.routerActions.replace(error.detail));
+    } else if (isBrowser()) {
       Toast.fail(error.message);
       await settingsService.api.reportError(error);
     } else {
@@ -116,9 +113,6 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
       startupStep: StartupStep.configLoaded,
     });
     const views = this.rootState.router.views;
-    if (isCur(views, ModuleNames.app, "LoginForm") && curUser.hasLogin) {
-      throw new RedirectError("301", "/");
-    }
 
     const subModules: ModuleNames[] = [ModuleNames.photos, ModuleNames.videos];
     for (const subModule of subModules) {

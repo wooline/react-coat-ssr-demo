@@ -3,7 +3,13 @@ import {moduleGetter} from "modules";
 import {ModuleNames} from "modules/names";
 import {buildApp} from "react-coat";
 
-getInitEnv(window, process.env.NODE_ENV !== "production");
+const env = getInitEnv();
+const initEnv: typeof InitEnv = {
+  clientPublicPath: env.clientPublicPath,
+  apiServerPath: env.apiServerPath.client,
+};
+// tslint:disable-next-line:no-string-literal
+window["InitEnv"] = initEnv;
 const rootRouter = advanceRouter(window.location.href);
 if (typeof rootRouter === "string") {
   window.location.href = rootRouter;

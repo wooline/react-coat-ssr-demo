@@ -4,7 +4,7 @@ import {equal} from "common/utils";
 import {Resource} from "entity/resource";
 import {RootState} from "modules";
 import {ModuleNames} from "modules/names";
-import {BaseModuleHandlers, effect, LOCATION_CHANGE, reducer, RouterState} from "react-coat";
+import {BaseModuleHandlers, effect, LOCATION_CHANGE, RouterState} from "react-coat";
 //  mergeSearch, replaceQuery
 
 export default class Handlers<S extends R["State"] = R["State"], R extends Resource = Resource> extends BaseModuleHandlers<S, RootState, ModuleNames> {
@@ -27,20 +27,14 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
   protected putSelectedIds(selectedIds: string[]): S {
     return {...this.state, selectedIds};
   } */
-  @reducer
-  public putRouteData(routeData: Partial<S>): S {
-    return {...this.state, ...routeData};
-  }
   @effect()
   public async searchList(options: R["ListOptions"] = {}) {
     const listSearch: R["ListSearch"] = {...this.state.listSearch!, ...options};
-    this.updateState({listSearch} as Partial<S>);
     const {listItems, listSummary} = await this.config.api.searchList(listSearch);
-    this.updateState({listItems, listSummary} as Partial<S>);
+    this.updateState({listSearch, listItems, listSummary} as Partial<S>);
   }
   @effect()
   public async getItemDetail(itemDetailId: string) {
-    this.updateState({itemDetailId} as Partial<S>);
     const arr: Array<Promise<any>> = [this.config.api.getItemDetail!(itemDetailId)];
     if (this.config.api.hitItem) {
       arr.push(this.config.api.hitItem!(itemDetailId));
@@ -96,7 +90,7 @@ export default class Handlers<S extends R["State"] = R["State"], R extends Resou
     const appHashData = wholeHashData[ModuleNames.app]! || {};
 
     if (isCur(views, this.namespace, "Details" as any)) {
-      if (this.state.itemDetailId !== modulePathData.itemId) {
+      if (appHashData.refresh || (appHashData.refresh === null && (!this.state.itemDetail || this.state.itemDetail.id !== modulePathData.itemId))) {
         await this.getItemDetail(modulePathData.itemId!);
       }
     } else if (isCur(views, this.namespace, "List" as any)) {

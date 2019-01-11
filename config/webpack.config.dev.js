@@ -3,7 +3,7 @@ const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const HtmlReplaceWebpackPlugin = require("html-replace-webpack-plugin");
 const PostcssPxtorem = require("postcss-pxtorem");
-const ManifestPlugin = require("webpack-manifest-plugin");
+// const ManifestPlugin = require("webpack-manifest-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const PostcssFlexbugsFixes = require("postcss-flexbugs-fixes");
 const PostcssPresetEnv = require("postcss-preset-env");
@@ -11,18 +11,16 @@ const StylelintPlugin = require("stylelint-webpack-plugin");
 const TSImportPlugin = require("ts-import-plugin");
 const paths = require("./paths");
 
-const appPackage = require(path.join(paths.rootPath, "./package.json"));
-const conPath = path.join(paths.configPath, "./dev");
+const conPath = path.join(paths.configPath, process.env.WEBSITE || "./dev");
 const conEnv = require(path.join(conPath, "./env"));
 
 const htmlReplace = [
-  // 服务器取ajax数据，无法使用相对路径，必须指明
   {
-    pattern: "@@LOCALHOST",
-    replacement: appPackage.devServer.url,
+    pattern: "$$ENV$$",
+    replacement: JSON.stringify(conEnv),
   },
   {
-    pattern: "@@CLIENT_PUBLIC",
+    pattern: "$$CLIENT_PUBLIC_PATH$$",
     replacement: conEnv.clientPublicPath,
   },
 ];
@@ -152,10 +150,10 @@ const clientConfig = {
       template: path.join(paths.publicPath, "./client/index.html"),
     }),
     new HtmlReplaceWebpackPlugin(htmlReplace),
-    new ManifestPlugin({
+    /* new ManifestPlugin({
       fileName: "client/asset-manifest.json",
       publicPath: "/",
-    }),
+    }), */
     new StylelintPlugin({
       configFile: path.join(paths.rootPath, "./.stylelintrc.json"),
       context: paths.srcPath,

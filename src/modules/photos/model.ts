@@ -13,7 +13,7 @@ class ModuleHandlers extends ArticleHandlers<State, PhotoResource> {
   @effect()
   protected async parseRouter() {
     const result = await super.parseRouter();
-    this.dispatch(this.callThisAction(this.putRouteData, {showComment: result.moduleSearchData.showComment}));
+    this.updateState({showComment: result.moduleSearchData.showComment});
     return result;
   }
   @effect()

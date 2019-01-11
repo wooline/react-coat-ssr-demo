@@ -8,7 +8,7 @@
     "build": "cross-env NODE_ENV=production node scripts/build.js",
     "prod-express-demo": "node scripts/ssr-demo.js && npm run build && node prod-express-demo",
     "gen-icon": "node scripts/gen-icon.js",
-    "test": "cross-env NODE_ENV=development node scripts/test.js"
+    "demo-build": "cross-env NODE_ENV=production WEBSITE=demo node scripts/build.js"
   },
   "repository": {
     "type": "git",

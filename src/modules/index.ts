@@ -67,7 +67,7 @@ export type ReturnModule<T extends () => any> = T extends () => Promise<infer R>
 
 // 定义整站路由与view的匹配模式
 export const moduleToUrl: {[K in keyof ModuleGetter]: {[V in keyof ReturnModule<ModuleGetter[K]>["views"]]+?: string}} = {
-  app: {Main: "/", LoginForm: "/login"},
+  app: {Main: "/"},
   photos: {Main: "/photos", List: "/photos/list", Details: "/photos/item/:itemId"},
   videos: {Main: "/videos", List: "/videos/list", Details: "/videos/item/:itemId"},
   messages: {Main: "/messages", List: "/messages/list"},

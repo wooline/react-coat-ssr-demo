@@ -1,8 +1,8 @@
-import {Modal} from "antd-mobile";
 import "asset/css/global.less";
-import {toPath, toUrl} from "common/routers";
+import {toPath} from "common/routers";
 import ClientRoute from "components/ClientRoute";
-import {routerActions} from "connected-react-router";
+import Modal from "components/Modal";
+import NotFound from "components/NotFound";
 import {StartupStep} from "entity/global";
 import {moduleGetter, RootState, RouterData} from "modules";
 import {ModuleNames} from "modules/names";
@@ -10,11 +10,10 @@ import * as React from "react";
 import {LoadingState, loadView} from "react-coat";
 import {connect, DispatchProp} from "react-redux";
 import {Route, Switch} from "react-router-dom";
-
+import thisModule from "../facade";
 import BottomNav from "./BottomNav";
 import "./index.less";
 import Loading from "./Loading";
-import LoginForm from "./LoginForm";
 import LoginPop from "./LoginPop";
 import TopNav from "./TopNav";
 import Welcome from "./Welcome";
@@ -27,19 +26,20 @@ interface Props extends DispatchProp {
   pathname: string;
   searchData: RouterData["searchData"];
   showLoginPop: boolean;
+  showNotFoundPop: boolean;
   startupStep: StartupStep;
   globalLoading: LoadingState;
 }
 
 class Component extends React.PureComponent<Props> {
   private onCloseLoginPop = () => {
-    const {pathname, searchData, dispatch} = this.props;
-    const url = toUrl(pathname, {...searchData, [ModuleNames.app]: {...searchData.app, showLoginPop: false}});
-    dispatch(routerActions.push(url));
+    this.props.dispatch(thisModule.actions.putCloseLoginPop());
   };
-
+  private onCloseNotFound = () => {
+    this.props.dispatch(thisModule.actions.putCloseNotFoundPop());
+  };
   public render() {
-    const {showLoginPop, startupStep, globalLoading} = this.props;
+    const {showLoginPop, startupStep, globalLoading, showNotFoundPop} = this.props;
     return (
       <div className={ModuleNames.app}>
         {startupStep !== StartupStep.init && (
@@ -49,14 +49,17 @@ class Component extends React.PureComponent<Props> {
               <Route exact={false} path={toPath(ModuleNames.photos)} component={PhotosView} />
               <Route exact={false} path={toPath(ModuleNames.videos)} component={VideosView} />
               <ClientRoute exact={false} path={toPath(ModuleNames.messages)} component={MessagesView} />
-              <Route exact={true} path={toPath(ModuleNames.app, "LoginForm")} component={LoginForm} />
+              <Route component={NotFound} />
             </Switch>
             <BottomNav />
           </div>
         )}
         {(startupStep === StartupStep.configLoaded || startupStep === StartupStep.startupImageLoaded || startupStep === StartupStep.startupCountEnd) && <Welcome className={startupStep} />}
-        <Modal visible={showLoginPop} transparent={true} onClose={this.onCloseLoginPop} title="请登录" closable={true}>
+        <Modal visible={showLoginPop} onClose={this.onCloseLoginPop} title="请登录" closable={true}>
           <LoginPop />
+        </Modal>
+        <Modal visible={showNotFoundPop} onClose={this.onCloseNotFound} title="找不到" closable={true}>
+          <NotFound />
         </Modal>
         <Loading loading={globalLoading} />
       </div>
@@ -70,6 +73,7 @@ const mapStateToProps = (state: RootState) => {
     pathname: state.router.location.pathname,
     searchData: state.router.searchData,
     showLoginPop: Boolean(app.showLoginPop && app.curUser !== null && !app.curUser.hasLogin),
+    showNotFoundPop: Boolean(app.showNotFoundPop),
     startupStep: app.startupStep,
     globalLoading: app.loading.global,
   };

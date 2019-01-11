@@ -20,10 +20,10 @@ export default function ajax<T>(method: string, url: string, params: {[key: stri
       return "";
     }
   });
-  Object.keys(InitEnv.apiServer).some(key => {
+  Object.keys(InitEnv.apiServerPath).some(key => {
     const reg = new RegExp(key);
     if (reg.test(url)) {
-      url = url.replace(reg, InitEnv.apiServer[key]);
+      url = url.replace(reg, InitEnv.apiServerPath[key]);
       return true;
     } else {
       return false;

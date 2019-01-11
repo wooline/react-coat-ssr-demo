@@ -29,3 +29,6 @@ export function equal(obj1: any, obj2: any): boolean {
 export function reference(data: any) {
   return data;
 }
+export function isBrowser(): boolean {
+  return typeof window === "object";
+}

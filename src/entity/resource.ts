@@ -64,7 +64,6 @@ export interface Resource<D extends ResourceDefined = ResourceDefined> {
     listItems?: Array<D["ListItem"]>;
     listSearch?: D["ListSearch"];
     listSummary?: D["ListSummary"];
-    itemDetailId?: string;
     itemDetail?: D["ItemDetail"];
     itemEditor?: D["ItemEditor"];
     selectedIds?: string[];
