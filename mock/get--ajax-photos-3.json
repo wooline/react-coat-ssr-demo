@@ -14,8 +14,8 @@
     "price": 800,
     "hot": 689,
     "comments": 862,
-    "coverUrl": "/client/imgs/3.jpg",
+    "coverUrl": "imgs/3.jpg",
     "remark": "精华的地方都玩到了，随手一拍就是风景大片，美不胜收！但是呢，最大的感受就是厦门的景点过于分散，自己玩容易走回头路，非常浪费时间，我个人觉得现在国内的成熟的旅游景点比如厦门这样的，最好还是结伴玩，毕竟出来玩，重要的是轻松和开心嘛！",
-    "picList": ["/client/imgs/3.jpg", "/client/imgs/6.jpg", "/client/imgs/7.jpg"]
+    "picList": ["imgs/3.jpg", "imgs/6.jpg", "imgs/7.jpg"]
   }
 }

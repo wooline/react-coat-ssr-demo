@@ -7,11 +7,11 @@
     "connection": "close"
   },
   "response": {
-    "logoUrl": "/client/imgs/logo.png",
+    "logoUrl": "imgs/logo.png",
     "newMessage": 0,
     "startupPage": {
       "linkUrl": "http://www.baidu.com/",
-      "imageUrl": "/client/imgs/startup.jpg",
+      "imageUrl": "imgs/startup.jpg",
       "times": 5
     }
   }

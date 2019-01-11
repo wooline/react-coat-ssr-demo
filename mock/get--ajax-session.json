@@ -11,6 +11,6 @@
     "uid": "0",
     "username": "guest",
     "hasLogin": false,
-    "avatarUrl": "/client/imgs/avatar.png"
+    "avatarUrl": "imgs/avatar.png"
   }
 }

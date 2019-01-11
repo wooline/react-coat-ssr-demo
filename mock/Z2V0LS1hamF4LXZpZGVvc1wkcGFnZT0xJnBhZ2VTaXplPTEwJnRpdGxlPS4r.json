@@ -20,36 +20,36 @@
         "id": "3",
         "title": "厦门+鼓浪屿自驾4日游",
         "hot": 6895,
-        "coverUrl": "/client/imgs/11.jpg",
-        "videoUrl": "/client/imgs/11.jpg"
+        "coverUrl": "imgs/11.jpg",
+        "videoUrl": "imgs/11.jpg"
       },
       {
         "id": "7",
         "title": "厚道北京火车/双高/双动5日跟团游",
         "hot": 658,
-        "coverUrl": "/client/imgs/15.jpg",
-        "videoUrl": "/client/imgs/15.jpg"
+        "coverUrl": "imgs/15.jpg",
+        "videoUrl": "imgs/15.jpg"
       },
       {
         "id": "9",
         "title": "黄山+宏村+新安江大巴3日跟团游",
         "hot": 8942,
-        "coverUrl": "/client/imgs/17.jpg",
-        "videoUrl": "/client/imgs/17.jpg"
+        "coverUrl": "imgs/17.jpg",
+        "videoUrl": "imgs/17.jpg"
       },
       {
         "id": "5",
         "title": "长沙+张家界森林公园+天门山+玻璃栈道+黄龙洞+凤凰古城双高6日跟团游",
         "hot": 882,
-        "coverUrl": "/client/imgs/13.jpg",
-        "videoUrl": "/client/imgs/13.jpg"
+        "coverUrl": "imgs/13.jpg",
+        "videoUrl": "imgs/13.jpg"
       },
       {
         "id": "4",
         "title": "住无锡318文化大院，游灵山小镇拈花湾",
         "hot": 562,
-        "coverUrl": "/client/imgs/12.jpg",
-        "videoUrl": "/client/imgs/12.jpg"
+        "coverUrl": "imgs/12.jpg",
+        "videoUrl": "imgs/12.jpg"
       }
     ]
   }

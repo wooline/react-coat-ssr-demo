@@ -23,7 +23,7 @@
         "type": "个人游",
         "price": 256,
         "hot": 658,
-        "coverUrl": "/client/imgs/7.jpg"
+        "coverUrl": "imgs/7.jpg"
       },
       {
         "id": "5",
@@ -32,7 +32,7 @@
         "type": "跟团游",
         "price": 1582,
         "hot": 36,
-        "coverUrl": "/client/imgs/5.jpg"
+        "coverUrl": "imgs/5.jpg"
       },
       {
         "id": "6",
@@ -41,7 +41,7 @@
         "type": "跟团游",
         "price": 3456,
         "hot": 67,
-        "coverUrl": "/client/imgs/6.jpg"
+        "coverUrl": "imgs/6.jpg"
       },
       {
         "id": "4",
@@ -50,7 +50,7 @@
         "type": "跟团游",
         "price": 2499,
         "hot": 265,
-        "coverUrl": "/client/imgs/4.jpg"
+        "coverUrl": "imgs/4.jpg"
       },
       {
         "id": "8",
@@ -59,7 +59,7 @@
         "type": "自驾游",
         "price": 399,
         "hot": 3562,
-        "coverUrl": "/client/imgs/8.jpg"
+        "coverUrl": "imgs/8.jpg"
       }
     ]
   }
