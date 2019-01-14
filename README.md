@@ -23,6 +23,7 @@
   - [单向数据流](#单向数据流)
   - [路由和加载子 module](#路由和加载子-module)
   - [模块的初始化](#模块的初始化)
+- [上线及发布](#上线及发布)
 - [总结一下 SSR 的 3 个要点](#总结一下-ssr-的-3-个要点)
 
 <!-- /TOC -->
@@ -158,6 +159,35 @@ react 运行在浏览器中时，model 和 view 可以双向异步更新：
 也就是说，你得在 module/INIT 这个 EffectHandler 当中将所有 Model 数据构建好，包括获取 API 数据、加载子 Model 等 。然后，一次性的生成 Store，并交给 React render 成 Html。所以说：
 
 - Model 是可以异步的，Render 是同步的
+
+## 上线及发布
+
+```
+npm run build
+```
+
+编译后将在/build/下生成两端目录：client/和 server/
+
+- client/ 故名思义，是我们的静态资源服务器中的代码，发布时，只需要将它上传到静态服务器中。
+- server/ 是我们的服务器渲染需要的 JS，因为服务器渲染不需要异步按需加载，所以通常只有一个叫做 main.js 的文件。该文件包含所有的服务器渲染的逻辑，包括路由逻辑。将该文件上传至 nodeJS 服务器，以如下方式调：
+
+```JS
+const mainModule = require("./mainModule");
+ mainModule.default(req.url).then(result => {
+    const { ssrInitStoreKey, data, html } = result;
+    // 替换模版中的 html 部分
+    let html = htmlTpl.replace(/[^>]*<!--\s*{react-coat-html}\s*-->[^<]*/m, `${html}`);
+    // 替换模版中的 redux data 部分
+    html = html.replace(/<!--\s*{react-coat-script}\s*-->/, `<script>window.${ssrInitStoreKey} = ${JSON.stringify(data)};</script>`);
+    res.send(html);
+})
+```
+
+- 具体示例可见:
+
+```
+npm run prod-express-demo
+```
 
 ## 总结一下 SSR 的 3 个要点
 
