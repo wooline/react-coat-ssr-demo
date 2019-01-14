@@ -29,7 +29,7 @@ export const moduleGetter = {
   },
 };
 
-export type ModuleGetter = ModulesDefined<typeof moduleGetter>;
+export type ModuleGetter = ModulesDefined<typeof moduleGetter>; // 验证一下是否有模块忘了配置
 
 // 定义整站的路由参数默认值
 export const defRouteData = {
@@ -40,7 +40,8 @@ export const defRouteData = {
   [ModuleNames.comments]: commentsDefRouteData,
 };
 
-type ModuleRouterData = ModulesDefined<typeof defRouteData>;
+type ModuleRouterData = ModulesDefined<typeof defRouteData>; // 验证一下是否有模块忘了配置
+
 type ModuleRouterDataOptions = {[k in keyof ModuleRouterData]: DeepPartial<ModuleRouterData[k]>}; // 路由参数均为可选项
 export type RouterData = {
   views: {[moduleName: string]: {[viewName: string]: boolean}};
@@ -61,7 +62,7 @@ interface States {
 }
 
 // 定义整站的Root State
-export type RootState = BaseState<RootRouter> & ModulesDefined<States>;
+export type RootState = BaseState<RootRouter> & ModulesDefined<States>; // 验证一下是否有模块忘了配置
 
 export type ReturnModule<T extends () => any> = T extends () => Promise<infer R> ? R : T extends () => infer R ? R : Module;
 
@@ -74,4 +75,4 @@ export const moduleToUrl: {[K in keyof ModuleGetter]: {[V in keyof ReturnModule<
   comments: {Main: "/:type/item/:typeId/comments", List: "/:type/item/:typeId/comments/list", Details: "/:type/item/:typeId/comments/item/:itemId"},
 };
 
-export type ModuleToUrl = ModulesDefined<typeof moduleToUrl>;
+export type ModuleToUrl = ModulesDefined<typeof moduleToUrl>; // 验证一下是否有模块忘了配置

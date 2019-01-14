@@ -1,7 +1,7 @@
 {
   "name": "ssr",
   "version": "1.0.0",
-  "description": "a demo of the react-coat with ssr",
+  "description": "a demo of the react-coat for SSR",
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_ENV=development node scripts/start.js",
@@ -61,15 +61,16 @@
     "yargs": "^12.0.0"
   },
   "devDependencies": {
-    "react-coat-dev-utils": "1.0.0-beta.8",
-    "react-coat-dev-pkg": "1.0.0-beta.4"
+    "react-coat-dev-utils": "^1.0.1",
+    "react-coat-dev-pkg": "^1.0.2",
+    "typescript": "^3.2.2"
   },
   "dependencies": {
     "antd-mobile": "~2.2.6",
     "deep-extend": "~0.6.0",
     "rc-form": "~2.2.7",
-    "react-coat": "^4.0.0-beta.11",
-    "react-coat-pkg": "4.0.0-beta.2",
+    "react-coat": "~4.0.0",
+    "react-coat-pkg": "~4.0.1",
     "ts-import-plugin": "~1.5.5"
   },
   "browserslist": [

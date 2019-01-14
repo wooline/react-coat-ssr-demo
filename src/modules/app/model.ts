@@ -80,6 +80,7 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
 
   @effect(null)
   protected async [LOCATION_CHANGE]() {
+    // 由于 parseRouter 是 protected 不对外开放的，所以这里不能使用 this.actions.parseRouter() 必须使用 this.callThisAction(this.parseRouter)
     this.dispatch(this.callThisAction(this.parseRouter));
   }
 
@@ -112,11 +113,14 @@ class ModuleHandlers extends BaseModuleHandlers<State, RootState, ModuleNames> {
       curUser,
       startupStep: StartupStep.configLoaded,
     });
-    const views = this.rootState.router.views;
 
+    // 以下逻辑专为 SSR 设计，在浏览器端运行时，加载 view 会自动导入其 model，所以我们无需手动 load model。
+    // 在 SSR 时，我们不能等到加载 view 时再来自动导入 model，需要提前手动 load model。
+    const views = this.rootState.router.views;
     const subModules: ModuleNames[] = [ModuleNames.photos, ModuleNames.videos];
     for (const subModule of subModules) {
       if (isCur(views, subModule)) {
+        // 加载子模块的model，并初始化它
         await loadModel(moduleGetter[subModule as any]).then(subModel => subModel(this.store));
         break;
       }
