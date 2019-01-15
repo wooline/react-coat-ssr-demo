@@ -12,6 +12,7 @@
 - [基本思路](#基本思路)
 - [主要难点](#主要难点)
 - [两端同构](#两端同构)
+- [浏览器渲染？服务器渲染？一键切换](#浏览器渲染服务器渲染一键切换)
 - [安装](#安装)
 - [运行](#运行)
 - [查看在线 Demo](#查看在线-demo)
@@ -56,6 +57,25 @@
 - 两套源码，两套编译。
 
 本 Demo 属于以上第 2 种，同一套源码，被编译成浏览器运行 JS 和 nodeJS。
+
+## 浏览器渲染？服务器渲染？一键切换
+
+打开项目根下的./package.json，在"devServer"项中，将 ssr 设为 true 将启用服务器渲染，设为 false 仅使用浏览器渲染
+
+```
+"devServer": {
+    "url": "http://localhost:7445",
+    "ssr": true,
+    "mock": true,  // 是否启用服务器渲染
+    "proxy": {
+      "/ajax/**": {
+        "target": "http://localhost:7446/",
+        "secure": false,
+        "changeOrigin": true
+      }
+    }
+  }
+```
 
 ## 安装
 
