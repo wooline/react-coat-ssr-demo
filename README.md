@@ -1,12 +1,18 @@
-- 本 Demo 主要用来演示用 react-coat 来开发**SPA 单页应用** + **SSR 服务器渲染**。
-- 请先了解一下：[react-coat v4.0](https://github.com/wooline/react-coat)。
-- 循序渐进先学习一下：[用 react-coat 开发 SPA 单页应用](https://github.com/wooline/react-coat-spa-demo)
+- 本 Demo 主要用来演示用 react-coat 来开发**SPA 单页应用** + **SSR 服务器渲染**。请先了解一下：[react-coat v4.0](https://github.com/wooline/react-coat)
 - [本 Demo 讨论提问专用贴](https://github.com/wooline/react-coat-ssr-demo/issues/1)
 - reac-coat 学习交流 QQ 群：**929696953**，有问题可以在群里问我
 
+> [入手：Helloworld](https://github.com/wooline/react-coat-helloworld)
+
+> [进阶：SPA(单页应用)](https://github.com/wooline/react-coat-spa-demo)
+
+> [升级：SPA(单页应用)+SSR(服务器渲染)（**本 demo**）](https://github.com/wooline/react-coat-ssr-demo)
+
 ---
 
-<!-- TOC -->
+# 本 Demo 为第三个：升级 SSR(服务器渲染)
+
+---
 
 - [单页 SSR](#单页-ssr)
 - [基本思路](#基本思路)
@@ -26,8 +32,6 @@
   - [模块的初始化](#模块的初始化)
 - [上线及发布](#上线及发布)
 - [总结一下 SSR 的 3 个要点](#总结一下-ssr-的-3-个要点)
-
-<!-- /TOC -->
 
 ## 单页 SSR
 
