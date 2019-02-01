@@ -1,9 +1,9 @@
 import {TabBar} from "antd-mobile";
 import {UnauthorizedError} from "common/Errors";
-import {isCur, toPath, toUrl} from "common/routers";
+import {toPath, toUrl} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import {routerActions} from "connected-react-router";
-import {RootState, RouterData} from "modules";
+import {RootRouter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import React from "react";
 import {errorAction} from "react-coat";
@@ -12,16 +12,16 @@ import "./index.less";
 
 interface Props extends DispatchProp {
   hasLogin: boolean;
-  views: RouterData["views"];
+  views: RootRouter["views"];
 }
 const onClick = (e: React.MouseEvent<HTMLAnchorElement>) => e.preventDefault();
 
 class Component extends React.PureComponent<Props> {
   public render() {
     const {dispatch, views} = this.props;
-    const photosUrl = toUrl(toPath(ModuleNames.photos, "List"), {}, {app: {refresh: true}});
-    const videosUrl = toUrl(toPath(ModuleNames.videos, "List"), {}, {app: {refresh: true}});
-    const messagesUrl = toUrl(toPath(ModuleNames.messages, "List"), {}, {app: {refresh: true}});
+    const photosUrl = toUrl(toPath(ModuleNames.photos, "Main"), null, {app: {refresh: true}});
+    const videosUrl = toUrl(toPath(ModuleNames.videos, "Main"), null, {app: {refresh: true}});
+    const messagesUrl = toUrl(toPath(ModuleNames.messages, "Main"), null, {app: {refresh: true}});
     const PhotosLink = (
       <a href={photosUrl} onClick={onClick}>
         <Icon type={IconClass.PICTURE} />
@@ -45,7 +45,7 @@ class Component extends React.PureComponent<Props> {
             selectedIcon={PhotosLink}
             title="组团"
             key="photos"
-            selected={isCur(views, ModuleNames.photos)}
+            selected={!!views.photos}
             onPress={() => {
               dispatch(routerActions.push(photosUrl));
             }}
@@ -55,7 +55,7 @@ class Component extends React.PureComponent<Props> {
             key="videos"
             icon={VideosLink}
             selectedIcon={VideosLink}
-            selected={isCur(views, ModuleNames.videos)}
+            selected={!!views.videos}
             onPress={() => {
               dispatch(routerActions.push(videosUrl));
             }}
@@ -65,7 +65,7 @@ class Component extends React.PureComponent<Props> {
             selectedIcon={MessagesLink}
             title="消息"
             key="messages"
-            selected={isCur(views, ModuleNames.messages)}
+            selected={!!views.messages}
             onPress={() => {
               if (!this.props.hasLogin) {
                 this.props.dispatch(errorAction(new UnauthorizedError()));
@@ -82,7 +82,7 @@ class Component extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    hasLogin: state.app.curUser!.hasLogin,
+    hasLogin: state.app!.curUser!.hasLogin,
     views: state.router.views,
   };
 };

@@ -20,16 +20,11 @@ interface Props extends DispatchProp {
 class Component extends React.PureComponent<Props> {
   private onSearch = (title: string) => {
     const {dispatch, pathname} = this.props;
-    dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.messages]: {search: {title}}})));
+    dispatch(routerActions.push(toUrl(pathname, {messages: {search: {title}}})));
   };
   private onSearchClose = () => {
     const {dispatch, pathname} = this.props;
-    dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.app]: {showSearch: false}, [ModuleNames.messages]: {search: {title: null}}})));
-    /* if (this.props.listSearch!.title) {
-      dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.app]: {showSearch: false}, [ModuleNames.messages]: {search: {title: null}}})));
-    } else {
-      dispatch(routerActions.push(toUrl(pathname, search, {[ModuleNames.app]: {showSearch: false}})));
-    } */
+    dispatch(routerActions.push(toUrl(pathname, {app: {showSearch: false}, messages: {search: {title: ""}}})));
   };
 
   public render() {
@@ -38,7 +33,7 @@ class Component extends React.PureComponent<Props> {
     if (listItems && listSearch) {
       return (
         <div className={`${ModuleNames.messages}-List`}>
-          <Search value={listSearch.title || ""} onClose={this.onSearchClose} onSearch={this.onSearch} visible={showSearch || listSearch.title !== null} />
+          <Search value={listSearch.title} onClose={this.onSearchClose} onSearch={this.onSearch} visible={showSearch || !!listSearch.title} />
           <div className="list-items">
             {listItems.map(item => (
               <div key={item.id}>
@@ -50,7 +45,7 @@ class Component extends React.PureComponent<Props> {
           </div>
           {listSummary && (
             <div className="g-pagination">
-              <Pagination dispatch={dispatch} baseUrl={toUrl(pathname, {[ModuleNames.messages]: {search: {...listSearch, page: NaN}}})} page={listSummary.page} totalPages={listSummary.totalPages} />
+              <Pagination dispatch={dispatch} baseUrl={toUrl(pathname, {messages: {search: {...listSearch, page: NaN}}})} page={listSummary.page} totalPages={listSummary.totalPages} />
             </div>
           )}
         </div>
@@ -62,9 +57,9 @@ class Component extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: RootState) => {
-  const model = state.messages;
+  const model = state.messages!;
   return {
-    showSearch: Boolean(state.app.showSearch),
+    showSearch: Boolean(state.app!.showSearch),
     pathname: state.router.location.pathname,
     listSearch: model.listSearch,
     listItems: model.listItems,

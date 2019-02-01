@@ -1,14 +1,29 @@
 import {routerActions} from "connected-react-router";
 import * as assignDeep from "deep-extend";
-import {defRouteData, ModuleGetter, moduleToUrl, ReturnModule, RootRouter, RouterData} from "modules";
+import {RootRouter, routerData, viewToPath} from "modules";
+import {ModuleNames} from "modules/names";
 import {RouterParser} from "react-coat";
 import {matchPath} from "react-router";
 import {Dispatch} from "redux";
 
-type MData = {[moduleName: string]: {[key: string]: any}};
-type Views = {[moduleName: string]: {[viewName: string]: boolean}};
+/*
+@Type PathToView
+根据 modules/index.ts中定义的 viewToPath 反推导出来，形如：
+{
+  "/": ["app", "Main"],
+  "/photos": ["photos", "Main"],
+  "/photos/:itemId": ["photos", "Details"],
+  "/videos": ["videos", "Main"],
+  "/videos/:itemId": ["videos", "Details"],
+  "/messages": ["messages", "Main"],
+  "/:type/:typeId/comments": ["comments", "Main"],
+  "/:type/:typeId/comments/:itemId": ["comments", "Details"],
+}
+*/
+type ViewToPath = typeof viewToPath;
+type PathToView = {[pathname: string]: [string, string]};
 
-const modulePaths = ((maps: {[mName: string]: string | {[vName: string]: string}}) => {
+const pathToView: PathToView = ((maps: {[mName: string]: string | {[vName: string]: string}}) => {
   const urls: {[pathname: string]: [string, string]} = {};
   for (const mName in maps) {
     if (maps.hasOwnProperty(mName)) {
@@ -25,20 +40,81 @@ const modulePaths = ((maps: {[mName: string]: string | {[vName: string]: string}
     }
   }
   return urls;
-})(moduleToUrl as any);
+})(viewToPath as any);
 
-const {defSearch, defHash}: {defSearch: RouterData["wholeSearchData"]; defHash: RouterData["wholeHashData"]} = (routeData => {
-  const search = {};
-  const hash = {};
-  for (const moduleName in routeData) {
-    if (routeData.hasOwnProperty(moduleName)) {
-      search[moduleName] = routeData[moduleName].searchData;
-      hash[moduleName] = routeData[moduleName].hashData;
+/*
+  解析 pathname，得到当前展示了哪些 view，以及 pathname中的参数，不同模块对应的解析结果是不同的，例如：
+  当前 pathname 为 /photos/2/comments/66
+  对于 photos 模块，因为配置了："/photos/:itemId": ["photos", "Details"]，所以解析出 {itemId:2}, 当前展示Details
+  对于 comments 模块，因为配置了："/:type/:typeId/comments/:itemId": ["comments", "Details"]，所以解析出 {type:photos, typeId:2, itemId:66}, 当前展示Details
+*/
+function parsePathname(pathname: string) {
+  const views: RootRouter["views"] = {};
+  const pathData: {[moduleName: string]: {[key: string]: any}} = {};
+  Object.keys(pathToView).forEach(url => {
+    const match = matchPath(pathname, url);
+    if (match) {
+      const [moduleName, viewName] = pathToView[url];
+      if (!views[moduleName]) {
+        views[moduleName] = {[viewName]: 1};
+      } else {
+        views[moduleName][viewName] = 1;
+      }
+      if (match.params) {
+        pathData[moduleName] = match.params;
+      }
+    }
+  });
+  return {views, pathData};
+}
+
+/*
+  根据 modules/index.ts中定义的 viewToPath, 只需知道要展示哪个view，就能推导出它的 pathname，并自动将path中的参数占位符替换，例如：
+  /:type/:typeId/comments => photos/4/comments
+*/
+export function toPath<N extends ModuleNames, V extends keyof ViewToPath[N], P extends RootRouter["pathData"][N]>(moduleName: N, viewName: V, params?: P): string {
+  const pathExp = viewToPath[moduleName as "app"][viewName as "Main"] || "";
+  let pathname = pathExp;
+  if (params) {
+    pathname = pathExp.replace(/:\w+/g, flag => {
+      const key = flag.substr(1);
+      if (params[key]) {
+        return params[key];
+      } else {
+        return "";
+      }
+    });
+  }
+  return pathname;
+}
+
+// 生成 Url
+export function toUrl(pathname: string, searchData?: RootRouter["searchData"] | null, hashData?: RootRouter["hashData"]): string {
+  let url = pathname;
+  if (searchData) {
+    const str = serialize(excludeDefData(searchData, routerData.wholeSearchData));
+    if (str) {
+      url += "?" + str.replace("?", "");
     }
   }
-  return {defSearch: search, defHash: hash};
-})(defRouteData);
+  if (hashData) {
+    const str = serialize(excludeDefData(hashData, routerData.wholeHashData));
+    if (str) {
+      url += "#" + str.replace("#", "");
+    }
+  }
+  return url;
+}
 
+/*
+用JSON格式序列化路由参数，并加上模块名作前缀，例如：
+{
+  app: {showSearch: false, showRegisterPop: false},
+  photos: {search: {title: "张家界"}, showComment: false},
+}
+序列化为：
+app-showSearch=false&app-showRegisterPop=false&photos-search={title: "张家界"}&photos-showComment=false
+*/
 function serialize(data: {[key: string]: any}): string {
   const flatArr: string[] = [];
   for (const mName in data) {
@@ -62,67 +138,37 @@ function serialize(data: {[key: string]: any}): string {
   }
 }
 
-export function toPath<N extends keyof RouterData["pathData"], M extends ReturnModule<ModuleGetter[N]>, V extends keyof M["views"], P extends RouterData["pathData"][N]>(
-  moduleName: N,
-  viewName?: V,
-  params?: P
-): string {
-  viewName = viewName || ("Main" as any);
-  let pathExp: string | {[viewName: string]: string} = moduleToUrl[moduleName] as string;
-  if (typeof pathExp !== "string") {
-    pathExp = pathExp[viewName as string];
+/*
+  将module前缀去掉，并转换成结构，列如：
+  app-showSearch=false&app-showRegisterPop=false&photos-search={title: "张家界"}&photos-showComment=false
+  反序列化为：
+  {
+    app: {showSearch: false, showRegisterPop: false},
+    photos: {search: {title: "张家界"}, showComment: false},
   }
-  let pathname = pathExp;
-  if (params) {
-    pathname = pathExp.replace(/:\w+/g, flag => {
-      const key = flag.substr(1);
-      if (params[key]) {
-        return params[key];
-      } else {
-        return "";
+*/
+function parseRoute(pre: {}, cur: string) {
+  const [key, val] = cur.split("=");
+  if (key) {
+    const arr = key.split("-");
+    const moduleName = arr.shift();
+    const moduleKey = arr.join("-");
+    if (moduleName && moduleKey) {
+      if (!pre[moduleName]) {
+        pre[moduleName] = {};
       }
-    });
-  }
-  return pathname;
-}
-export function toUrl(pathname: string, searchData?: RouterData["searchData"], hashData?: RouterData["hashData"]): string {
-  let url = pathname;
-  if (searchData) {
-    let str = searchData as string;
-    if (typeof searchData !== "string") {
-      str = serialize(excludeDefData(searchData, defSearch));
-    }
-    if (str) {
-      url += "?" + str.replace("?", "");
+      pre[moduleName][moduleKey] = unserializeQuery(val);
     }
   }
-  if (hashData) {
-    let str = hashData as string;
-    if (typeof hashData !== "string") {
-      str = serialize(excludeDefData(hashData, defHash));
-    }
-    if (str) {
-      url += "#" + str.replace("#", "");
-    }
-  }
-  return url;
-}
-
-export function isCur<N extends keyof ModuleGetter, M extends ReturnModule<ModuleGetter[N]>, V extends keyof M["views"]>(views: RouterData["views"], moduleName: N, viewName?: V): boolean {
-  return views[moduleName] && views[moduleName][(viewName as string) || "Main"];
-}
-
-export function linkTo(e: React.MouseEvent<HTMLAnchorElement>, dispatch: Dispatch) {
-  e.preventDefault();
-  const href = e.currentTarget.getAttribute("href") as string;
-  if (href && href !== "#") {
-    dispatch(routerActions.push(href));
-  }
+  return pre;
 }
 
 const ISO_DATE_FORMAT = /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(\.\d+)?(Z|[+-][01]\d:[0-5]\d)$/;
 
-export function unserializeUrlQuery(query: string): any {
+/*
+  将字符串变成 Data，因为 JSON 中没有 Date 类型，所以用正则表达式匹配自动转换
+*/
+function unserializeQuery(query: string): any {
   if (!query) {
     return "";
   }
@@ -139,61 +185,58 @@ export function unserializeUrlQuery(query: string): any {
   }
   return args;
 }
-/* export function mergeSearch<S>(options: Partial<S>, def: S): Partial<S> {
-  const search = {...def, ...options};
-  return Object.keys(search).reduce((prev, cur) => {
-    if (typeof search[cur] === "object") {
-      if (JSON.stringify(search[cur]) !== JSON.stringify(def[cur])) {
-        prev[cur] = search[cur];
-      }
-    } else {
-      if (search[cur] !== def[cur]) {
-        prev[cur] = search[cur];
-      }
-    }
-    return prev;
-  }, {});
-} */
 
-function parsePathname(
-  pathname: string
-): {
-  pathData: MData;
-  views: Views;
-} {
-  const views: Views = {};
-  const pathData: MData = {};
-  Object.keys(modulePaths).forEach(url => {
-    const match = matchPath(pathname, url);
-    if (match) {
-      const result = modulePaths[url];
-      if (!views[result[0]]) {
-        views[result[0]] = {};
+/*
+ 排除默认路由参数，如果传参与默认一致，则省去
+*/
+const excludeDefData = (data: any, def: any) => {
+  const result: any = {};
+  for (const key in data) {
+    if (data.hasOwnProperty(key)) {
+      if (typeof data[key] === "object" && def[key] && !Array.isArray(def[key])) {
+        result[key] = excludeDefData(data[key], def[key]);
+      } else if (data[key] !== def[key]) {
+        result[key] = data[key];
       }
-      views[result[0]][result[1]] = true;
-      if (match.params) {
-        pathData[result[0]] = match.params;
-      }
-    }
-  });
-  return {views, pathData};
-}
-function parseRoute(pre: {}, cur: string) {
-  const [key, val] = cur.split("=");
-  if (key) {
-    const arr = key.split("-");
-    const moduleName = arr.shift();
-    const moduleKey = arr.join("-");
-    if (moduleName && moduleKey) {
-      if (!pre[moduleName]) {
-        pre[moduleName] = {};
-      }
-      pre[moduleName][moduleKey] = unserializeUrlQuery(val);
     }
   }
-  return pre;
+  if (Object.keys(result).length === 0) {
+    return undefined;
+  }
+  return result;
+};
+
+/*
+ 合并默认路由参数，与以上方法互逆，并补足当前views中展示的
+*/
+function mergeDefData<T extends {[moduleName: string]: any}>(views: {[moduleName: string]: any}, data: any, def: T) {
+  const newData: T = {...data};
+  Object.keys(views).forEach(moduleName => {
+    if (!newData[moduleName]) {
+      newData[moduleName] = {};
+    }
+  });
+  Object.keys(newData).forEach(moduleName => {
+    if (def[moduleName]) {
+      newData[moduleName] = assignDeep({}, def[moduleName], data[moduleName]);
+    }
+  });
+  return newData;
 }
 
+/*
+  react-coat 框架中只集成了 connected-react-router，只对路由做简单的解析，比如：
+  /photos/item/2/comments/item/66?photos-search={title: "张家界"}&photos-showComment=false
+  connected-react-router 只解析为：{
+    location: {
+      pathname: "/photos/item/2/comments/item/66",
+      search: "photos-search={title: "张家界"}&photos-showComment=false",
+      hash: ""
+    }
+  }
+  react-coat 框架留了一个自定义解析的钩子方便用户扩展：
+  RouterParser<T = any> = (nextRouter: T, prevRouter?: T) => T
+*/
 export const routerParser: RouterParser<RootRouter> = (nextRouter, prevRouter) => {
   const nRouter: RootRouter = {...nextRouter};
   const changed = {pathname: false, search: false, hash: false};
@@ -212,43 +255,18 @@ export const routerParser: RouterParser<RootRouter> = (nextRouter, prevRouter) =
     changed.hash = true;
   }
   if (changed.pathname || changed.search) {
-    nRouter.wholeSearchData = mergeDefData(nRouter.views, nRouter.searchData, defSearch);
+    nRouter.wholeSearchData = mergeDefData(nRouter.views, nRouter.searchData, routerData.wholeSearchData);
   }
   if (changed.pathname || changed.hash) {
-    nRouter.wholeHashData = mergeDefData(nRouter.views, nRouter.hashData, defHash);
+    nRouter.wholeHashData = mergeDefData(nRouter.views, nRouter.hashData, routerData.wholeHashData);
   }
   return nRouter;
 };
-function mergeDefData(views: Views, data: any, def: any) {
-  const newData = {...data};
-  Object.keys(views).forEach(mName => {
-    if (!newData[mName]) {
-      newData[mName] = {};
-    }
-  });
-  Object.keys(newData).forEach(mName => {
-    if (def[mName]) {
-      newData[mName] = assignDeep({}, def[mName], newData[mName]);
-    }
-  });
-  return newData;
-}
-const excludeDefData = (data: any, def: any) => {
-  const result: any = {};
-  for (const key in data) {
-    if (data.hasOwnProperty(key)) {
-      if (typeof data[key] === "object" && def[key] && !Array.isArray(def[key])) {
-        result[key] = excludeDefData(data[key], def[key]);
-      } else if (data[key] !== def[key]) {
-        result[key] = data[key];
-      }
-    }
-  }
-  if (Object.keys(result).length === 0) {
-    return undefined;
-  }
-  return result;
-};
+
+/*
+为了节省ssr时服务器资源，将一些能静态判断的URL跳转及路由解析提前处理
+该方法只作抛砖引玉的示例，还有很多细节未完整处理
+*/
 export function advanceRouter(url: string): RootRouter | string {
   let [pathname, search, hash] = url.split(/[?#]/);
   if (url.indexOf("?") === -1) {
@@ -261,7 +279,7 @@ export function advanceRouter(url: string): RootRouter | string {
   const redirects = [
     {
       path: /^\/$/,
-      replace: "/photos/list",
+      replace: "/photos",
     },
     {
       path: /\/$/,
@@ -286,7 +304,15 @@ export function advanceRouter(url: string): RootRouter | string {
     pathData,
     searchData,
     hashData,
-    wholeSearchData: mergeDefData(views, searchData, defSearch),
-    wholeHashData: mergeDefData(views, hashData, defHash),
+    wholeSearchData: mergeDefData(views, searchData, routerData.wholeSearchData),
+    wholeHashData: mergeDefData(views, hashData, routerData.wholeHashData),
   };
+}
+
+export function linkTo(e: React.MouseEvent<HTMLAnchorElement>, dispatch: Dispatch) {
+  e.preventDefault();
+  const href = e.currentTarget.getAttribute("href") as string;
+  if (href && href !== "#") {
+    dispatch(routerActions.push(href));
+  }
 }

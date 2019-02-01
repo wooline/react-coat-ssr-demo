@@ -6,9 +6,11 @@ import api from "./api";
 import {defRouteData} from "./facade";
 export {State} from "entity/comment";
 
+const initState: State = {};
+
 class ModuleHandlers extends ResourceHandlers<State, CommentResource> {
-  constructor() {
-    super({}, {api});
+  constructor(init: State) {
+    super(init, {api});
   }
   @effect()
   public async createItem(data: ItemCreateData) {
@@ -30,4 +32,4 @@ class ModuleHandlers extends ResourceHandlers<State, CommentResource> {
 // 导出本模块的Actions
 export type ModuleActions = Actions<ModuleHandlers>;
 
-export default exportModel(ModuleNames.comments, ModuleHandlers);
+export default exportModel(ModuleNames.comments, ModuleHandlers, initState);

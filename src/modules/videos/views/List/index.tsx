@@ -22,44 +22,25 @@ interface Props extends DispatchProp {
 let scrollTop = 0;
 
 class Component extends React.PureComponent<Props> {
-  private scroll = () => {
-    window.scrollTo(0, scrollTop);
-    scrollTop = 0;
-  };
-  private onItemClick = () => {
-    scrollTop = window.pageYOffset;
-  };
   private onSearch = (title: string) => {
     const {dispatch, pathname} = this.props;
-    dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.videos]: {search: {title}}})));
+    dispatch(routerActions.push(toUrl(pathname, {videos: {search: {title}}})));
   };
   private onSearchClose = () => {
     const {dispatch, pathname} = this.props;
-    dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.app]: {showSearch: false}, [ModuleNames.videos]: {search: {title: null}}})));
-    /* if (this.props.listSearch!.title) {
-      dispatch(routerActions.push(toUrl(pathname, {[ModuleNames.app]: {showSearch: false}, [ModuleNames.videos]: {search: {title: null}}})));
-    } else {
-      dispatch(routerActions.push(toUrl(pathname, search, {[ModuleNames.app]: {showSearch: false}})));
-    } */
+    dispatch(routerActions.push(toUrl(pathname, {app: {showSearch: false}, videos: {search: {title: ""}}})));
   };
-
-  public componentDidMount() {
-    this.scroll();
-  }
-  public componentDidUpdate() {
-    this.scroll();
-  }
 
   public render() {
     const {dispatch, showSearch, pathname, listSearch, listItems, listSummary} = this.props;
 
     if (listItems && listSearch) {
-      const itemBaseUrl = toUrl(toPath(ModuleNames.comments, "List", {type: ModuleNames.videos, typeId: "---"}), {
-        [ModuleNames.comments]: {search: {articleId: "---"}},
+      const itemBaseUrl = toUrl(toPath(ModuleNames.comments, "Main", {type: "videos", typeId: "---"}), {
+        comments: {search: {articleId: "---"}},
       });
       return (
         <div className={`${ModuleNames.videos}-List g-pic-list`}>
-          <Search value={listSearch.title || ""} onClose={this.onSearchClose} onSearch={this.onSearch} visible={showSearch || listSearch.title !== null} />
+          <Search value={listSearch.title} onClose={this.onSearchClose} onSearch={this.onSearch} visible={showSearch || !!listSearch.title} />
           <div className="list-items">
             {listItems.map(item => (
               <LinkButton onClick={this.onItemClick} dispatch={dispatch} href={itemBaseUrl.replace(/---/g, item.id)} key={item.id} className="g-pre-img">
@@ -76,7 +57,7 @@ class Component extends React.PureComponent<Props> {
           </div>
           {listSummary && (
             <div className="g-pagination">
-              <Pagination dispatch={dispatch} baseUrl={toUrl(pathname, {[ModuleNames.videos]: {search: {...listSearch, page: NaN}}})} page={listSummary.page} totalPages={listSummary.totalPages} />
+              <Pagination dispatch={dispatch} baseUrl={toUrl(pathname, {videos: {search: {...listSearch, page: NaN}}})} page={listSummary.page} totalPages={listSummary.totalPages} />
             </div>
           )}
         </div>
@@ -85,12 +66,25 @@ class Component extends React.PureComponent<Props> {
       return null;
     }
   }
+  private scroll = () => {
+    window.scrollTo(0, scrollTop);
+    scrollTop = 0;
+  };
+  private onItemClick = () => {
+    scrollTop = window.pageYOffset;
+  };
+  public componentDidMount() {
+    this.scroll();
+  }
+  public componentDidUpdate() {
+    this.scroll();
+  }
 }
 
 const mapStateToProps = (state: RootState) => {
-  const model = state.videos;
+  const model = state.videos!;
   return {
-    showSearch: Boolean(state.app.showSearch),
+    showSearch: Boolean(state.app!.showSearch),
     pathname: state.router.location.pathname,
     listSearch: model.listSearch,
     listItems: model.listItems,

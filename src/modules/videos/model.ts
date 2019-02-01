@@ -6,9 +6,11 @@ import api from "./api";
 
 export {State} from "entity/video";
 
+const initState: State = {};
+
 class ModuleHandlers extends ArticleHandlers<State, VideoResource> {
-  constructor() {
-    super({}, {api});
+  constructor(init: State) {
+    super(init, {api});
   }
   @effect()
   protected async [ModuleNames.videos + "/INIT"]() {
@@ -19,4 +21,4 @@ class ModuleHandlers extends ArticleHandlers<State, VideoResource> {
 // 导出本模块的Actions
 export type ModuleActions = Actions<ModuleHandlers>;
 
-export default exportModel(ModuleNames.videos, ModuleHandlers);
+export default exportModel(ModuleNames.videos, ModuleHandlers, initState);

@@ -12,7 +12,7 @@ export const defRouteData: ModuleRoute<PathData, SearchData, HashData> = {
   pathData: {},
   searchData: {
     search: {
-      title: null,
+      title: "",
       page: 1,
       pageSize: 10,
     },

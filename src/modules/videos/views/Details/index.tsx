@@ -24,7 +24,7 @@ class Component extends React.PureComponent<Props> {
         <div className={`${ModuleNames.videos}-Details g-details g-doc-width g-modal g-enter-in`}>
           <div className="subject">
             <h2 />
-            <LinkButton dispatch={dispatch} href={toUrl(toPath(ModuleNames.videos, "List", {}), {[ModuleNames.videos]: {search: listSearch}})} className="close-button">
+            <LinkButton dispatch={dispatch} href={toUrl(toPath(ModuleNames.videos, "Main", {}), {videos: {search: listSearch}})} className="close-button">
               <MIcon size="md" type="cross-circle" />
             </LinkButton>
           </div>
@@ -69,7 +69,7 @@ class Component extends React.PureComponent<Props> {
 }
 
 const mapStateToProps = (state: RootState) => {
-  const model = state.videos;
+  const model = state.videos!;
   return {
     listSearch: model.listSearch,
     itemDetail: model.itemDetail,

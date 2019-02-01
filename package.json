@@ -1,6 +1,6 @@
 {
   "name": "ssr",
-  "version": "1.0.0",
+  "version": "4.1.0",
   "description": "a demo of the react-coat for SSR",
   "main": "index.js",
   "scripts": {
@@ -69,7 +69,7 @@
     "antd-mobile": "~2.2.6",
     "deep-extend": "~0.6.0",
     "rc-form": "~2.2.7",
-    "react-coat": "~4.0.0",
+    "react-coat": "~4.1.0",
     "react-coat-pkg": "~4.0.1",
     "ts-import-plugin": "~1.5.5"
   },

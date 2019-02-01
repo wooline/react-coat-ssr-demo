@@ -1,4 +1,3 @@
-import {ModuleNames} from "modules/names";
 import {Resource, ResourceDefined} from "./resource";
 
 interface Item {
@@ -13,7 +12,7 @@ interface Detail extends Item {
   repliesList: Array<Item & {id: string}>;
 }
 export type CommentDefined = ResourceDefined & {
-  PathData: {type: ModuleNames; typeId: string};
+  PathData: {type: "photos" | "videos"; typeId: string};
   ListItem: Item;
   ItemDetail: Detail;
   ListSearch: {

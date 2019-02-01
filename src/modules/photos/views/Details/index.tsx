@@ -3,7 +3,7 @@ import {toPath, toUrl} from "common/routers";
 import Icon, {IconClass} from "components/Icon";
 import LinkButton from "components/LinkButton";
 import {ItemDetail, ListSearch} from "entity/photo";
-import {RootState, RouterData} from "modules";
+import {RootRouter, RootState} from "modules";
 import {Main as Comments} from "modules/comments/views";
 import {ModuleNames} from "modules/names";
 import React from "react";
@@ -13,7 +13,7 @@ import "./index.less";
 
 interface Props extends DispatchProp {
   pathname: string;
-  searchData: RouterData["searchData"];
+  searchData: RootRouter["searchData"];
   showComment: boolean;
   listSearch: ListSearch | undefined;
   itemDetail: ItemDetail | undefined;
@@ -46,7 +46,7 @@ class Component extends React.PureComponent<Props, State> {
         <div className={`${ModuleNames.photos}-Details g-details g-doc-width g-modal g-enter-in`}>
           <div className="subject">
             <h2>{itemDetail.title}</h2>
-            <LinkButton dispatch={dispatch} href={toUrl(toPath(ModuleNames.photos, "List", {}), {[ModuleNames.photos]: {search: listSearch, showComment: false}})} className="close-button">
+            <LinkButton dispatch={dispatch} href={toUrl(toPath(ModuleNames.photos, "Main", {}), {photos: {search: listSearch, showComment: false}})} className="close-button">
               <MIcon size="md" type="cross-circle" />
             </LinkButton>
           </div>
@@ -63,14 +63,7 @@ class Component extends React.PureComponent<Props, State> {
             </Carousel>
           </div>
 
-          <LinkButton
-            dispatch={dispatch}
-            href={toUrl(pathname, {
-              ...searchData,
-              [ModuleNames.photos]: {showComment: true},
-            })}
-            className="comment-bar"
-          >
+          <LinkButton dispatch={dispatch} href={toUrl(pathname, {...searchData, photos: {showComment: true}})} className="comment-bar">
             <span>
               <Icon type={IconClass.HEART} />
               <br />
@@ -83,14 +76,7 @@ class Component extends React.PureComponent<Props, State> {
             </span>
           </LinkButton>
           <div className={"comments-panel" + (showComment ? " on" : "")}>
-            <LinkButton
-              dispatch={dispatch}
-              href={toUrl(pathname, {
-                ...searchData,
-                [ModuleNames.photos]: {showComment: false},
-              })}
-              className="mask"
-            />
+            <LinkButton dispatch={dispatch} href={toUrl(pathname, {...searchData, photos: {showComment: false}})} className="mask" />
             <div className="dialog">
               <Comments />
             </div>
@@ -118,7 +104,7 @@ class Component extends React.PureComponent<Props, State> {
 }
 
 const mapStateToProps = (state: RootState) => {
-  const model = state.photos;
+  const model = state.photos!;
   return {
     pathname: state.router.location.pathname,
     searchData: state.router.searchData,

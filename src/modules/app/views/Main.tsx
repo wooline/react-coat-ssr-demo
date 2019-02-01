@@ -4,12 +4,12 @@ import ClientRoute from "components/ClientRoute";
 import Modal from "components/Modal";
 import NotFound from "components/NotFound";
 import {StartupStep} from "entity/global";
-import {moduleGetter, RootState, RouterData} from "modules";
+import {moduleGetter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import * as React from "react";
 import {LoadingState, loadView} from "react-coat";
 import {connect, DispatchProp} from "react-redux";
-import {Route, Switch} from "react-router-dom";
+import {Redirect, Route, Switch} from "react-router-dom";
 import thisModule from "../facade";
 import BottomNav from "./BottomNav";
 import "./index.less";
@@ -23,8 +23,6 @@ const VideosView = loadView(moduleGetter, ModuleNames.videos, "Main");
 const MessagesView = loadView(moduleGetter, ModuleNames.messages, "Main");
 
 interface Props extends DispatchProp {
-  pathname: string;
-  searchData: RouterData["searchData"];
   showLoginPop: boolean;
   showNotFoundPop: boolean;
   startupStep: StartupStep;
@@ -33,10 +31,10 @@ interface Props extends DispatchProp {
 
 class Component extends React.PureComponent<Props> {
   private onCloseLoginPop = () => {
-    this.props.dispatch(thisModule.actions.putCloseLoginPop());
+    this.props.dispatch(thisModule.actions.putLoginPop(false));
   };
   private onCloseNotFound = () => {
-    this.props.dispatch(thisModule.actions.putCloseNotFoundPop());
+    this.props.dispatch(thisModule.actions.putNotFoundPop(false));
   };
   public render() {
     const {showLoginPop, startupStep, globalLoading, showNotFoundPop} = this.props;
@@ -46,9 +44,10 @@ class Component extends React.PureComponent<Props> {
           <div className="g-page">
             <TopNav />
             <Switch>
-              <Route exact={false} path={toPath(ModuleNames.photos)} component={PhotosView} />
-              <Route exact={false} path={toPath(ModuleNames.videos)} component={VideosView} />
-              <ClientRoute exact={false} path={toPath(ModuleNames.messages)} component={MessagesView} />
+              <Redirect exact={true} path="/" to={toPath(ModuleNames.photos, "Main")} />
+              <Route exact={false} path={toPath(ModuleNames.photos, "Main")} component={PhotosView} />
+              <Route exact={false} path={toPath(ModuleNames.videos, "Main")} component={VideosView} />
+              <ClientRoute exact={false} path={toPath(ModuleNames.messages, "Main")} component={MessagesView} />
               <Route component={NotFound} />
             </Switch>
             <BottomNav />
@@ -66,13 +65,11 @@ class Component extends React.PureComponent<Props> {
     );
   }
 }
-// todo document title处理
+
 const mapStateToProps = (state: RootState) => {
-  const app = state.app;
+  const app = state.app!;
   return {
-    pathname: state.router.location.pathname,
-    searchData: state.router.searchData,
-    showLoginPop: Boolean(app.showLoginPop && app.curUser !== null && !app.curUser.hasLogin),
+    showLoginPop: Boolean(app.showLoginPop && !app.curUser!.hasLogin),
     showNotFoundPop: Boolean(app.showNotFoundPop),
     startupStep: app.startupStep,
     globalLoading: app.loading.global,

@@ -6,11 +6,12 @@ import api from "./api";
 
 export {State} from "entity/photo";
 
+const initState: State = {};
+
 class ModuleHandlers extends ArticleHandlers<State, PhotoResource> {
-  constructor() {
-    super({}, {api});
+  constructor(init: State) {
+    super(init, {api});
   }
-  @effect()
   protected async parseRouter() {
     const result = await super.parseRouter();
     this.updateState({showComment: result.moduleSearchData.showComment});
@@ -25,4 +26,4 @@ class ModuleHandlers extends ArticleHandlers<State, PhotoResource> {
 // 导出本模块的Actions
 export type ModuleActions = Actions<ModuleHandlers>;
 
-export default exportModel(ModuleNames.photos, ModuleHandlers);
+export default exportModel(ModuleNames.photos, ModuleHandlers, initState);

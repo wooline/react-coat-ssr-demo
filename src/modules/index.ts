@@ -1,78 +1,51 @@
-import {DeepPartial} from "entity/common";
-import {defRouteData as appDefRouteData, ModuleState as AppState} from "modules/app/facade";
-import {defRouteData as commentsDefRouteData, ModuleState as CommentsState} from "modules/comments/facade";
-import {defRouteData as messagesDefRouteData, ModuleState as MessagesState} from "modules/messages/facade";
-import {defRouteData as photosDefRouteData, ModuleState as PhotosState} from "modules/photos/facade";
-import {defRouteData as videosDefRouteData, ModuleState as VideosState} from "modules/videos/facade";
-import {Module, RootState as BaseState, RouterState} from "react-coat";
-import {ModuleNames} from "./names";
-
-// 一个验证器，利用TS类型来确保增加一个module时，相关的配置都同时增加了
-type ModulesDefined<T extends {[key in ModuleNames]: any}> = T;
+import {defineModuleGetter, defineRouterData, defineViewToPath} from "common/utils";
+import {defRouteData as appDefRouteData} from "modules/app/facade";
+import {defRouteData as commentsDefRouteData} from "modules/comments/facade";
+import {defRouteData as messagesDefRouteData} from "modules/messages/facade";
+import {defRouteData as photosDefRouteData} from "modules/photos/facade";
+import {defRouteData as videosDefRouteData} from "modules/videos/facade";
+import {RootState as BaseState, RouterState} from "react-coat";
 
 // 定义模块的加载方案，同步或者异步均可
-export const moduleGetter = {
-  [ModuleNames.app]: () => {
+export const moduleGetter = defineModuleGetter({
+  app: () => {
     return import(/* webpackChunkName: "app" */ "modules/app");
   },
-  [ModuleNames.photos]: () => {
+  photos: () => {
     return import(/* webpackChunkName: "photos" */ "modules/photos");
   },
-  [ModuleNames.videos]: () => {
+  videos: () => {
     return import(/* webpackChunkName: "videos" */ "modules/videos");
   },
-  [ModuleNames.messages]: () => {
+  messages: () => {
     return import(/* webpackChunkName: "messages" */ "modules/messages");
   },
-  [ModuleNames.comments]: () => {
+  comments: () => {
     return import(/* webpackChunkName: "comments" */ "modules/comments");
   },
-};
+});
 
-export type ModuleGetter = ModulesDefined<typeof moduleGetter>; // 验证一下是否有模块忘了配置
+export type ModuleGetter = typeof moduleGetter;
 
-// 定义整站的路由参数默认值
-export const defRouteData = {
-  [ModuleNames.app]: appDefRouteData,
-  [ModuleNames.photos]: photosDefRouteData,
-  [ModuleNames.videos]: videosDefRouteData,
-  [ModuleNames.messages]: messagesDefRouteData,
-  [ModuleNames.comments]: commentsDefRouteData,
-};
+// 扩展 connected-react-router 的路由结构
+export const routerData = defineRouterData({
+  app: appDefRouteData,
+  photos: photosDefRouteData,
+  videos: videosDefRouteData,
+  messages: messagesDefRouteData,
+  comments: commentsDefRouteData,
+});
 
-type ModuleRouterData = ModulesDefined<typeof defRouteData>; // 验证一下是否有模块忘了配置
+// 通过下面的 viewToPath 配置，可通过当前 pathname 推导出当前展示了哪些 views，具体实现在 ./src/common/routers.ts
+export type RootRouter = RouterState & typeof routerData & {views: RootState["views"]};
 
-type ModuleRouterDataOptions = {[k in keyof ModuleRouterData]: DeepPartial<ModuleRouterData[k]>}; // 路由参数均为可选项
-export type RouterData = {
-  views: {[moduleName: string]: {[viewName: string]: boolean}};
-  pathData: {[M in keyof ModuleRouterData]?: ModuleRouterData[M]["pathData"]};
-  searchData: {[M in keyof ModuleRouterDataOptions]?: ModuleRouterDataOptions[M]["searchData"]};
-  hashData: {[M in keyof ModuleRouterDataOptions]?: ModuleRouterDataOptions[M]["hashData"]};
-  wholeSearchData: {[M in keyof ModuleRouterData]?: ModuleRouterData[M]["searchData"]};
-  wholeHashData: {[M in keyof ModuleRouterData]?: ModuleRouterData[M]["hashData"]};
-};
-export type RootRouter = RouterState & RouterData;
-// 定义整站Module States
-interface States {
-  [ModuleNames.app]: AppState;
-  [ModuleNames.photos]: PhotosState;
-  [ModuleNames.videos]: VideosState;
-  [ModuleNames.messages]: MessagesState;
-  [ModuleNames.comments]: CommentsState;
-}
-
-// 定义整站的Root State
-export type RootState = BaseState<RootRouter> & ModulesDefined<States>; // 验证一下是否有模块忘了配置
-
-export type ReturnModule<T extends () => any> = T extends () => Promise<infer R> ? R : T extends () => infer R ? R : Module;
+export type RootState = BaseState<ModuleGetter, RootRouter>;
 
 // 定义整站路由与view的匹配模式
-export const moduleToUrl: {[K in keyof ModuleGetter]: {[V in keyof ReturnModule<ModuleGetter[K]>["views"]]+?: string}} = {
+export const viewToPath = defineViewToPath({
   app: {Main: "/"},
-  photos: {Main: "/photos", List: "/photos/list", Details: "/photos/item/:itemId"},
-  videos: {Main: "/videos", List: "/videos/list", Details: "/videos/item/:itemId"},
-  messages: {Main: "/messages", List: "/messages/list"},
-  comments: {Main: "/:type/item/:typeId/comments", List: "/:type/item/:typeId/comments/list", Details: "/:type/item/:typeId/comments/item/:itemId"},
-};
-
-export type ModuleToUrl = ModulesDefined<typeof moduleToUrl>; // 验证一下是否有模块忘了配置
+  photos: {Main: "/photos", Details: "/photos/:itemId", List: null},
+  videos: {Main: "/videos", Details: "/videos/:itemId", List: null},
+  messages: {Main: "/messages", List: null},
+  comments: {Main: "/:type/:typeId/comments", Details: "/:type/:typeId/comments/:itemId", List: null},
+});

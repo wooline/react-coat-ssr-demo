@@ -19,8 +19,8 @@ class Component extends React.PureComponent<Props> {
       <div className={`${ModuleNames.comments}`}>
         <div className="wrap">
           <Switch>
-            <Route exact={false} path={toPath(ModuleNames.comments, "List")} component={ListView} />
-            <Route exact={false} path={toPath(ModuleNames.comments, "Details")} component={DetailsView} />
+            <Route exact={true} path={toPath(ModuleNames.comments, "Details")} component={DetailsView} />
+            <Route component={ListView} />
           </Switch>
         </div>
         <Editor />

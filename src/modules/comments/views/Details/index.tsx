@@ -2,7 +2,7 @@ import {Icon as MIcon} from "antd-mobile";
 import {toPath, toUrl} from "common/routers";
 import LinkButton from "components/LinkButton";
 import {ItemDetail, ListSearch, PathData} from "entity/comment";
-import {RootState, RouterData} from "modules";
+import {RootRouter, RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import React from "react";
 import {findDOMNode} from "react-dom";
@@ -10,7 +10,7 @@ import {connect, DispatchProp} from "react-redux";
 import "./index.less";
 
 interface Props extends DispatchProp {
-  searchData: RouterData["searchData"];
+  searchData: RootRouter["searchData"];
   pathData: PathData;
   listSearch: ListSearch | undefined;
   itemDetail: ItemDetail | undefined;
@@ -31,7 +31,7 @@ class Component extends React.PureComponent<Props> {
           <div className="list-header">
             <LinkButton
               dispatch={dispatch}
-              href={toUrl(toPath(ModuleNames.comments, "List", {type, typeId}), {...searchData, [ModuleNames.comments]: {search: {...listSearch, articleId: typeId}}})}
+              href={toUrl(toPath(ModuleNames.comments, "Main", {type, typeId}), {...searchData, comments: {search: {...listSearch, articleId: typeId}}})}
               className="close-button"
             >
               <MIcon size="md" type="left" />
@@ -91,8 +91,8 @@ const mapStateToProps = (state: RootState) => {
   return {
     searchData: state.router.searchData,
     pathData: state.router.pathData.comments!,
-    listSearch: state.comments.listSearch,
-    itemDetail: state.comments.itemDetail,
+    listSearch: state.comments!.listSearch,
+    itemDetail: state.comments!.itemDetail,
   };
 };
 

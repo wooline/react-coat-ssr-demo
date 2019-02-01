@@ -1,11 +1,8 @@
 import {Button, InputItem, List, Toast} from "antd-mobile";
-import {toUrl} from "common/routers";
-import LinkButton from "components/LinkButton";
 import {RCForm} from "entity/common";
 import {LoginRequest} from "entity/session";
-import {RootState, RouterData} from "modules";
+import {RootRouter, RootState} from "modules";
 import thisModule from "modules/app/facade";
-import {ModuleNames} from "modules/names";
 import {createForm} from "rc-form";
 import * as React from "react";
 import {connect, DispatchProp} from "react-redux";
@@ -13,7 +10,7 @@ import "./index.less";
 
 interface Props extends RCForm, DispatchProp {
   pathname: string;
-  searchData: RouterData["searchData"];
+  searchData: RootRouter["searchData"];
 }
 
 class Component extends React.PureComponent<Props> {
@@ -32,9 +29,6 @@ class Component extends React.PureComponent<Props> {
 
   public render() {
     const {
-      pathname,
-      searchData,
-      dispatch,
       form: {getFieldProps},
     } = this.props;
 
@@ -56,7 +50,6 @@ class Component extends React.PureComponent<Props> {
         },
       ],
     });
-    const regUrl = toUrl(pathname, {...searchData, [ModuleNames.app]: {...searchData.app, showRegisterPop: true}});
     return (
       <div className="app-LoginPop">
         <List className="bd">
@@ -68,9 +61,7 @@ class Component extends React.PureComponent<Props> {
             登录
           </Button>
           <div className="links">
-            <LinkButton href={regUrl} key="0" dispatch={dispatch}>
-              + 注册新会员
-            </LinkButton>
+            <span>+ 注册新会员</span>
           </div>
         </div>
       </div>

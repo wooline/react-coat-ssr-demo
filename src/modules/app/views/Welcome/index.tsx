@@ -96,8 +96,8 @@ class Component extends React.PureComponent<Props> {
 
 const mapStateToProps = (state: RootState) => {
   return {
-    startupStep: state.app.startupStep,
-    config: state.app.projectConfig!.startupPage,
+    startupStep: state.app!.startupStep,
+    config: state.app!.projectConfig!.startupPage,
   };
 };
 

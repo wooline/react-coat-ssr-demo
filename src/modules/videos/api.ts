@@ -3,6 +3,10 @@ import {ItemDetail, ListItem, ListSearch, ListSummary} from "entity/video";
 
 export class API {
   public searchList(listSearch: ListSearch) {
+    listSearch = {...listSearch};
+    if (!listSearch.title) {
+      delete listSearch.title;
+    }
     return request<{listItems: ListItem[]; listSummary: ListSummary}>("get", "/ajax/videos", listSearch).then(reslut => {
       reslut.listItems.forEach(item => {
         item.coverUrl = InitEnv.clientPublicPath + item.coverUrl;

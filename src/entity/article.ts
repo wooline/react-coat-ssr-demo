@@ -2,7 +2,7 @@ import {Resource, ResourceDefined} from "./resource";
 
 export type ArticleDefined = ResourceDefined & {
   ListSearch: {
-    title: string | null;
+    title: string;
   };
 };
 
