@@ -1,16 +1,20 @@
-- 本 Demo 主要用来演示用 react-coat 来开发**SPA 单页应用** + **SSR 服务器渲染**。请先了解一下：[react-coat v4.0](https://github.com/wooline/react-coat)
+- react-coat 同时支持`单页浏览器渲染(SPA)`和`服务器渲染(SSR)`，请先了解一下：[react-coat v4.0](https://github.com/wooline/react-coat)
 - [本 Demo 讨论提问专用贴](https://github.com/wooline/react-coat-ssr-demo/issues/1)
-- reac-coat 学习交流 QQ 群：**929696953**，有问题可以在群里问我
+- **如果有错误或 Bug 欢迎批评指正，如果觉得还不错请别忘了给个 Star >\_<**
+
+---
+
+react-coat 使用**Typescript**开发，集成**Redux**，由浅入深请看 3 个 Demo：
 
 > [入手：Helloworld](https://github.com/wooline/react-coat-helloworld)
 
 > [进阶：SPA(单页应用)](https://github.com/wooline/react-coat-spa-demo)
 
-> [升级：SPA(单页应用)+SSR(服务器渲染)（**本 demo**）](https://github.com/wooline/react-coat-ssr-demo)
+> [升级：SPA(单页应用)+SSR(服务器渲染)-(**本 demo**)](https://github.com/wooline/react-coat-ssr-demo)
 
 ---
 
-# 本 Demo 为第三个：升级 SSR(服务器渲染)
+## 第三站：SPA(单页应用) + SSR(服务器渲染)
 
 # 文档整理中。。。
 
@@ -39,13 +43,27 @@
 - [上线及发布](#上线及发布)
 - [总结一下 SSR 的 3 个要点](#总结一下-ssr-的-3-个要点)
 
+## 安装
+
+```
+git clone https://github.com/wooline/react-coat-ssr-demo.git
+npm install
+```
+
+## 运行
+
+- `npm start` 以开发模式运行
+- `npm run build` 以产品模式编译生成文件
+- `npm run prod-express-demo` 以产品模式编译生成文件并启用一个 express 做 demo
+- `npm run gen-icon` 自动生成 [iconfont](https://iconfont.cn) 文件及 ts 类型
+
 ## 单页 SSR
 
-本 Demo 用来演示如何利用 react-coat 来开发服务器和浏览器同构的`“单页 SSR ”`项目，什么是`单页 SSR`？
+本 Demo 用来演示如何利用 react-coat 来开发服务器和浏览器同构的`单页SSR`项目，什么是`单页SSR`？
 
-- 浏览器在载入第一个页面后，不再进行整个页面的刷新，而是通过 ajax 进行局部更新。
-- 虽然浏览器载入第一个页面后不再整体刷新，但是在交互过程中，随时刷新页面，可以适时重现当前内容。
-- 重现当前内容由服务器端生成，以提高加载速度和 利于 SEO。
+- 浏览器载入的第一个页面由服务器渲染完成，以提高加载速度和利于 SEO。
+- 载入第一个页面后，不再进行整个页面的刷新，而是通过 ajax 局部更新。
+- 虽然以后不再整体刷新，但是在交互过程中，随时刷新页面，可以通过 URL 重现当前内容。
 
 > 所以`单页 SSR`既可以保持 SPA 单页应用的用户体验，同时又能让搜索引擎抓取静态 html，还能提高首屏加载速度
 
