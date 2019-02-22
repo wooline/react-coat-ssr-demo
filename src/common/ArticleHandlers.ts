@@ -3,7 +3,7 @@ import {moduleGetter} from "modules";
 import {loadModel} from "react-coat";
 import ResourceHandlers from "./ResourceHandlers";
 
-export default class Handlers<S extends R["State"], R extends ArticleResource> extends ResourceHandlers<S, R> {
+export default class Handlers<R extends ArticleResource, S extends R["State"]> extends ResourceHandlers<R, S> {
   /*
     使用服务器渲染时，不能依赖于react-router-dom路由来自动载入model，需要自已载入model
   */

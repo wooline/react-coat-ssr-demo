@@ -8,12 +8,13 @@ export {State} from "entity/photo";
 
 const initState: State = {};
 
-class ModuleHandlers extends ArticleHandlers<State, PhotoResource> {
+class ModuleHandlers extends ArticleHandlers<PhotoResource, State> {
   constructor(init: State) {
     super(init, {api});
   }
   protected async parseRouter() {
     const result = await super.parseRouter();
+    // 及时将路由数据消化为redux数据
     this.updateState({showComment: result.moduleSearchData.showComment});
     return result;
   }

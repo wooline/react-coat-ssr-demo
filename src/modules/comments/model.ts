@@ -8,7 +8,7 @@ export {State} from "entity/comment";
 
 const initState: State = {};
 
-class ModuleHandlers extends ResourceHandlers<State, CommentResource> {
+class ModuleHandlers extends ResourceHandlers<CommentResource, State> {
   constructor(init: State) {
     super(init, {api});
   }

@@ -5,7 +5,7 @@ import {RootState} from "modules";
 import {ModuleNames} from "modules/names";
 import {BaseModuleHandlers, effect, VIEW_INVALID} from "react-coat";
 
-export default class Handlers<S extends R["State"] = R["State"], R extends Resource = Resource> extends BaseModuleHandlers<S, RootState, ModuleNames> {
+export default class Handlers<R extends Resource = Resource, S extends R["State"] = R["State"]> extends BaseModuleHandlers<S, RootState, ModuleNames> {
   constructor(initState: S, protected config: {api: R["API"]}) {
     super(initState);
   }
