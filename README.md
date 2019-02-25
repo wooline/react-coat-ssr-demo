@@ -1,3 +1,15 @@
+# 文档整理中。。。
+
+## 查看在线 Demo
+
+> [点击查看在线 Demo](http://react-coat.ssr.teying.vip/)
+
+- 用浏览器打开网页，刷新一下浏览器，看是否能保持当前页面内容
+- 查看网页源码，看服务器是否输出静态的 Html
+- 在页面中的某\<a\>链接上，用鼠标右键选择在`新窗口中打开`
+
+---
+
 - react-coat 同时支持`单页浏览器渲染(SPA)`和`服务器渲染(SSR)`，请先了解一下：[react-coat v4.0](https://github.com/wooline/react-coat)
 - [本 Demo 讨论提问专用贴](https://github.com/wooline/react-coat-ssr-demo/issues/1)
 - **如果有错误或 Bug 欢迎批评指正，如果觉得还不错请别忘了给个 Star >\_<**
@@ -15,8 +27,6 @@ react-coat 使用**Typescript**开发，集成**Redux**，由浅入深请看 3 �
 ---
 
 ## 第三站：SPA(单页应用) + SSR(服务器渲染)
-
-# 文档整理中。。。
 
 - link 需要提前计算出 url
 - model 需要手动载入
