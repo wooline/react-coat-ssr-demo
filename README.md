@@ -1,5 +1,5 @@
 - 本 Demo 演示`单页浏览器渲染(SPA)`+`服务器渲染(SSR)`，请先了解一下：[react-coat v4.0](https://github.com/wooline/react-coat)
-- 你可能觉得本 Demo 中对路由封装过于重度，以及不喜欢使用继承的方式来组织 Model。没关系，你可以去掉这些逻辑，react-coat 框架本身并没任何要求。
+- 你可能觉得本 Demo 中对路由封装过于重度，以及不喜欢使用继承的方式来组织 Model。没关系，你可以酌情去掉这些逻辑，此处只是抛砖引玉，react-coat 框架本身并没任何要求。
 
 ---
 
@@ -12,6 +12,7 @@
 - [本工程化亮点](#本工程化亮点)
   - [脚手架完备，开箱即用](#脚手架完备开箱即用)
   - [浏览器渲染？服务器渲染？一键切换](#浏览器渲染服务器渲染一键切换)
+  - [充分利用 TS 强大的类型检查](#充分利用-ts-强大的类型检查)
 - [安装](#安装)
 - [运行](#运行)
 - [查看在线 Demo](#查看在线-demo)
@@ -44,7 +45,7 @@
 - 要么只是纸上谈兵，连象样的 Demo 都没有。
 - 要么就是一些过时的版本。
 
-所以你缺的不是 SSR 教程，而是完整的可以应用到生产环境的案例。
+所以你缺的不是 SSR 教程，而是可以应用到生产环境的完整案例。
 
 ## 单页同构 SSR
 
@@ -95,6 +96,10 @@ Ok，本工程脚手架已解决上述问题，你只需一行命令运行：
     }
   }
 ```
+
+### 充分利用 TS 强大的类型检查
+
+本 Demo 不仅利用 TS 类型来定义各种数据结构，更重要的是将 module、model、view、action、router 全面联系起来，相互约束、相互 check。
 
 ## 安装
 
@@ -323,7 +328,7 @@ render(){
 
 ```JS
 @effect(null)
-protected async [ERROR](error: CustomError) {
+protected async ["@@framework/ERROR"](error: CustomError) {
   if (error.code === "401") {
     this.dispatch(this.actions.putShowLoginPop(true));
   } else if (error.code === "404") {
