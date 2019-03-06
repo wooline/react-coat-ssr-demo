@@ -1,5 +1,5 @@
 - 本 Demo 演示`单页浏览器渲染(SPA)`+`服务器渲染(SSR)`，请先了解一下：[react-coat v4.0](https://github.com/wooline/react-coat)
-- 你可能觉得本 Demo 中对路由封装过于重度，以及不喜欢使用 Class 继承的方式来组织 Model。没关系，各喜各爱，react-coat 框架本身并没任何要求。
+- 你可能觉得本 Demo 中对路由封装过于重度，以及不喜欢使用继承的方式来组织 Model。没关系，你可以去掉这些逻辑，react-coat 框架本身并没任何要求。
 
 ---
 
@@ -26,11 +26,12 @@
   - [单向数据流](#单向数据流)
   - [两个渲染阶段](#两个渲染阶段)
   - [模块初始化的差异](#模块初始化的差异)
-  - [前置路由逻辑](#前置路由逻辑)
-  - [前置路由不等于集中配置](#前置路由不等于集中配置)
+  - [提取路由逻辑](#提取路由逻辑)
+  - [提取路由不等于集中配置](#提取路由不等于集中配置)
   - [生成静态的 Link Url](#生成静态的-link-url)
   - [错误处理](#错误处理)
   - [使用 Transfer-Encoding: chunked](#使用-transfer-encoding-chunked)
+  - [后记](#后记)
 
 <!-- /TOC -->
 
@@ -47,12 +48,12 @@
 
 ## 单页同构 SSR
 
-对于 React 的 Server-Side Rendering 也许你会说：这不已经有 next.js，还有 prerender 么？可是亲，你真的用过它们做过稍复杂一点的项目么？而我们的目标要更进一步，不仅要 SSR，还要有 Sinle Page（单页）的用户体验，和 isomorphic（同构）的工程化方案，所以我们给自已提 8 个要求：
+对于 React 的 Server-Side Rendering 也许你会说：这不已经有 next.js，还有 prerender 么？可是亲，你真的用过它们做过稍复杂一点的项目么？而我们的目标要更进一步，不仅要 SSR，还要有 Single Page（单页）的用户体验，和 isomorphic（同构）的工程化方案，所以我们给自已提 8 个要求：
 
 1. 浏览器与服务器复用同一套代码与路由。
 2. 编译出来的代码要便于部署，不要太多依赖。
 3. 浏览器载入的首屏由服务器渲染完成，以提高加载速度和利于 SEO。
-4. 首屏由服务器渲染完成后，浏览器不再做重复的渲染工作（包括不再重复的请求数据）。
+4. 浏览器不再重复做服务器已完成的渲染工作（包括不再重复的请求数据）。
 5. 首屏后不再整体刷新，而是通过 ajax 局部更新，带来单页的用户体验。
 6. 在交互过程中，随时刷新页面，可以通过 URL 重现当前内容（包括打开弹窗等动作）。
 7. 所有的路由跳转 link 回归到原始的\<a href="..."\>，方便让搜索引擎爬取。
@@ -166,7 +167,7 @@ React-coat 支持服务器和浏览器同构，所以你可以暂时忘掉你是
 我们生成了`/build/server/main.js`这个服务器端运行文件，它包含了应用的服务器渲染逻辑，你只需要将它 copy 到你的 web server 框架中执行，比如 express 为例：
 
 ```JS
-const mainModule = require("./server/main.js");
+const mainModule = require("./server/main.js");// build生成的 main.js
 const app = express();
 
 app.use((req, res, next)=>{
@@ -238,9 +239,9 @@ if (typeof rootRouter === "string") {
 
 我们知道，在 React-coat 框架的 model 中，每个模块的初始化都会派发 moduleName/INIT 这个 action，我们可以 handle 这个 action，去做一些请求数据和初始化的工作。
 
-所以我们规定，在 SSR 时 Model 只执行完主模块 INIT 的 actionHandler 后就要出生。换个说法，主模块 INIT 的 actionHandler 就是娘胎，想要在服务器运行的逻辑，都得写在这个 actionHandler 中。
+因此我们规定，在 SSR 时 Model 只执行完主模块 INITActionHandler 后就要出生。换个说法，主模块 INITActionHandler 就是娘胎，想要在服务器运行的逻辑，都得写在这个 actionHandler 中。
 
-- 所以：改装成 SSR 的主要工作就是写好 Model 的 INIT ActionHandler:
+- 所以：改装成 SSR 的重要工作就是写好 Model 的 INITActionHandler:
 
 ```JS
 @effect()
@@ -251,9 +252,9 @@ protected async [ModuleNames.app + "/INIT"]() {
 
 ### 模块初始化的差异
 
-上面说道 SSR 时只执行主模块的 INIT ActionHandler，那其它模块的初始化怎么办？毕竟应用不可能就一个主模块吧？
+上面说道 SSR 时只执行主模块的 INITActionHandler，那其它模块的初始化怎么办？毕竟应用不可能就一个主模块吧？
 
-我们在做 SPA 单页时，render 一个 View 时，框架会自动导入并初始化它的 Model，这样省时省力。但是在 SSR 时，我们上面强调过**单向数据流**，所有 model 都必须在 view render 之前准备好，所以不能依赖 view render 时自动导入了。
+我们在做 SPA 单页时，render 一个 View 时，框架会自动导入并初始化它的 Model，这样省时省力。但是在 SSR 时，我们上面强调过**单向数据流**，所有 model 都必须在 view render 之前准备好，所以不能依赖 view 来自动导入了。
 
 - 所以在 SSR 时，如果一个 Model 的初始化需要另一个 Model 参与，需要手动 loadModel。例如：
 
@@ -269,7 +270,7 @@ protected async [ModuleNames.app + "/INIT"]() {
 
 ```
 
-### 前置路由逻辑
+### 提取路由逻辑
 
 从上面初始化差异看出，因为 SSR 需要**单向数据流**，所有 model 都必须在 view render 之前准备好。而某些 model 的初始化逻辑又依赖于路由的逻辑。而我们在单页 SPA 时往往把路由逻辑分散写在各个 Component 中，因为`路由皆组件`嘛，所以...
 
@@ -278,7 +279,7 @@ protected async [ModuleNames.app + "/INIT"]() {
 
 当然，如果你事先知道你是要做 SSR，一开始就可以直接放到 model 中。
 
-### 前置路由不等于集中配置
+### 提取路由不等于集中配置
 
 我们刚说把一部分路由逻辑从 view 回收到 model 中执行，但并不等于集中配置路由。路由逻辑依然是分散在各个 model 中，依然是对外封装的，父模块只与子模块打交道，而不会参与子模块内部路由逻辑。这样非常有利于解耦和模块化。
 
@@ -336,13 +337,13 @@ protected async [ERROR](error: CustomError) {
 }
 ```
 
-在服务器渲染中，这个 ErrorActionHandler 依然有效，因为 SSR 中的单向数据流，model 是必须在 view 之前运行完成的，所以它只能 handle model 运行中的 error，而 model 之后 render view 过程中的 error 此处是 handle 不到的。如果你需要在服务器中 handle render view 过程中的 error，你需要在应用之上层 try catch，比如在 express 中。
+在服务器渲染中，这个 ErrorActionHandler 依然有效，但因为单向数据流，model 必须在 view 之前完成的，所以它只能 handle model 运行中的 error，而之后 render view 过程中的 error 此处是 handle 不到的，如果你需要 handle，请在应用之上层 try catch，比如在 express 中。
 
 ### 使用 Transfer-Encoding: chunked
 
 使用 SSR，意味着首屏你看到的是需要先经过服务器运算后返回的，为了减少白屏等待时间你可以使用 Http 的 Transfer-Encoding: chunked，先让服务器返回一个静态的 Loading 页面，然后再开始服务器渲染。
 
-但是这样一来，如果后面服务器运算出需要 Redirect 重定向，而此时你的 Http 头已经输出了，不能再利用 301 跳转，所以你只能继续输出一段 JS 来让浏览器执行跳转，例如：
+但是这样一来，如果后服务器运算出需要 Redirect 重定向，而此时你的 Http 头已经输出了，不能再利用 301 跳转，所以你只能继续输出一段 JS 来让浏览器执行跳转，例如：
 
 ```JS
 if (err.code === "301" || err.code === "302") {
@@ -357,3 +358,7 @@ if (err.code === "301" || err.code === "302") {
     }
 }
 ```
+
+### 后记
+
+以上罗列出个人觉得比较重要的点，其它还有很多实用的技巧可以直接看 Demo，里面有注释，如果有什么问题也可以直接留言或加 QQ 群 929696953
