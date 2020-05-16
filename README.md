@@ -1,5 +1,6 @@
-- 本 Demo 演示`单页浏览器渲染(SPA)`+`服务器渲染(SSR)`，请先了解一下：[react-coat v4.0](https://github.com/wooline/react-coat)
-- 你可能觉得本 Demo 中对路由封装过于重度，以及不喜欢使用继承的方式来组织 Model。没关系，你可以酌情去掉这些逻辑，此处只是抛砖引玉，react-coat 框架本身并没任何要求。
+# 最新更新：有了更好的升级替代方案，请看
+
+[**medux-react-ssr**](https://github.com/wooline/medux-react-ssr)
 
 ---
 
